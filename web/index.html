@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>볼트 검사 - 환경 테스트</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 24px auto; padding: 0 16px; }
+    button { font-size: 18px; padding: 14px 18px; margin: 6px 0; width: 100%; border-radius: 10px; border: 1px solid #888; }
+    #log { white-space: pre-wrap; background: #f3f3f3; padding: 12px; border-radius: 8px; font-size: 14px; }
+    video { width: 100%; border-radius: 8px; background: #000; }
+  </style>
+</head>
+<body>
+  <h2>환경 테스트 (스키마 v1.0)</h2>
+  <p>아래 버튼을 위에서부터 차례대로 눌러 보세요. 결과가 맨 아래 칸에 나옵니다.</p>
+  <button id="btnSave">1. 가짜 검사 1건 저장 (Firestore)</button>
+  <button id="btnCam">2. 카메라 켜기</button>
+  <button id="btnBle">3. ESP32 블루투스 연결 (5단계 후)</button>
+  <video id="cam" playsinline autoplay muted hidden></video>
+  <div id="log">대기 중...</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeFirestore, persistentLocalCache, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { firebaseConfig } from "./firebase-config.js";
+    import { newBoltRecord, tappingFromBle } from "./schema.js";
+
+    const log = (m) => (document.getElementById("log").textContent = m + "\n" + document.getElementById("log").textContent);
+    const app = initializeApp(firebaseConfig);
+    // 오프라인 저장: 통신이 끊겨도 기기에 저장해 두었다가 연결되면 자동 업로드
+    const db = initializeFirestore(app, { localCache: persistentLocalCache() });
+    log("Firebase 연결 준비 완료. 온라인 상태: " + navigator.onLine);
+
+    document.getElementById("btnSave").onclick = () => {
+      const rec = newBoltRecord({
+        flangeId: "FL999", boltId: "B01", inspector: "테스트", deviceId: "TAB-TEST",
+        vision: { protrusion_mm: 5.0, thread_count: 2, confidence: 0.9, crop_jpg_b64: null, result: "OK" },
+      });
+      rec.app_version = "0.1";
+      // await 하지 않음: 오프라인이면 여기서 멈추지 않고 나중에 자동 업로드됨
+      setDoc(doc(db, "inspections", rec.record_id), rec)
+        .then(() => log("서버 저장 완료: " + rec.record_id))
+        .catch((e) => log("저장 실패: " + e.message));
+      log("기기에 저장함(서버 전송 대기): " + rec.record_id);
+    };
+
+    document.getElementById("btnCam").onclick = async () => {
+      try {
+        const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        const v = document.getElementById("cam"); v.srcObject = s; v.hidden = false;
+        log("카메라 OK");
+      } catch (e) { log("카메라 실패: " + e.message + " (HTTPS 주소인지 확인)"); }
+    };
+
+    // ESP32 쪽 tap_v1.ino 와 같은 UUID
+    const SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    const CHAR_UUID    = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+    document.getElementById("btnBle").onclick = async () => {
+      try {
+        if (!navigator.bluetooth) throw new Error("이 브라우저는 Web Bluetooth 미지원 (Android 크롬 사용)");
+        const dev = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: "TAP-" }], optionalServices: [SERVICE_UUID] });
+        const ch = await (await (await dev.gatt.connect()).getPrimaryService(SERVICE_UUID)).getCharacteristic(CHAR_UUID);
+        await ch.startNotifications();
+        // ESP32가 20바이트씩 나눠 보내므로 줄바꿈(\n)이 올 때까지 이어 붙임
+        let pending = "";
+        ch.addEventListener("characteristicvaluechanged", (e) => {
+          pending += new TextDecoder().decode(e.target.value);
+          let i;
+          while ((i = pending.indexOf("\n")) >= 0) {
+            const line = pending.slice(0, i).trim();
+            pending = pending.slice(i + 1);
+            if (!line) continue;
+            try { log("타음 수신: " + JSON.stringify(tappingFromBle(JSON.parse(line)))); }
+            catch (err) { log("BLE 메시지 해석 실패: " + line); }
+          }
+        });
+        log("BLE 연결 OK: " + dev.name);
+      } catch (e) { log("BLE 실패: " + e.message); }
+    };
+  </script>
+</body>
+</html>

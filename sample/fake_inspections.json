@@ -1,0 +1,5810 @@
+[
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B01-20261006131341",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:13:41+09:00",
+    "vision": {
+      "protrusion_mm": 5.8,
+      "thread_count": 2,
+      "confidence": 0.98,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3232.7,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3232.7,
+          "mag": 0.847,
+          "energy_pct": 70.2
+        },
+        "acc": {
+          "peak_hz": 420.4,
+          "mag": 0.668,
+          "energy_pct": 72.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B02-20261006131411",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B02",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:14:11+09:00",
+    "vision": {
+      "protrusion_mm": 5.2,
+      "thread_count": 2,
+      "confidence": 0.86,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3371.9,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3371.9,
+          "mag": 0.678,
+          "energy_pct": 58.7
+        },
+        "acc": {
+          "peak_hz": 449.2,
+          "mag": 0.616,
+          "energy_pct": 56.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B03-20261006131435",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:14:35+09:00",
+    "vision": {
+      "protrusion_mm": 7.1,
+      "thread_count": 3,
+      "confidence": 0.95,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3175.9,
+      "decay_ms": null,
+      "score": 1,
+      "model": "range",
+      "result": "CHECK",
+      "features": {
+        "mic": {
+          "peak_hz": 3175.9,
+          "mag": 0.783,
+          "energy_pct": 70.3
+        },
+        "acc": {
+          "peak_hz": 435.8,
+          "mag": 0.715,
+          "energy_pct": 70.4
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "CHECK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B04-20261006131517",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:15:17+09:00",
+    "vision": {
+      "protrusion_mm": 7.1,
+      "thread_count": 3,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3123.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3123.9,
+          "mag": 0.799,
+          "energy_pct": 68.6
+        },
+        "acc": {
+          "peak_hz": 411.9,
+          "mag": 0.713,
+          "energy_pct": 69.7
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-GAP-20261006131717",
+    "type": "GAP",
+    "flange_id": "FL001",
+    "bolt_id": "GAP",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:17:17+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.27,
+        2.02,
+        2.28,
+        2.26
+      ],
+      "gap_diff_mm": 0.26,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B01-20261009124838",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T12:48:38+09:00",
+    "vision": {
+      "protrusion_mm": 8.5,
+      "thread_count": 3,
+      "confidence": 0.83,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3272.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3272.3,
+          "mag": 0.827,
+          "energy_pct": 71.2
+        },
+        "acc": {
+          "peak_hz": 416.7,
+          "mag": 0.723,
+          "energy_pct": 71.7
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B02-20261009124908",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B02",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T12:49:08+09:00",
+    "vision": {
+      "protrusion_mm": 6.7,
+      "thread_count": 3,
+      "confidence": 0.8,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3174.7,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3174.7,
+          "mag": 0.792,
+          "energy_pct": 66.4
+        },
+        "acc": {
+          "peak_hz": 409.9,
+          "mag": 0.73,
+          "energy_pct": 71.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B03-20261009124943",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B03",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T12:49:43+09:00",
+    "vision": {
+      "protrusion_mm": 8.6,
+      "thread_count": 3,
+      "confidence": 0.86,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3214.1,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3214.1,
+          "mag": 0.825,
+          "energy_pct": 65.5
+        },
+        "acc": {
+          "peak_hz": 414.5,
+          "mag": 0.714,
+          "energy_pct": 72.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B04-20261009125038",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B04",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T12:50:38+09:00",
+    "vision": {
+      "protrusion_mm": 5.1,
+      "thread_count": 2,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3175.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3175.5,
+          "mag": 0.826,
+          "energy_pct": 69.4
+        },
+        "acc": {
+          "peak_hz": 411.5,
+          "mag": 0.687,
+          "energy_pct": 73.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-GAP-20261009125238",
+    "type": "GAP",
+    "flange_id": "FL001",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T12:52:38+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.14,
+        2.35,
+        2.38,
+        2.06
+      ],
+      "gap_diff_mm": 0.32,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B01-20261012101734",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:17:34+09:00",
+    "vision": {
+      "protrusion_mm": 4.6,
+      "thread_count": 2,
+      "confidence": 0.94,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3230.1,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3230.1,
+          "mag": 0.753,
+          "energy_pct": 71.7
+        },
+        "acc": {
+          "peak_hz": 424.2,
+          "mag": 0.744,
+          "energy_pct": 71.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B02-20261012101754",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B02",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:17:54+09:00",
+    "vision": {
+      "protrusion_mm": 6.9,
+      "thread_count": 3,
+      "confidence": 0.89,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3180.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3180.8,
+          "mag": 0.772,
+          "energy_pct": 74.1
+        },
+        "acc": {
+          "peak_hz": 418.8,
+          "mag": 0.75,
+          "energy_pct": 70.7
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B03-20261012101846",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:18:46+09:00",
+    "vision": {
+      "protrusion_mm": 7.4,
+      "thread_count": 3,
+      "confidence": 0.92,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3210.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3210.6,
+          "mag": 0.758,
+          "energy_pct": 68.2
+        },
+        "acc": {
+          "peak_hz": 426.9,
+          "mag": 0.679,
+          "energy_pct": 74.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-B04-20261012101941",
+    "type": "BOLT",
+    "flange_id": "FL001",
+    "bolt_id": "B04",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:19:41+09:00",
+    "vision": {
+      "protrusion_mm": 6.3,
+      "thread_count": 3,
+      "confidence": 0.77,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3221.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3221.9,
+          "mag": 0.774,
+          "energy_pct": 68.0
+        },
+        "acc": {
+          "peak_hz": 416.8,
+          "mag": 0.709,
+          "energy_pct": 70.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL001-GAP-20261012102141",
+    "type": "GAP",
+    "flange_id": "FL001",
+    "bolt_id": "GAP",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:21:41+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.39,
+        2.84,
+        2.24,
+        2.04
+      ],
+      "gap_diff_mm": 0.8,
+      "result": "CHECK"
+    },
+    "tapping": null,
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B01-20261006101754",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B01",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:17:54+09:00",
+    "vision": {
+      "protrusion_mm": 1.4,
+      "thread_count": 1,
+      "confidence": 0.76,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3146.2,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3146.2,
+          "mag": 0.792,
+          "energy_pct": 66.9
+        },
+        "acc": {
+          "peak_hz": 411.0,
+          "mag": 0.709,
+          "energy_pct": 73.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B02-20261006101854",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B02",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:18:54+09:00",
+    "vision": {
+      "protrusion_mm": 4.9,
+      "thread_count": 2,
+      "confidence": 0.83,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3100.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3100.6,
+          "mag": 0.8,
+          "energy_pct": 67.7
+        },
+        "acc": {
+          "peak_hz": 413.2,
+          "mag": 0.731,
+          "energy_pct": 71.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B03-20261006101943",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:19:43+09:00",
+    "vision": {
+      "protrusion_mm": 4.7,
+      "thread_count": 2,
+      "confidence": 0.78,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3297.4,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3297.4,
+          "mag": 0.781,
+          "energy_pct": 69.8
+        },
+        "acc": {
+          "peak_hz": 418.4,
+          "mag": 0.691,
+          "energy_pct": 73.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B04-20261006102019",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B04",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:20:19+09:00",
+    "vision": {
+      "protrusion_mm": 6.1,
+      "thread_count": 3,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3189.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3189.9,
+          "mag": 0.815,
+          "energy_pct": 68.9
+        },
+        "acc": {
+          "peak_hz": 412.4,
+          "mag": 0.707,
+          "energy_pct": 72.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-GAP-20261006102219",
+    "type": "GAP",
+    "flange_id": "FL002",
+    "bolt_id": "GAP",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:22:19+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.28,
+        2.37,
+        2.3,
+        2.12
+      ],
+      "gap_diff_mm": 0.25,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B01-20261009094636",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B01",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:46:36+09:00",
+    "vision": {
+      "protrusion_mm": 6.9,
+      "thread_count": 3,
+      "confidence": 0.83,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3262.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3262.3,
+          "mag": 0.777,
+          "energy_pct": 68.9
+        },
+        "acc": {
+          "peak_hz": 407.9,
+          "mag": 0.726,
+          "energy_pct": 69.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B02-20261009094728",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B02",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:47:28+09:00",
+    "vision": {
+      "protrusion_mm": 4.4,
+      "thread_count": 2,
+      "confidence": 0.94,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3082.6,
+      "decay_ms": null,
+      "score": 1,
+      "model": "range",
+      "result": "CHECK",
+      "features": {
+        "mic": {
+          "peak_hz": 3082.6,
+          "mag": 0.799,
+          "energy_pct": 71.2
+        },
+        "acc": {
+          "peak_hz": 409.3,
+          "mag": 0.683,
+          "energy_pct": 70.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "CHECK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B03-20261009094803",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B03",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:48:03+09:00",
+    "vision": {
+      "protrusion_mm": 6.3,
+      "thread_count": 3,
+      "confidence": 0.8,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3126.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3126.6,
+          "mag": 0.809,
+          "energy_pct": 67.4
+        },
+        "acc": {
+          "peak_hz": 414.9,
+          "mag": 0.725,
+          "energy_pct": 70.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B04-20261009094824",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B04",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:48:24+09:00",
+    "vision": {
+      "protrusion_mm": 6.4,
+      "thread_count": 3,
+      "confidence": 0.86,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3228.1,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3228.1,
+          "mag": 0.776,
+          "energy_pct": 66.6
+        },
+        "acc": {
+          "peak_hz": 407.2,
+          "mag": 0.757,
+          "energy_pct": 71.4
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-GAP-20261009095024",
+    "type": "GAP",
+    "flange_id": "FL002",
+    "bolt_id": "GAP",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:50:24+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.18,
+        2.37,
+        2.4,
+        2.38
+      ],
+      "gap_diff_mm": 0.22,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B01-20261012094134",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B01",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:41:34+09:00",
+    "vision": {
+      "protrusion_mm": 1.7,
+      "thread_count": 1,
+      "confidence": 0.83,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3842.0,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3842.0,
+          "mag": 0.529,
+          "energy_pct": 43.5
+        },
+        "acc": {
+          "peak_hz": 335.6,
+          "mag": 0.527,
+          "energy_pct": 43.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B02-20261012094154",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B02",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:41:54+09:00",
+    "vision": {
+      "protrusion_mm": 6.0,
+      "thread_count": 3,
+      "confidence": 0.93,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3098.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3098.8,
+          "mag": 0.775,
+          "energy_pct": 66.3
+        },
+        "acc": {
+          "peak_hz": 425.2,
+          "mag": 0.731,
+          "energy_pct": 70.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B03-20261012094221",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B03",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:42:21+09:00",
+    "vision": {
+      "protrusion_mm": 6.4,
+      "thread_count": 3,
+      "confidence": 0.92,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3109.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3109.6,
+          "mag": 0.791,
+          "energy_pct": 71.8
+        },
+        "acc": {
+          "peak_hz": 400.3,
+          "mag": 0.723,
+          "energy_pct": 69.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-B04-20261012094308",
+    "type": "BOLT",
+    "flange_id": "FL002",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:43:08+09:00",
+    "vision": {
+      "protrusion_mm": 4.8,
+      "thread_count": 2,
+      "confidence": 0.93,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3267.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3267.6,
+          "mag": 0.773,
+          "energy_pct": 68.4
+        },
+        "acc": {
+          "peak_hz": 409.5,
+          "mag": 0.686,
+          "energy_pct": 74.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL002-GAP-20261012094508",
+    "type": "GAP",
+    "flange_id": "FL002",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:45:08+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.3,
+        2.03,
+        2.06,
+        2.4
+      ],
+      "gap_diff_mm": 0.37,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B01-20261006101757",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:17:57+09:00",
+    "vision": {
+      "protrusion_mm": 6.5,
+      "thread_count": 3,
+      "confidence": 0.78,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3253.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3253.3,
+          "mag": 0.79,
+          "energy_pct": 67.3
+        },
+        "acc": {
+          "peak_hz": 406.7,
+          "mag": 0.7,
+          "energy_pct": 71.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B02-20261006101839",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B02",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:18:39+09:00",
+    "vision": {
+      "protrusion_mm": 5.6,
+      "thread_count": 3,
+      "confidence": 0.75,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3194.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3194.5,
+          "mag": 0.798,
+          "energy_pct": 66.8
+        },
+        "acc": {
+          "peak_hz": 419.5,
+          "mag": 0.709,
+          "energy_pct": 74.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B03-20261006101905",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B03",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:19:05+09:00",
+    "vision": {
+      "protrusion_mm": 7.0,
+      "thread_count": 4,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3321.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3321.3,
+          "mag": 0.797,
+          "energy_pct": 67.5
+        },
+        "acc": {
+          "peak_hz": 419.5,
+          "mag": 0.695,
+          "energy_pct": 70.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B04-20261006101926",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:19:26+09:00",
+    "vision": {
+      "protrusion_mm": 4.7,
+      "thread_count": 2,
+      "confidence": 0.81,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3196.2,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3196.2,
+          "mag": 0.774,
+          "energy_pct": 70.2
+        },
+        "acc": {
+          "peak_hz": 419.3,
+          "mag": 0.716,
+          "energy_pct": 71.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-GAP-20261006102126",
+    "type": "GAP",
+    "flange_id": "FL003",
+    "bolt_id": "GAP",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:21:26+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.33,
+        2.02,
+        2.3,
+        2.36
+      ],
+      "gap_diff_mm": 0.34,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B01-20261009135853",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B01",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T13:58:53+09:00",
+    "vision": {
+      "protrusion_mm": 6.9,
+      "thread_count": 3,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3152.7,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3152.7,
+          "mag": 0.776,
+          "energy_pct": 68.5
+        },
+        "acc": {
+          "peak_hz": 416.2,
+          "mag": 0.716,
+          "energy_pct": 72.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B02-20261009135945",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B02",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T13:59:45+09:00",
+    "vision": {
+      "protrusion_mm": 1.6,
+      "thread_count": 1,
+      "confidence": 0.79,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3697.4,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3697.4,
+          "mag": 0.532,
+          "energy_pct": 39.0
+        },
+        "acc": {
+          "peak_hz": 327.6,
+          "mag": 0.461,
+          "energy_pct": 40.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B03-20261009140016",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:00:16+09:00",
+    "vision": {
+      "protrusion_mm": 5.8,
+      "thread_count": 3,
+      "confidence": 0.78,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3205.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3205.9,
+          "mag": 0.804,
+          "energy_pct": 68.7
+        },
+        "acc": {
+          "peak_hz": 417.0,
+          "mag": 0.701,
+          "energy_pct": 70.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B04-20261009140109",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B04",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:01:09+09:00",
+    "vision": {
+      "protrusion_mm": 5.3,
+      "thread_count": 3,
+      "confidence": 0.93,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3182.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3182.5,
+          "mag": 0.786,
+          "energy_pct": 69.2
+        },
+        "acc": {
+          "peak_hz": 411.6,
+          "mag": 0.716,
+          "energy_pct": 72.3
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-GAP-20261009140309",
+    "type": "GAP",
+    "flange_id": "FL003",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:03:09+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.11,
+        2.31,
+        2.2,
+        2.22
+      ],
+      "gap_diff_mm": 0.2,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B01-20261012124640",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T12:46:40+09:00",
+    "vision": {
+      "protrusion_mm": 5.4,
+      "thread_count": 3,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3190.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3190.8,
+          "mag": 0.789,
+          "energy_pct": 70.1
+        },
+        "acc": {
+          "peak_hz": 408.3,
+          "mag": 0.722,
+          "energy_pct": 72.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B02-20261012124732",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B02",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T12:47:32+09:00",
+    "vision": {
+      "protrusion_mm": 5.3,
+      "thread_count": 3,
+      "confidence": 0.97,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3218.4,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3218.4,
+          "mag": 0.81,
+          "energy_pct": 67.7
+        },
+        "acc": {
+          "peak_hz": 418.2,
+          "mag": 0.726,
+          "energy_pct": 72.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B03-20261012124827",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B03",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T12:48:27+09:00",
+    "vision": {
+      "protrusion_mm": 4.3,
+      "thread_count": 2,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3213.4,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3213.4,
+          "mag": 0.762,
+          "energy_pct": 70.1
+        },
+        "acc": {
+          "peak_hz": 428.2,
+          "mag": 0.735,
+          "energy_pct": 72.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-B04-20261012124915",
+    "type": "BOLT",
+    "flange_id": "FL003",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T12:49:15+09:00",
+    "vision": {
+      "protrusion_mm": 6.0,
+      "thread_count": 3,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3098.8,
+      "decay_ms": null,
+      "score": 1,
+      "model": "range",
+      "result": "CHECK",
+      "features": {
+        "mic": {
+          "peak_hz": 3098.8,
+          "mag": 0.824,
+          "energy_pct": 68.7
+        },
+        "acc": {
+          "peak_hz": 402.3,
+          "mag": 0.719,
+          "energy_pct": 69.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "CHECK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL003-GAP-20261012125115",
+    "type": "GAP",
+    "flange_id": "FL003",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T12:51:15+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.36,
+        2.06,
+        2.29,
+        2.26
+      ],
+      "gap_diff_mm": 0.3,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B01-20261006110928",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T11:09:28+09:00",
+    "vision": {
+      "protrusion_mm": 4.4,
+      "thread_count": 2,
+      "confidence": 0.97,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3115.7,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3115.7,
+          "mag": 0.784,
+          "energy_pct": 71.5
+        },
+        "acc": {
+          "peak_hz": 417.4,
+          "mag": 0.717,
+          "energy_pct": 75.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B02-20261006110958",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B02",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T11:09:58+09:00",
+    "vision": {
+      "protrusion_mm": 6.6,
+      "thread_count": 3,
+      "confidence": 0.79,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3303.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3303.6,
+          "mag": 0.797,
+          "energy_pct": 68.5
+        },
+        "acc": {
+          "peak_hz": 411.2,
+          "mag": 0.693,
+          "energy_pct": 72.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B03-20261006111043",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B03",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T11:10:43+09:00",
+    "vision": {
+      "protrusion_mm": 4.3,
+      "thread_count": 2,
+      "confidence": 0.82,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3225.7,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3225.7,
+          "mag": 0.803,
+          "energy_pct": 71.0
+        },
+        "acc": {
+          "peak_hz": 414.6,
+          "mag": 0.709,
+          "energy_pct": 73.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B04-20261006111124",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B04",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T11:11:24+09:00",
+    "vision": {
+      "protrusion_mm": 5.2,
+      "thread_count": 3,
+      "confidence": 0.75,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3238.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3238.0,
+          "mag": 0.827,
+          "energy_pct": 69.8
+        },
+        "acc": {
+          "peak_hz": 417.8,
+          "mag": 0.719,
+          "energy_pct": 70.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-GAP-20261006111324",
+    "type": "GAP",
+    "flange_id": "FL004",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T11:13:24+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.38,
+        2.05,
+        2.37,
+        2.09
+      ],
+      "gap_diff_mm": 0.33,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B01-20261009094336",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:43:36+09:00",
+    "vision": {
+      "protrusion_mm": 6.9,
+      "thread_count": 3,
+      "confidence": 0.79,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3093.4,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3093.4,
+          "mag": 0.815,
+          "energy_pct": 68.9
+        },
+        "acc": {
+          "peak_hz": 422.2,
+          "mag": 0.668,
+          "energy_pct": 71.3
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B02-20261009094412",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B02",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:44:12+09:00",
+    "vision": {
+      "protrusion_mm": 5.5,
+      "thread_count": 3,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3161.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3161.0,
+          "mag": 0.778,
+          "energy_pct": 64.5
+        },
+        "acc": {
+          "peak_hz": 417.7,
+          "mag": 0.732,
+          "energy_pct": 72.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B03-20261009094437",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B03",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:44:37+09:00",
+    "vision": {
+      "protrusion_mm": 6.5,
+      "thread_count": 3,
+      "confidence": 0.79,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3160.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3160.9,
+          "mag": 0.8,
+          "energy_pct": 70.5
+        },
+        "acc": {
+          "peak_hz": 400.7,
+          "mag": 0.707,
+          "energy_pct": 73.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B04-20261009094458",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B04",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:44:58+09:00",
+    "vision": {
+      "protrusion_mm": 6.5,
+      "thread_count": 3,
+      "confidence": 0.77,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3244.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3244.3,
+          "mag": 0.843,
+          "energy_pct": 71.3
+        },
+        "acc": {
+          "peak_hz": 422.2,
+          "mag": 0.718,
+          "energy_pct": 73.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-GAP-20261009094658",
+    "type": "GAP",
+    "flange_id": "FL004",
+    "bolt_id": "GAP",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:46:58+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.05,
+        2.0,
+        2.4,
+        2.17
+      ],
+      "gap_diff_mm": 0.4,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B01-20261012141828",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B01",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T14:18:28+09:00",
+    "vision": {
+      "protrusion_mm": 2.3,
+      "thread_count": 1,
+      "confidence": 0.97,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3164.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3164.9,
+          "mag": 0.799,
+          "energy_pct": 70.8
+        },
+        "acc": {
+          "peak_hz": 433.7,
+          "mag": 0.706,
+          "energy_pct": 71.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B02-20261012141900",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B02",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T14:19:00+09:00",
+    "vision": {
+      "protrusion_mm": 5.9,
+      "thread_count": 3,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3212.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3212.9,
+          "mag": 0.834,
+          "energy_pct": 68.9
+        },
+        "acc": {
+          "peak_hz": 430.3,
+          "mag": 0.686,
+          "energy_pct": 71.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B03-20261012141952",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B03",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T14:19:52+09:00",
+    "vision": {
+      "protrusion_mm": 4.6,
+      "thread_count": 2,
+      "confidence": 0.93,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3187.1,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3187.1,
+          "mag": 0.82,
+          "energy_pct": 71.1
+        },
+        "acc": {
+          "peak_hz": 409.4,
+          "mag": 0.687,
+          "energy_pct": 72.7
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-B04-20261012142012",
+    "type": "BOLT",
+    "flange_id": "FL004",
+    "bolt_id": "B04",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T14:20:12+09:00",
+    "vision": {
+      "protrusion_mm": 1.8,
+      "thread_count": 1,
+      "confidence": 0.97,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3760.7,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3760.7,
+          "mag": 0.484,
+          "energy_pct": 46.1
+        },
+        "acc": {
+          "peak_hz": 340.9,
+          "mag": 0.485,
+          "energy_pct": 45.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL004-GAP-20261012142212",
+    "type": "GAP",
+    "flange_id": "FL004",
+    "bolt_id": "GAP",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T14:22:12+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.04,
+        2.33,
+        2.17,
+        2.2
+      ],
+      "gap_diff_mm": 0.29,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B01-20261006131939",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B01",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:19:39+09:00",
+    "vision": {
+      "protrusion_mm": 10.7,
+      "thread_count": 4,
+      "confidence": 0.83,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3266.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3266.9,
+          "mag": 0.794,
+          "energy_pct": 71.2
+        },
+        "acc": {
+          "peak_hz": 413.6,
+          "mag": 0.689,
+          "energy_pct": 72.4
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B02-20261006132039",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B02",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:20:39+09:00",
+    "vision": {
+      "protrusion_mm": 10.7,
+      "thread_count": 4,
+      "confidence": 0.98,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3154.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3154.3,
+          "mag": 0.817,
+          "energy_pct": 69.5
+        },
+        "acc": {
+          "peak_hz": 413.5,
+          "mag": 0.712,
+          "energy_pct": 71.3
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B03-20261006132103",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:21:03+09:00",
+    "vision": {
+      "protrusion_mm": 10.2,
+      "thread_count": 3,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3259.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3259.5,
+          "mag": 0.784,
+          "energy_pct": 68.1
+        },
+        "acc": {
+          "peak_hz": 428.5,
+          "mag": 0.766,
+          "energy_pct": 76.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B04-20261006132147",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:21:47+09:00",
+    "vision": {
+      "protrusion_mm": 9.0,
+      "thread_count": 3,
+      "confidence": 0.81,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3204.1,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3204.1,
+          "mag": 0.805,
+          "energy_pct": 72.1
+        },
+        "acc": {
+          "peak_hz": 419.1,
+          "mag": 0.686,
+          "energy_pct": 72.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B05-20261006132209",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B05",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:22:09+09:00",
+    "vision": {
+      "protrusion_mm": 6.3,
+      "thread_count": 2,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3229.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3229.3,
+          "mag": 0.779,
+          "energy_pct": 65.7
+        },
+        "acc": {
+          "peak_hz": 409.9,
+          "mag": 0.727,
+          "energy_pct": 70.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B06-20261006132304",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B06",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:23:04+09:00",
+    "vision": {
+      "protrusion_mm": 5.6,
+      "thread_count": 2,
+      "confidence": 0.95,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3190.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3190.8,
+          "mag": 0.805,
+          "energy_pct": 70.2
+        },
+        "acc": {
+          "peak_hz": 417.7,
+          "mag": 0.722,
+          "energy_pct": 70.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B07-20261006132324",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B07",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:23:24+09:00",
+    "vision": {
+      "protrusion_mm": 5.9,
+      "thread_count": 2,
+      "confidence": 0.81,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3176.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3176.5,
+          "mag": 0.774,
+          "energy_pct": 71.3
+        },
+        "acc": {
+          "peak_hz": 419.8,
+          "mag": 0.692,
+          "energy_pct": 71.3
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B08-20261006132416",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B08",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:24:16+09:00",
+    "vision": {
+      "protrusion_mm": 5.9,
+      "thread_count": 2,
+      "confidence": 0.94,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3185.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3185.6,
+          "mag": 0.818,
+          "energy_pct": 65.8
+        },
+        "acc": {
+          "peak_hz": 412.7,
+          "mag": 0.701,
+          "energy_pct": 77.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-GAP-20261006132616",
+    "type": "GAP",
+    "flange_id": "FL005",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T13:26:16+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.01,
+        2.86,
+        2.23,
+        2.21
+      ],
+      "gap_diff_mm": 0.85,
+      "result": "NG"
+    },
+    "tapping": null,
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B01-20261009143658",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B01",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:36:58+09:00",
+    "vision": {
+      "protrusion_mm": 7.2,
+      "thread_count": 2,
+      "confidence": 0.98,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3262.1,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3262.1,
+          "mag": 0.797,
+          "energy_pct": 70.4
+        },
+        "acc": {
+          "peak_hz": 434.4,
+          "mag": 0.704,
+          "energy_pct": 71.3
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B02-20261009143757",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B02",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:37:57+09:00",
+    "vision": {
+      "protrusion_mm": 5.6,
+      "thread_count": 2,
+      "confidence": 0.94,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3278.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3278.8,
+          "mag": 0.812,
+          "energy_pct": 70.3
+        },
+        "acc": {
+          "peak_hz": 416.4,
+          "mag": 0.758,
+          "energy_pct": 75.4
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B03-20261009143844",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:38:44+09:00",
+    "vision": {
+      "protrusion_mm": 9.8,
+      "thread_count": 3,
+      "confidence": 0.78,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3236.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3236.8,
+          "mag": 0.817,
+          "energy_pct": 64.9
+        },
+        "acc": {
+          "peak_hz": 424.5,
+          "mag": 0.705,
+          "energy_pct": 72.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B04-20261009143940",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B04",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:39:40+09:00",
+    "vision": {
+      "protrusion_mm": 9.7,
+      "thread_count": 3,
+      "confidence": 0.94,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3244.4,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3244.4,
+          "mag": 0.791,
+          "energy_pct": 65.6
+        },
+        "acc": {
+          "peak_hz": 422.6,
+          "mag": 0.691,
+          "energy_pct": 71.3
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B05-20261009144014",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B05",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:40:14+09:00",
+    "vision": {
+      "protrusion_mm": 0.6,
+      "thread_count": 0,
+      "confidence": 0.9,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3160.7,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3160.7,
+          "mag": 0.791,
+          "energy_pct": 64.4
+        },
+        "acc": {
+          "peak_hz": 428.5,
+          "mag": 0.716,
+          "energy_pct": 74.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B06-20261009144109",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B06",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:41:09+09:00",
+    "vision": {
+      "protrusion_mm": 0.5,
+      "thread_count": 0,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3998.2,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3998.2,
+          "mag": 0.531,
+          "energy_pct": 37.6
+        },
+        "acc": {
+          "peak_hz": 324.3,
+          "mag": 0.434,
+          "energy_pct": 45.5
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B07-20261009144129",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B07",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:41:29+09:00",
+    "vision": {
+      "protrusion_mm": 5.8,
+      "thread_count": 2,
+      "confidence": 0.96,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3205.2,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3205.2,
+          "mag": 0.75,
+          "energy_pct": 69.7
+        },
+        "acc": {
+          "peak_hz": 409.4,
+          "mag": 0.717,
+          "energy_pct": 71.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B08-20261009144222",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B08",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:42:22+09:00",
+    "vision": {
+      "protrusion_mm": 2.3,
+      "thread_count": 1,
+      "confidence": 0.81,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3791.8,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3791.8,
+          "mag": 0.528,
+          "energy_pct": 41.4
+        },
+        "acc": {
+          "peak_hz": 327.7,
+          "mag": 0.42,
+          "energy_pct": 46.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-GAP-20261009144422",
+    "type": "GAP",
+    "flange_id": "FL005",
+    "bolt_id": "GAP",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T14:44:22+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.3,
+        2.09,
+        2.26,
+        2.18
+      ],
+      "gap_diff_mm": 0.21,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B01-20261012093950",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B01",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:39:50+09:00",
+    "vision": {
+      "protrusion_mm": 7.0,
+      "thread_count": 2,
+      "confidence": 0.76,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3320.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3320.0,
+          "mag": 0.85,
+          "energy_pct": 71.6
+        },
+        "acc": {
+          "peak_hz": 424.9,
+          "mag": 0.693,
+          "energy_pct": 74.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B02-20261012094014",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B02",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:40:14+09:00",
+    "vision": {
+      "protrusion_mm": 7.2,
+      "thread_count": 2,
+      "confidence": 0.9,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3196.4,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3196.4,
+          "mag": 0.798,
+          "energy_pct": 68.4
+        },
+        "acc": {
+          "peak_hz": 420.6,
+          "mag": 0.699,
+          "energy_pct": 71.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B03-20261012094110",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B03",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:41:10+09:00",
+    "vision": {
+      "protrusion_mm": 8.0,
+      "thread_count": 3,
+      "confidence": 0.86,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3129.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3129.5,
+          "mag": 0.791,
+          "energy_pct": 73.6
+        },
+        "acc": {
+          "peak_hz": 419.5,
+          "mag": 0.704,
+          "energy_pct": 73.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B04-20261012094143",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:41:43+09:00",
+    "vision": {
+      "protrusion_mm": 7.0,
+      "thread_count": 2,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3246.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3246.0,
+          "mag": 0.772,
+          "energy_pct": 68.6
+        },
+        "acc": {
+          "peak_hz": 426.4,
+          "mag": 0.717,
+          "energy_pct": 72.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B05-20261012094210",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B05",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:42:10+09:00",
+    "vision": {
+      "protrusion_mm": 8.4,
+      "thread_count": 3,
+      "confidence": 0.82,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3301.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3301.0,
+          "mag": 0.783,
+          "energy_pct": 69.2
+        },
+        "acc": {
+          "peak_hz": 416.4,
+          "mag": 0.747,
+          "energy_pct": 68.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B06-20261012094231",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B06",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:42:31+09:00",
+    "vision": {
+      "protrusion_mm": 5.8,
+      "thread_count": 2,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3156.4,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3156.4,
+          "mag": 0.787,
+          "energy_pct": 70.3
+        },
+        "acc": {
+          "peak_hz": 424.2,
+          "mag": 0.745,
+          "energy_pct": 68.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B07-20261012094315",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B07",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:43:15+09:00",
+    "vision": {
+      "protrusion_mm": 10.5,
+      "thread_count": 4,
+      "confidence": 0.8,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3248.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3248.8,
+          "mag": 0.793,
+          "energy_pct": 67.7
+        },
+        "acc": {
+          "peak_hz": 423.8,
+          "mag": 0.687,
+          "energy_pct": 67.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-B08-20261012094408",
+    "type": "BOLT",
+    "flange_id": "FL005",
+    "bolt_id": "B08",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:44:08+09:00",
+    "vision": {
+      "protrusion_mm": 7.3,
+      "thread_count": 2,
+      "confidence": 0.89,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3175.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3175.9,
+          "mag": 0.763,
+          "energy_pct": 67.7
+        },
+        "acc": {
+          "peak_hz": 422.6,
+          "mag": 0.718,
+          "energy_pct": 75.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL005-GAP-20261012094608",
+    "type": "GAP",
+    "flange_id": "FL005",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T09:46:08+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.28,
+        2.09,
+        2.36,
+        2.19
+      ],
+      "gap_diff_mm": 0.27,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B01-20261006102120",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:21:20+09:00",
+    "vision": {
+      "protrusion_mm": 9.1,
+      "thread_count": 3,
+      "confidence": 0.84,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3187.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3187.0,
+          "mag": 0.762,
+          "energy_pct": 67.5
+        },
+        "acc": {
+          "peak_hz": 413.6,
+          "mag": 0.68,
+          "energy_pct": 72.9
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B02-20261006102202",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B02",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:22:02+09:00",
+    "vision": {
+      "protrusion_mm": 6.1,
+      "thread_count": 2,
+      "confidence": 0.83,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3158.1,
+      "decay_ms": null,
+      "score": 1,
+      "model": "range",
+      "result": "CHECK",
+      "features": {
+        "mic": {
+          "peak_hz": 3158.1,
+          "mag": 0.751,
+          "energy_pct": 70.4
+        },
+        "acc": {
+          "peak_hz": 419.2,
+          "mag": 0.719,
+          "energy_pct": 72.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": false,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "CHECK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B03-20261006102247",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B03",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:22:47+09:00",
+    "vision": {
+      "protrusion_mm": 10.4,
+      "thread_count": 3,
+      "confidence": 0.91,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3241.1,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3241.1,
+          "mag": 0.801,
+          "energy_pct": 71.5
+        },
+        "acc": {
+          "peak_hz": 423.0,
+          "mag": 0.72,
+          "energy_pct": 72.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B04-20261006102323",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:23:23+09:00",
+    "vision": {
+      "protrusion_mm": 7.5,
+      "thread_count": 2,
+      "confidence": 0.98,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3105.3,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3105.3,
+          "mag": 0.796,
+          "energy_pct": 68.5
+        },
+        "acc": {
+          "peak_hz": 421.5,
+          "mag": 0.676,
+          "energy_pct": 75.3
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B05-20261006102410",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B05",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:24:10+09:00",
+    "vision": {
+      "protrusion_mm": 10.0,
+      "thread_count": 3,
+      "confidence": 0.81,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3206.8,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3206.8,
+          "mag": 0.77,
+          "energy_pct": 65.6
+        },
+        "acc": {
+          "peak_hz": 418.0,
+          "mag": 0.708,
+          "energy_pct": 70.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B06-20261006102448",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B06",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:24:48+09:00",
+    "vision": {
+      "protrusion_mm": 6.2,
+      "thread_count": 2,
+      "confidence": 0.97,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3206.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3206.0,
+          "mag": 0.784,
+          "energy_pct": 70.1
+        },
+        "acc": {
+          "peak_hz": 414.9,
+          "mag": 0.709,
+          "energy_pct": 74.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B07-20261006102520",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B07",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:25:20+09:00",
+    "vision": {
+      "protrusion_mm": 9.6,
+      "thread_count": 3,
+      "confidence": 0.85,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3530.0,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3530.0,
+          "mag": 0.69,
+          "energy_pct": 56.1
+        },
+        "acc": {
+          "peak_hz": 440.0,
+          "mag": 0.64,
+          "energy_pct": 57.7
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B08-20261006102605",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B08",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:26:05+09:00",
+    "vision": {
+      "protrusion_mm": 10.5,
+      "thread_count": 4,
+      "confidence": 0.88,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3168.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3168.5,
+          "mag": 0.799,
+          "energy_pct": 67.0
+        },
+        "acc": {
+          "peak_hz": 413.3,
+          "mag": 0.698,
+          "energy_pct": 67.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-GAP-20261006102805",
+    "type": "GAP",
+    "flange_id": "FL006",
+    "bolt_id": "GAP",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-06T10:28:05+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.16,
+        2.25,
+        2.06,
+        2.35
+      ],
+      "gap_diff_mm": 0.29,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B01-20261009092555",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B01",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:25:55+09:00",
+    "vision": {
+      "protrusion_mm": 7.9,
+      "thread_count": 3,
+      "confidence": 0.83,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3106.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3106.0,
+          "mag": 0.79,
+          "energy_pct": 69.3
+        },
+        "acc": {
+          "peak_hz": 418.7,
+          "mag": 0.666,
+          "energy_pct": 71.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B02-20261009092631",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B02",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:26:31+09:00",
+    "vision": {
+      "protrusion_mm": 6.7,
+      "thread_count": 2,
+      "confidence": 0.86,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3251.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3251.9,
+          "mag": 0.814,
+          "energy_pct": 68.8
+        },
+        "acc": {
+          "peak_hz": 413.8,
+          "mag": 0.726,
+          "energy_pct": 70.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B03-20261009092701",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:27:01+09:00",
+    "vision": {
+      "protrusion_mm": 5.8,
+      "thread_count": 2,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3124.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3124.0,
+          "mag": 0.78,
+          "energy_pct": 71.9
+        },
+        "acc": {
+          "peak_hz": 421.5,
+          "mag": 0.739,
+          "energy_pct": 71.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B04-20261009092735",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B04",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:27:35+09:00",
+    "vision": {
+      "protrusion_mm": 7.2,
+      "thread_count": 2,
+      "confidence": 0.92,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3261.0,
+      "decay_ms": null,
+      "score": 1,
+      "model": "range",
+      "result": "CHECK",
+      "features": {
+        "mic": {
+          "peak_hz": 3261.0,
+          "mag": 0.785,
+          "energy_pct": 68.7
+        },
+        "acc": {
+          "peak_hz": 437.4,
+          "mag": 0.729,
+          "energy_pct": 71.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "CHECK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B05-20261009092807",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B05",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:28:07+09:00",
+    "vision": {
+      "protrusion_mm": 6.3,
+      "thread_count": 2,
+      "confidence": 0.88,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3194.5,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3194.5,
+          "mag": 0.808,
+          "energy_pct": 71.4
+        },
+        "acc": {
+          "peak_hz": 416.6,
+          "mag": 0.666,
+          "energy_pct": 71.4
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B06-20261009092843",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B06",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:28:43+09:00",
+    "vision": {
+      "protrusion_mm": 6.5,
+      "thread_count": 2,
+      "confidence": 0.75,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3201.0,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3201.0,
+          "mag": 0.803,
+          "energy_pct": 71.6
+        },
+        "acc": {
+          "peak_hz": 422.2,
+          "mag": 0.73,
+          "energy_pct": 69.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B07-20261009092929",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B07",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:29:29+09:00",
+    "vision": {
+      "protrusion_mm": 6.5,
+      "thread_count": 2,
+      "confidence": 0.81,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3256.4,
+      "decay_ms": null,
+      "score": 1,
+      "model": "range",
+      "result": "CHECK",
+      "features": {
+        "mic": {
+          "peak_hz": 3256.4,
+          "mag": 0.852,
+          "energy_pct": 70.5
+        },
+        "acc": {
+          "peak_hz": 421.8,
+          "mag": 0.714,
+          "energy_pct": 75.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": false,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "CHECK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B08-20261009093006",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B08",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:30:06+09:00",
+    "vision": {
+      "protrusion_mm": 7.3,
+      "thread_count": 2,
+      "confidence": 0.91,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3139.7,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3139.7,
+          "mag": 0.797,
+          "energy_pct": 69.9
+        },
+        "acc": {
+          "peak_hz": 425.2,
+          "mag": 0.699,
+          "energy_pct": 72.6
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-GAP-20261009093206",
+    "type": "GAP",
+    "flange_id": "FL006",
+    "bolt_id": "GAP",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-09T09:32:06+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.36,
+        3.14,
+        2.17,
+        2.12
+      ],
+      "gap_diff_mm": 1.02,
+      "result": "NG"
+    },
+    "tapping": null,
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B01-20261012100522",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B01",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:05:22+09:00",
+    "vision": {
+      "protrusion_mm": 9.5,
+      "thread_count": 3,
+      "confidence": 0.93,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3181.9,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3181.9,
+          "mag": 0.803,
+          "energy_pct": 68.7
+        },
+        "acc": {
+          "peak_hz": 412.0,
+          "mag": 0.709,
+          "energy_pct": 73.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B02-20261012100542",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B02",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:05:42+09:00",
+    "vision": {
+      "protrusion_mm": 2.8,
+      "thread_count": 1,
+      "confidence": 0.96,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3733.0,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3733.0,
+          "mag": 0.523,
+          "energy_pct": 45.0
+        },
+        "acc": {
+          "peak_hz": 322.2,
+          "mag": 0.475,
+          "energy_pct": 43.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B03-20261012100630",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B03",
+    "inspector": "박안전",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:06:30+09:00",
+    "vision": {
+      "protrusion_mm": 6.0,
+      "thread_count": 2,
+      "confidence": 0.79,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3273.8,
+      "decay_ms": null,
+      "score": 2,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3273.8,
+          "mag": 0.858,
+          "energy_pct": 73.0
+        },
+        "acc": {
+          "peak_hz": 418.5,
+          "mag": 0.729,
+          "energy_pct": 72.2
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B04-20261012100656",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B04",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:06:56+09:00",
+    "vision": {
+      "protrusion_mm": 9.3,
+      "thread_count": 3,
+      "confidence": 0.9,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3206.6,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3206.6,
+          "mag": 0.839,
+          "energy_pct": 66.4
+        },
+        "acc": {
+          "peak_hz": 427.4,
+          "mag": 0.709,
+          "energy_pct": 74.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "OK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B05-20261012100721",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B05",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:07:21+09:00",
+    "vision": {
+      "protrusion_mm": 5.6,
+      "thread_count": 2,
+      "confidence": 0.93,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3212.2,
+      "decay_ms": null,
+      "score": 0,
+      "model": "range",
+      "result": "OK",
+      "features": {
+        "mic": {
+          "peak_hz": 3212.2,
+          "mag": 0.783,
+          "energy_pct": 69.6
+        },
+        "acc": {
+          "peak_hz": 425.2,
+          "mag": 0.711,
+          "energy_pct": 73.0
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "OK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B06-20261012100800",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B06",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:08:00+09:00",
+    "vision": {
+      "protrusion_mm": 8.8,
+      "thread_count": 3,
+      "confidence": 0.87,
+      "crop_jpg_b64": null,
+      "result": "OK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3166.1,
+      "decay_ms": null,
+      "score": 1,
+      "model": "range",
+      "result": "CHECK",
+      "features": {
+        "mic": {
+          "peak_hz": 3166.1,
+          "mag": 0.747,
+          "energy_pct": 70.8
+        },
+        "acc": {
+          "peak_hz": 424.9,
+          "mag": 0.714,
+          "energy_pct": 72.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": true,
+          "mag": false,
+          "energy_pct": true
+        },
+        "acc": {
+          "peak_hz": true,
+          "mag": true,
+          "energy_pct": true
+        }
+      },
+      "sensor_results": {
+        "mic": "CHECK",
+        "acc": "OK"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "CHECK",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B07-20261012100826",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B07",
+    "inspector": "김현장",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:08:26+09:00",
+    "vision": {
+      "protrusion_mm": 1.8,
+      "thread_count": 1,
+      "confidence": 0.88,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3913.3,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3913.3,
+          "mag": 0.516,
+          "energy_pct": 40.9
+        },
+        "acc": {
+          "peak_hz": 332.7,
+          "mag": 0.506,
+          "energy_pct": 42.8
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-B08-20261012100924",
+    "type": "BOLT",
+    "flange_id": "FL006",
+    "bolt_id": "B08",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:09:24+09:00",
+    "vision": {
+      "protrusion_mm": 1.8,
+      "thread_count": 1,
+      "confidence": 0.98,
+      "crop_jpg_b64": null,
+      "result": "CHECK"
+    },
+    "gap": null,
+    "tapping": {
+      "peak_hz": 3927.3,
+      "decay_ms": null,
+      "score": 6,
+      "model": "range",
+      "result": "NG",
+      "features": {
+        "mic": {
+          "peak_hz": 3927.3,
+          "mag": 0.511,
+          "energy_pct": 39.7
+        },
+        "acc": {
+          "peak_hz": 350.1,
+          "mag": 0.467,
+          "energy_pct": 43.1
+        }
+      },
+      "checks": {
+        "mic": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        },
+        "acc": {
+          "peak_hz": false,
+          "mag": false,
+          "energy_pct": false
+        }
+      },
+      "sensor_results": {
+        "mic": "NG",
+        "acc": "NG"
+      },
+      "ref_source": "실측 등록 n=10 ±3.0σ"
+    },
+    "final_result": "NG",
+    "app_version": "0.1"
+  },
+  {
+    "schema_version": "1.1",
+    "record_id": "FL006-GAP-20261012101124",
+    "type": "GAP",
+    "flange_id": "FL006",
+    "bolt_id": "GAP",
+    "inspector": "이검사",
+    "device_id": "TAB-01",
+    "inspected_at": "2026-10-12T10:11:24+09:00",
+    "vision": null,
+    "gap": {
+      "gap_mm": [
+        2.35,
+        2.19,
+        2.09,
+        2.1
+      ],
+      "gap_diff_mm": 0.26,
+      "result": "OK"
+    },
+    "tapping": null,
+    "final_result": "OK",
+    "app_version": "0.1"
+  }
+]

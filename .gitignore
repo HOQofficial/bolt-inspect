@@ -1,0 +1,12 @@
+# 절대 GitHub에 올리면 안 되는 것
+key.json
+# 파이썬
+.venv/
+__pycache__/
+# 학습 원본(용량 큼) - 공유 드라이브에 둠
+data/raw/
+# 로컬 저장소(key.json 없을 때 쓰는 내 PC 데이터)
+local_db/
+# 용량 큰 파일 (모델·학습 사진은 공유 드라이브로)
+models/*.pt
+data/labels/

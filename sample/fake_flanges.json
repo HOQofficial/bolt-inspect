@@ -1,0 +1,498 @@
+[
+  {
+    "schema_version": "1.1",
+    "flange_id": "FL001",
+    "zone": "보일러실",
+    "bolt_spec": "M20",
+    "bolt_count": 4,
+    "nut_height_mm": 18.0,
+    "pitch_mm": 2.5,
+    "limits": {
+      "protrusion_mm": {
+        "min": 5.0,
+        "max": 20.0
+      },
+      "gap_mm": {
+        "min": 1.5,
+        "max": 3.5,
+        "max_diff": 0.8
+      }
+    },
+    "tap_baseline": {
+      "B01": {
+        "peak_hz": 3191,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B02": {
+        "peak_hz": 2843,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B03": {
+        "peak_hz": 3122,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B04": {
+        "peak_hz": 3019,
+        "std_hz": 40,
+        "n": 10
+      }
+    },
+    "updated_at": "2026-10-05T09:00:00+09:00",
+    "tap_ref": {
+      "mic": {
+        "peak_hz": [
+          3017.3317,
+          3315.1283
+        ],
+        "mag": [
+          0.7296,
+          0.8824
+        ],
+        "energy_pct": [
+          61.27,
+          74.85
+        ]
+      },
+      "acc": {
+        "peak_hz": [
+          401.374,
+          432.226
+        ],
+        "mag": [
+          0.6425,
+          0.7821
+        ],
+        "energy_pct": [
+          68.4289,
+          74.9711
+        ]
+      },
+      "n": 10,
+      "k_sigma": 3.0,
+      "registered_at": "2026-10-05T09:30:00+09:00"
+    }
+  },
+  {
+    "schema_version": "1.1",
+    "flange_id": "FL002",
+    "zone": "엔진룸-1층",
+    "bolt_spec": "M16",
+    "bolt_count": 4,
+    "nut_height_mm": 14.8,
+    "pitch_mm": 2.0,
+    "limits": {
+      "protrusion_mm": {
+        "min": 4.0,
+        "max": 16.0
+      },
+      "gap_mm": {
+        "min": 1.5,
+        "max": 3.5,
+        "max_diff": 0.8
+      }
+    },
+    "tap_baseline": {
+      "B01": {
+        "peak_hz": 2852,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B02": {
+        "peak_hz": 3051,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B03": {
+        "peak_hz": 2944,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B04": {
+        "peak_hz": 3131,
+        "std_hz": 40,
+        "n": 10
+      }
+    },
+    "updated_at": "2026-10-05T09:00:00+09:00",
+    "tap_ref": {
+      "mic": {
+        "peak_hz": [
+          3084.6666,
+          3301.0134
+        ],
+        "mag": [
+          0.7249,
+          0.8903
+        ],
+        "energy_pct": [
+          63.16,
+          73.92
+        ]
+      },
+      "acc": {
+        "peak_hz": [
+          397.6093,
+          436.8107
+        ],
+        "mag": [
+          0.6607,
+          0.7647
+        ],
+        "energy_pct": [
+          66.8533,
+          76.4667
+        ]
+      },
+      "n": 10,
+      "k_sigma": 3.0,
+      "registered_at": "2026-10-05T09:30:00+09:00"
+    }
+  },
+  {
+    "schema_version": "1.1",
+    "flange_id": "FL003",
+    "zone": "엔진룸-2층",
+    "bolt_spec": "M16",
+    "bolt_count": 4,
+    "nut_height_mm": 14.8,
+    "pitch_mm": 2.0,
+    "limits": {
+      "protrusion_mm": {
+        "min": 4.0,
+        "max": 16.0
+      },
+      "gap_mm": {
+        "min": 1.5,
+        "max": 3.5,
+        "max_diff": 0.8
+      }
+    },
+    "tap_baseline": {
+      "B01": {
+        "peak_hz": 3178,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B02": {
+        "peak_hz": 3150,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B03": {
+        "peak_hz": 2837,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B04": {
+        "peak_hz": 3151,
+        "std_hz": 40,
+        "n": 10
+      }
+    },
+    "updated_at": "2026-10-05T09:00:00+09:00",
+    "tap_ref": {
+      "mic": {
+        "peak_hz": [
+          2980.7437,
+          3360.8763
+        ],
+        "mag": [
+          0.726,
+          0.838
+        ],
+        "energy_pct": [
+          62.7794,
+          76.5206
+        ]
+      },
+      "acc": {
+        "peak_hz": [
+          398.9889,
+          438.4511
+        ],
+        "mag": [
+          0.64,
+          0.7574
+        ],
+        "energy_pct": [
+          69.1628,
+          75.1172
+        ]
+      },
+      "n": 10,
+      "k_sigma": 3.0,
+      "registered_at": "2026-10-05T09:30:00+09:00"
+    }
+  },
+  {
+    "schema_version": "1.1",
+    "flange_id": "FL004",
+    "zone": "엔진룸-1층",
+    "bolt_spec": "M16",
+    "bolt_count": 4,
+    "nut_height_mm": 14.8,
+    "pitch_mm": 2.0,
+    "limits": {
+      "protrusion_mm": {
+        "min": 4.0,
+        "max": 16.0
+      },
+      "gap_mm": {
+        "min": 1.5,
+        "max": 3.5,
+        "max_diff": 0.8
+      }
+    },
+    "tap_baseline": {
+      "B01": {
+        "peak_hz": 3134,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B02": {
+        "peak_hz": 2880,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B03": {
+        "peak_hz": 3051,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B04": {
+        "peak_hz": 3124,
+        "std_hz": 40,
+        "n": 10
+      }
+    },
+    "updated_at": "2026-10-05T09:00:00+09:00",
+    "tap_ref": {
+      "mic": {
+        "peak_hz": [
+          2974.9111,
+          3454.3289
+        ],
+        "mag": [
+          0.7323,
+          0.8783
+        ],
+        "energy_pct": [
+          63.0505,
+          74.0495
+        ]
+      },
+      "acc": {
+        "peak_hz": [
+          394.7639,
+          438.2361
+        ],
+        "mag": [
+          0.6554,
+          0.7646
+        ],
+        "energy_pct": [
+          66.5575,
+          77.0625
+        ]
+      },
+      "n": 10,
+      "k_sigma": 3.0,
+      "registered_at": "2026-10-05T09:30:00+09:00"
+    }
+  },
+  {
+    "schema_version": "1.1",
+    "flange_id": "FL005",
+    "zone": "엔진룸-2층",
+    "bolt_spec": "M24",
+    "bolt_count": 8,
+    "nut_height_mm": 21.5,
+    "pitch_mm": 3.0,
+    "limits": {
+      "protrusion_mm": {
+        "min": 6.0,
+        "max": 24.0
+      },
+      "gap_mm": {
+        "min": 1.5,
+        "max": 3.5,
+        "max_diff": 0.8
+      }
+    },
+    "tap_baseline": {
+      "B01": {
+        "peak_hz": 2862,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B02": {
+        "peak_hz": 3143,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B03": {
+        "peak_hz": 2913,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B04": {
+        "peak_hz": 2858,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B05": {
+        "peak_hz": 3227,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B06": {
+        "peak_hz": 3139,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B07": {
+        "peak_hz": 3171,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B08": {
+        "peak_hz": 3098,
+        "std_hz": 40,
+        "n": 10
+      }
+    },
+    "updated_at": "2026-10-05T09:00:00+09:00",
+    "tap_ref": {
+      "mic": {
+        "peak_hz": [
+          3069.6105,
+          3331.3295
+        ],
+        "mag": [
+          0.7016,
+          0.872
+        ],
+        "energy_pct": [
+          62.5044,
+          75.0756
+        ]
+      },
+      "acc": {
+        "peak_hz": [
+          398.3103,
+          444.6497
+        ],
+        "mag": [
+          0.6088,
+          0.7974
+        ],
+        "energy_pct": [
+          67.7621,
+          77.4179
+        ]
+      },
+      "n": 10,
+      "k_sigma": 3.0,
+      "registered_at": "2026-10-05T09:30:00+09:00"
+    }
+  },
+  {
+    "schema_version": "1.1",
+    "flange_id": "FL006",
+    "zone": "펌프룸",
+    "bolt_spec": "M24",
+    "bolt_count": 8,
+    "nut_height_mm": 21.5,
+    "pitch_mm": 3.0,
+    "limits": {
+      "protrusion_mm": {
+        "min": 6.0,
+        "max": 24.0
+      },
+      "gap_mm": {
+        "min": 1.5,
+        "max": 3.5,
+        "max_diff": 0.8
+      }
+    },
+    "tap_baseline": {
+      "B01": {
+        "peak_hz": 3079,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B02": {
+        "peak_hz": 3354,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B03": {
+        "peak_hz": 3017,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B04": {
+        "peak_hz": 2949,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B05": {
+        "peak_hz": 2908,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B06": {
+        "peak_hz": 3268,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B07": {
+        "peak_hz": 2849,
+        "std_hz": 40,
+        "n": 10
+      },
+      "B08": {
+        "peak_hz": 2980,
+        "std_hz": 40,
+        "n": 10
+      }
+    },
+    "updated_at": "2026-10-05T09:00:00+09:00",
+    "tap_ref": {
+      "mic": {
+        "peak_hz": [
+          3039.6014,
+          3416.5386
+        ],
+        "mag": [
+          0.7547,
+          0.8427
+        ],
+        "energy_pct": [
+          64.7666,
+          72.0134
+        ]
+      },
+      "acc": {
+        "peak_hz": [
+          399.9978,
+          437.1022
+        ],
+        "mag": [
+          0.6411,
+          0.7749
+        ],
+        "energy_pct": [
+          66.8512,
+          78.9688
+        ]
+      },
+      "n": 10,
+      "k_sigma": 3.0,
+      "registered_at": "2026-10-05T09:30:00+09:00"
+    }
+  }
+]

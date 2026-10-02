@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bolt-inspect/flange/1.1",
+  "title": "flanges/{flange_id} - 플랜지 기준정보 (스키마 v1.1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "flange_id",
+    "zone",
+    "bolt_spec",
+    "bolt_count",
+    "nut_height_mm",
+    "pitch_mm",
+    "limits",
+    "tap_baseline",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0",
+        "1.1"
+      ]
+    },
+    "flange_id": {
+      "type": "string",
+      "pattern": "^FL[0-9]{3}$",
+      "description": "예: FL023. QR에 들어가는 값"
+    },
+    "zone": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "description": "예: 엔진룸-2층"
+    },
+    "bolt_spec": {
+      "enum": [
+        "M12",
+        "M16",
+        "M20",
+        "M24",
+        "M30",
+        "M36"
+      ]
+    },
+    "bolt_count": {
+      "type": "integer",
+      "minimum": 4,
+      "maximum": 32
+    },
+    "nut_height_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "비전 배율 기준(너트 높이). 실물을 캘리퍼로 재서 입력"
+    },
+    "pitch_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protrusion_mm",
+        "gap_mm"
+      ],
+      "properties": {
+        "protrusion_mm": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          }
+        },
+        "gap_mm": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max",
+            "max_diff"
+          ],
+          "properties": {
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            },
+            "max_diff": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "tap_baseline": {
+      "type": "object",
+      "description": "볼트별 정상 타음 기준값. 키 = B01, B02 ... 아직 등록 안 했으면 빈 객체 {}",
+      "propertyNames": {
+        "pattern": "^B[0-9]{2}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "peak_hz",
+          "std_hz",
+          "n"
+        ],
+        "properties": {
+          "peak_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "std_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "기준을 만든 타격 횟수"
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tap_ref": {
+      "description": "v1.1: 범위 판정(range) 기준. 타음 검사 화면의 '정상 기준 등록'으로 저장. 없으면 null",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mic",
+            "acc",
+            "n",
+            "k_sigma",
+            "registered_at"
+          ],
+          "properties": {
+            "mic": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "peak_hz",
+                "mag",
+                "energy_pct"
+              ],
+              "properties": {
+                "peak_hz": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "[하한, 상한]"
+                },
+                "mag": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "[하한, 상한]"
+                },
+                "energy_pct": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "[하한, 상한]"
+                }
+              }
+            },
+            "acc": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "peak_hz",
+                    "mag",
+                    "energy_pct"
+                  ],
+                  "properties": {
+                    "peak_hz": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      },
+                      "description": "[하한, 상한]"
+                    },
+                    "mag": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      },
+                      "description": "[하한, 상한]"
+                    },
+                    "energy_pct": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      },
+                      "description": "[하한, 상한]"
+                    }
+                  }
+                }
+              ]
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 3
+            },
+            "k_sigma": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "registered_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

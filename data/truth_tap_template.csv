@@ -1,0 +1,2 @@
+file,flange_id,bolt_id,torque_pct,state,session,hit_no,recorded_by,recorded_at
+FL001_B02_t040_s1_017.wav,FL001,B02,40,partial,s1,17,홍길동,2026-10-08T10:00:00+09:00
