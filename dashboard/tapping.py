@@ -3,8 +3,10 @@
 측정 -> 특징값 6개 -> 기준 범위 비교 -> 큰 판정 표시 -> 저장(Firestore 또는 local_db)
 정상 기준은 플랜지마다 등록되어 저장됩니다(flanges.tap_ref).
 """
+import csv
 import json
 import time
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
@@ -17,6 +19,42 @@ from sim import CONDITIONS, DEMO_REF, mock_features, mock_spectra
 import audio_features
 
 APP_VERSION = "1.1"
+
+# 정상 샘플 원본 기록: '➕ 정상 샘플로 추가'를 누를 때마다 한 줄씩 쌓임 (나중에 학습·발표 자료에 사용)
+SAMPLE_CSV = Path(__file__).resolve().parent.parent / "data" / "tap_samples.csv"
+SAMPLE_COLS = ["recorded_at", "session", "flange_id", "bolt_id", "state", "torque_pct", "hit_no", "recorded_by",
+               "device_id", "record_id", "mic_peak_hz", "mic_mag", "mic_energy_pct",
+               "acc_peak_hz", "acc_mag", "acc_energy_pct"]
+
+
+def log_sample(res, inspector_name, state="normal", torque_pct=100):
+    """정상 샘플 1건을 data/tap_samples.csv 에 한 줄 추가. 돌려주는 값 = 같은 볼트·같은 날 몇 번째인지(hit_no).
+    파일이 엑셀로 열려 있으면 쓸 수 없으므로 OSError 가 날 수 있음(호출하는 쪽에서 처리)."""
+    doc, ft = res["doc"], res["features"]
+    at = now_kst_iso()
+    session = at[:10].replace("-", "")            # 날짜 = 세션 (다른 날 데이터로 시험용을 나누기 위함)
+    hit_no = 1
+    if SAMPLE_CSV.exists():
+        with SAMPLE_CSV.open(encoding="utf-8-sig", newline="") as fh:
+            hit_no += sum(1 for row in csv.DictReader(fh)
+                          if (row.get("flange_id"), row.get("bolt_id"), row.get("session"), row.get("state"))
+                          == (doc["flange_id"], doc["bolt_id"], session, state))
+    row = {"recorded_at": at, "session": session, "flange_id": doc["flange_id"], "bolt_id": doc["bolt_id"],
+           "state": state, "torque_pct": torque_pct, "hit_no": hit_no, "recorded_by": inspector_name or "미입력",
+           "device_id": doc.get("device_id", ""), "record_id": doc.get("record_id", "")}
+    for sn in ("mic", "acc"):
+        v = ft.get(sn)
+        for k in ("peak_hz", "mag", "energy_pct"):
+            row[f"{sn}_{k}"] = "" if v is None else v[k]
+    SAMPLE_CSV.parent.mkdir(exist_ok=True)
+    new_file = not SAMPLE_CSV.exists()
+    with SAMPLE_CSV.open("a", encoding="utf-8-sig" if new_file else "utf-8", newline="") as fh:   # utf-8-sig = 엑셀에서 한글 안 깨짐
+        w = csv.DictWriter(fh, fieldnames=SAMPLE_COLS)
+        if new_file:
+            w.writeheader()
+        w.writerow(row)
+    return hit_no
+
 ss = st.session_state
 for k, v in {"result": None, "samples": [], "count": 0, "last_saved": None}.items():
     ss.setdefault(k, v)
@@ -151,9 +189,14 @@ with st.sidebar:
     st.write(f"수집된 정상 샘플: **{len(ss.samples)} / {target_n}**")
     if st.button("➕ 방금 측정값을 정상 샘플로 추가", width="stretch", disabled=ss.result is None):
         ss.samples.append(ss.result["features"])
-        st.toast(f"정상 샘플 {len(ss.samples)}개째 추가됨. 다시 '측정 시작' → 추가를 반복하세요.")
+        try:
+            n_hit = log_sample(ss.result, inspector)
+            st.toast(f"정상 샘플 {len(ss.samples)}개째 추가 · data/tap_samples.csv 에 기록 ({n_hit}번째)")
+        except OSError as e:   # 엑셀로 열어 둔 경우 등: 화면 기준 계산은 계속, 기록만 실패
+            st.toast(f"정상 샘플 {len(ss.samples)}개째 추가됨. 그런데 CSV 기록은 실패: {e}", icon="⚠️")
         st.rerun()
     st.progress(min(len(ss.samples) / target_n, 1.0))
+    st.caption("정상 샘플은 추가할 때마다 `data/tap_samples.csv` 에 원본이 기록돼요 (샘플 초기화를 해도 파일은 그대로).")
     if len(ss.samples) < 3:
         st.caption("샘플이 3개 이상 모여야 아래 '정상 기준 계산 · 저장' 버튼이 눌립니다. "
                    "샘플을 추가해도 위 판정은 바뀌지 않고, 저장해야 새 기준이 적용됩니다.")
