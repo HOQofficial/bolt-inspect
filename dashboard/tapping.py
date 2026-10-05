@@ -34,7 +34,11 @@ def read_serial(port, timeout=10):
     if ss.get("ser_port") != port:
         if ss.get("ser"):
             ss.ser.close()
-        ss.ser = serial.Serial(port, 115200, timeout=1)
+        try:
+            ss.ser = serial.Serial(port, 115200, timeout=1)
+        except serial.SerialException as e:
+            ss.ser, ss.ser_port = None, None
+            raise ValueError(f"{port} 를 열 수 없어요. Arduino IDE 시리얼 모니터가 켜져 있으면 닫고 다시 하세요. ({e})")
         ss.ser_port = port
         time.sleep(2)  # 열 때 보드가 재시작하는 시간
     ss.ser.reset_input_buffer()
@@ -48,7 +52,35 @@ def read_serial(port, timeout=10):
                     return features_from_msg(msg)
             except ValueError:
                 pass
-    raise TimeoutError(f"{timeout}초 안에 ESP32 특징값(v2 메시지)이 오지 않았습니다.")
+    raise TimeoutError(f"{timeout}초 안에 ESP32 특징값(v2 메시지)이 오지 않았습니다. ▶ 측정 시작을 누른 뒤 BOOT 버튼을 짧게 눌렀는지, 올바른 펌웨어(tap_sim_v2)를 올렸는지 확인하세요.")
+
+
+def read_wifi(addr, timeout=10, auto_tap=False):
+    """ESP32 가 자체 Wi-Fi(SoftAP)로 보내는 특징값을 읽음.
+    PC 가 ESP32 Wi-Fi(TAP-01)에 접속한 상태에서 http://<addr>/latest 를 확인해,
+    측정 순번(seq)이 바뀌면 = 새 타격으로 보고 그 값을 돌려줌."""
+    import urllib.request
+    base = "http://" + addr.strip().removeprefix("http://").rstrip("/")
+
+    def get(path):
+        try:
+            with urllib.request.urlopen(base + path, timeout=3) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except OSError as e:
+            raise ValueError(f"ESP32({base})에 연결할 수 없어요. PC 의 Wi-Fi 가 ESP32 Wi-Fi(TAP-01)에 "
+                             f"연결돼 있는지 확인하세요. ({e})")
+
+    start = get("/latest")["msg"].get("seq", 0)
+    if auto_tap:
+        get("/tap")
+    end = time.time() + timeout
+    while time.time() < end:
+        msg = get("/latest")["msg"]
+        if msg.get("seq", 0) != start and msg.get("v") == 2:
+            return features_from_msg(msg)
+        time.sleep(0.3)
+    raise TimeoutError(f"{timeout}초 안에 새 측정이 오지 않았어요. ▶ 측정 시작을 누른 뒤 BOOT 버튼을 짧게 누르거나, "
+                       "'테스트용 가짜 타격 자동 요청'을 켜세요.")
 
 
 FL = flanges()
@@ -63,7 +95,7 @@ with st.sidebar:
     f = FL[fid]
     bolt = st.selectbox("볼트 (12시부터 시계방향)", [f"B{i:02d}" for i in range(1, f["bolt_count"] + 1)])
     inspector = st.text_input("검사자", value=ss.get("inspector", "홍길동"), key="inspector")
-    source = st.radio("측정 방식", ["가상 데이터", "PC 마이크", "ESP32 (USB)"], horizontal=True,
+    source = st.radio("측정 방식", ["가상 데이터", "PC 마이크", "ESP32 (USB)", "ESP32 (Wi-Fi)"], horizontal=True,
                       help="PC 마이크 = 이어폰·헤드셋 마이크로 실제 타격음 테스트 (음향 센서만)")
     if source == "가상 데이터":
         cond = st.selectbox("가상 측정 조건", CONDITIONS)
@@ -85,8 +117,29 @@ with st.sidebar:
             mic_idx = None
         st.caption("측정 시작 후 2초 안에 마이크 가까이(10~20cm)에서 볼트를 한 번 두드리세요. "
                    "처음엔 '정상 기준 등록'부터 하세요 (데모 기준은 가상 데이터용).")
+    elif source == "ESP32 (Wi-Fi)":
+        wifi_addr = st.text_input("ESP32 주소", "192.168.4.1", help="ESP32 SoftAP 기본 주소. 시리얼 모니터 첫 줄에도 나옴")
+        wifi_auto = st.toggle("테스트용 가짜 타격 자동 요청", value=False,
+                              help="센서 없이 연결만 시험할 때: 측정 시작을 누르면 ESP32 에 /tap 을 보내 가짜 타격 1번을 만듦. "
+                                   "실제 센서로 측정할 때는 끄고, 측정 시작 후 볼트를 치세요.")
+        st.caption("PC 의 Wi-Fi 를 'TAP-01'(비밀번호 bolt1234)에 연결한 상태여야 해요. 이 동안 인터넷은 끊겨요 "
+                   "(저장은 내 PC local_db 에 됨). 브라우저로 http://192.168.4.1 을 열면 ESP32 화면도 볼 수 있어요.")
     else:
-        port = st.text_input("COM 포트", "COM3", help="Arduino IDE 에서 보이던 포트 번호")
+        try:
+            from serial.tools import list_ports
+            ports = [(p.device, f"{p.device} - {p.description}") for p in list_ports.comports()]
+        except Exception:
+            ports = []
+        if st.button("🔄 포트 다시 찾기", help="ESP32 를 앱을 켠 뒤에 꽂았을 때"):
+            st.rerun()
+        if ports:
+            port = st.selectbox("COM 포트", [p for p, _ in ports], format_func=dict(ports).get,
+                                help="ESP32 는 보통 'CP210x' 또는 'CH340' 이 이름에 들어 있어요")
+        else:
+            st.warning("USB 로 연결된 장치가 안 보여요. 케이블(데이터용인지)과 드라이버를 확인하세요.")
+            port = st.text_input("COM 포트 (직접 입력)", "COM3")
+        st.caption("Arduino IDE 의 시리얼 모니터는 꼭 닫으세요 (포트를 한 프로그램만 쓸 수 있어요). "
+                   "▶ 측정 시작을 누른 뒤 10초 안에 ESP32 의 BOOT 버튼을 짧게 누르세요.")
     autosave = st.toggle("측정하면 자동 저장", value=True)
 
     st.divider()
@@ -151,12 +204,14 @@ if st.button("▶ 측정 시작", type="primary", width="stretch"):
                     raise ValueError(f"타격음이 감지되지 않았습니다 (최대 음량 {abs(x).max():.3f}). "
                                      "마이크 가까이에서 더 세게 두드려 보세요.")
                 feats, spec = {"mic": mic, "acc": None}, (fr, mg)
+            elif source == "ESP32 (Wi-Fi)":
+                feats = read_wifi(wifi_addr, auto_tap=wifi_auto)
             else:
                 feats = read_serial(port)
         tapping = tapping_from_features(feats, ref, ref_src)
         at = now_kst_iso()
         doc = {"schema_version": SCHEMA_VERSION, "record_id": make_record_id(fid, bolt, at), "type": "BOLT",
-               "flange_id": fid, "bolt_id": bolt, "inspector": inspector or "미입력", "device_id": {"PC 마이크": "PC-MIC", "ESP32 (USB)": "TAP-USB"}.get(source, "PC-SIM"),
+               "flange_id": fid, "bolt_id": bolt, "inspector": inspector or "미입력", "device_id": {"PC 마이크": "PC-MIC", "ESP32 (USB)": "TAP-USB", "ESP32 (Wi-Fi)": "TAP-WIFI"}.get(source, "PC-SIM"),
                "inspected_at": at, "vision": None, "gap": None, "tapping": tapping,
                "final_result": tapping["result"], "app_version": APP_VERSION}
         ss.result = {"features": feats, "tapping": tapping, "doc": doc, "sim": source == "가상 데이터",

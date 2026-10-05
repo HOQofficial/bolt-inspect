@@ -8,6 +8,7 @@
 | `schema/` | 확정 스키마 (flange, inspection). **바꾸려면 4번 담당과 합의** | 4번 |
 | `tools/` | `schema_rules.py`(공용 규칙), `validate.py`(검사), `make_fake_data.py`(가짜 데이터), `seed_firestore.py`(업로드) | 전원 |
 | `dashboard/` | Streamlit 앱: `app.py`(메뉴) · `home.py`(검사 현황) · `tapping.py`(타음 검사, 조원 V3 통합) · `vision.py`(비전 검사: 볼트 돌출 · I-마킹 · 플랜지 틈) · `store.py`(저장소) · `ui.py`(화면 부품) | 2·4번 |
+| `tools/add_flange.py` | 시편·플랜지를 앱에 등록 (`--id FL101 --nut-height 13.0`) | 3·4번 |
 | `tools/sim.py` | 가상 타음 데이터 (조원 V3 의 make_mock) | 2번 |
 | `tools/merge_public_data.py` | 공개 데이터 zip + 우리 라벨을 학습 세트로 합침 | 3번 |
 | `reference/` | 조원 V3 원본 (참고용) | - |
