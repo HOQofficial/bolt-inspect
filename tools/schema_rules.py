@@ -1,4 +1,4 @@
-"""스키마 v1.1 - JSON Schema로 표현하기 어려운 규칙과 공용 함수.
+"""스키마 v1.2 - JSON Schema로 표현하기 어려운 규칙과 공용 함수.
 
 모든 팀원(앱, 대시보드, 학습 스크립트)은 이 파일의 함수를 그대로 쓰거나 똑같이 구현합니다.
 """
@@ -8,7 +8,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
 
-SCHEMA_VERSION = "1.1"
+SCHEMA_VERSION = "1.2"
 KST = timezone(timedelta(hours=9))
 RESULT_RANK = {"OK": 0, "CHECK": 1, "NG": 2}
 # 화면에 보여줄 한글 (데이터에는 OK/CHECK/NG 로 저장)
@@ -61,6 +61,19 @@ def judge_protrusion(mm, limits):
     if mm < limits["min"]:
         return "CHECK"
     return "OK"
+
+
+MARK_LIMITS = {"ok": 10.0, "check": 20.0}   # 마킹 끊김(%) 기준. 너트 위 마킹 길이 대비
+
+
+def judge_marking(gap_pct, limits=MARK_LIMITS):
+    """I-마킹(풀림 표시) 판정. gap_pct = 너트 마킹과 고정부 마킹이 끊어진 거리 / 너트 마킹 길이 × 100.
+    너트가 10° 정도 돌면 대략 10% 어긋남."""
+    if gap_pct <= limits["ok"]:
+        return "OK"
+    if gap_pct <= limits["check"]:
+        return "CHECK"
+    return "NG"
 
 
 def judge_tap_rule(peak_hz, baseline):

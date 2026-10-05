@@ -10,3 +10,7 @@ local_db/
 # 용량 큰 파일 (모델·학습 사진은 공유 드라이브로)
 models/*.pt
 data/labels/
+data/public_zips/
+data/train_set/
+data/train_set.zip
+data/train_set_preview/

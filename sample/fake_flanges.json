@@ -1,6 +1,6 @@
 [
   {
-    "schema_version": "1.1",
+    "schema_version": "1.2",
     "flange_id": "FL001",
     "zone": "보일러실",
     "bolt_spec": "M20",
@@ -76,7 +76,7 @@
     }
   },
   {
-    "schema_version": "1.1",
+    "schema_version": "1.2",
     "flange_id": "FL002",
     "zone": "엔진룸-1층",
     "bolt_spec": "M16",
@@ -152,7 +152,7 @@
     }
   },
   {
-    "schema_version": "1.1",
+    "schema_version": "1.2",
     "flange_id": "FL003",
     "zone": "엔진룸-2층",
     "bolt_spec": "M16",
@@ -228,7 +228,7 @@
     }
   },
   {
-    "schema_version": "1.1",
+    "schema_version": "1.2",
     "flange_id": "FL004",
     "zone": "엔진룸-1층",
     "bolt_spec": "M16",
@@ -304,7 +304,7 @@
     }
   },
   {
-    "schema_version": "1.1",
+    "schema_version": "1.2",
     "flange_id": "FL005",
     "zone": "엔진룸-2층",
     "bolt_spec": "M24",
@@ -400,7 +400,7 @@
     }
   },
   {
-    "schema_version": "1.1",
+    "schema_version": "1.2",
     "flange_id": "FL006",
     "zone": "펌프룸",
     "bolt_spec": "M24",

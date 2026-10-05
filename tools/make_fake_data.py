@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
-from schema_rules import (KST, SCHEMA_VERSION, calc_tap_ref, judge_gap, judge_protrusion,
+from schema_rules import (KST, SCHEMA_VERSION, calc_tap_ref, judge_gap, judge_marking, judge_protrusion,
                           make_record_id, tapping_from_features, validate, worst)
 from sim import mock_features
 
@@ -62,6 +62,10 @@ for f in flanges:
             vision = {"protrusion_mm": mm, "thread_count": max(0, round(mm / f["pitch_mm"])),
                       "confidence": round(random.uniform(0.75, 0.98), 2), "crop_jpg_b64": None,
                       "result": judge_protrusion(mm, f["limits"]["protrusion_mm"])}
+            gp = round(random.uniform(15, 60) if bad and random.random() < .6 else random.uniform(0, 8), 1)
+            mres = judge_marking(gp)
+            vision["marking"] = {"gap_pct": gp, "method": "auto", "color": "red", "result": mres}
+            vision["result"] = worst(vision["result"], mres)
             cond = ("체결 이상 의심" if bad and random.random() < .6
                     else "재측정 필요" if random.random() < .05 else "정상 체결")
             ref = f["tap_ref"]

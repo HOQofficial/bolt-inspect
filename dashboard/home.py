@@ -29,13 +29,19 @@ fl_info = {f["flange_id"]: f for f in flanges}
 # 단, 타음과 비전을 따로 저장했을 수 있으므로 '최근 타음 판정'과 '최근 비전 판정' 중 더 나쁜 쪽을 씀.
 srt = df.sort_values("inspected_at")
 latest = srt.groupby(["flange_id", "bolt_id"]).tail(1).copy()
-for col in ("tapping.result", "vision.result"):
+# v1.2: 비전은 '돌출'과 'I-마킹'을 따로 저장할 수 있으므로 각각의 최근 판정을 봄
+if "vision.result" in srt and "vision.protrusion_mm" in srt:
+    srt["_prot"] = srt["vision.result"].where(srt["vision.protrusion_mm"].notna())
+if "vision.marking.result" in srt:
+    srt["_mark"] = srt["vision.marking.result"]
+TRACKS = ("tapping.result", "_prot", "_mark")
+for col in TRACKS:
     if col in srt:
         last = srt.dropna(subset=[col]).groupby(["flange_id", "bolt_id"])[col].last()
         latest[col + ".last"] = [last.get((a, b)) for a, b in zip(latest.flange_id, latest.bolt_id)]
 _s = lambda v: v if isinstance(v, str) else None   # 빈칸(NaN) -> None
 latest["final_result"] = [
-    worst(r.final_result, _s(r.get("tapping.result.last")), _s(r.get("vision.result.last"))) if r.type == "BOLT"
+    worst(r.final_result, *(_s(r.get(c + ".last")) for c in TRACKS)) if r.type == "BOLT"
     else r.final_result for _, r in latest.iterrows()]
 
 # ---- 1. 전체 상태 배너 ----
@@ -89,7 +95,8 @@ if sel_res:
     view = view[view["판정"].isin(sel_res)]
 cols_map = {"inspected_at": "검사시각", "flange_id": "플랜지", "bolt_id": "볼트", "inspector": "검사자",
             "판정": "판정", "tapping.features.mic.peak_hz": "음향 Peak(Hz)", "tapping.features.acc.peak_hz": "진동 Peak(Hz)",
-            "tapping.score": "범위 이탈 수", "vision.protrusion_mm": "돌출(mm)", "gap.gap_diff_mm": "틈 편차(mm)"}
+            "tapping.score": "범위 이탈 수", "vision.protrusion_mm": "돌출(mm)", "vision.marking.gap_pct": "마킹 끊김(%)",
+            "gap.gap_diff_mm": "틈 편차(mm)"}
 table = view[[c for c in cols_map if c in view.columns]].rename(columns=cols_map).sort_values("검사시각", ascending=False)
 num = {c: "{:.1f}" for c in table.columns if c.endswith(")") and c != "틈 편차(mm)"} | {"틈 편차(mm)": "{:.2f}", "범위 이탈 수": "{:.0f}"}
 fmt = {k: v for k, v in num.items() if k in table} | {"검사시각": lambda t: t.strftime("%m/%d %H:%M:%S")}

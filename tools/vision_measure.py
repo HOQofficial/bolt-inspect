@@ -149,21 +149,145 @@ def model_available():
 _model = None
 
 
+def pair_boxes(nuts, tips):
+    """너트 상자들과 볼트 끝 상자들 중 '같은 볼트'인 짝을 고름.
+    nuts/tips = [(신뢰도, [x1, y1, x2, y2]), ...]
+    조건: 볼트 끝의 가운데가 너트 가로 범위 안에 있고, 볼트 끝 위쪽이 너트 윗면보다 위에 있어야 함.
+    반환: (점 3개, 신뢰도, 실패 이유)"""
+    best = None
+    for nc, n in nuts:
+        nw = n[2] - n[0]
+        for tc, t in tips:
+            cx = (t[0] + t[2]) / 2
+            inside = n[0] - 0.15 * nw <= cx <= n[2] + 0.15 * nw
+            above = t[1] < n[1]
+            close = t[3] >= n[1] - 0.5 * (n[3] - n[1])     # 볼트 끝 상자 아래쪽이 너트 윗면 근처
+            if inside and above and close:
+                score = min(nc, tc)
+                if best is None or score > best[1]:
+                    best = ([(n[0], n[1]), (n[2], n[3]), (cx, t[1])], score)
+    if best:
+        return best[0], best[1], None
+    if not nuts or not tips:
+        return None, 0.0, "너트나 볼트 끝을 찾지 못했어요"
+    return None, 0.0, "너트와 볼트 끝을 찾았지만 같은 볼트로 이어지지 않아요 (옆모습 사진이 아니거나, 볼트 끝이 위를 향하지 않음)"
+
+
 def detect(img, conf=0.35):
-    """YOLO 로 nut / bolt_tip 상자를 찾아 클릭 3점으로 바꿔 줌. 못 찾으면 None.
-    반환: [너트 왼쪽위, 너트 오른쪽아래, 볼트 끝], 신뢰도"""
+    """YOLO 로 nut / bolt_tip 상자를 찾아, 같은 볼트인 짝을 클릭 3점으로 바꿔 줌.
+    반환: (점 3개 / 너트만 찾으면 점 2개 / None, 신뢰도, 메모 또는 None)"""
     global _model
     from ultralytics import YOLO
     if _model is None:
         _model = YOLO(str(MODEL_PATH))
     r = _model.predict(img, conf=conf, verbose=False)[0]
-    best = {}
+    found = {"nut": [], "bolt_tip": []}
     for b in r.boxes:
         name = r.names[int(b.cls)]
-        c = float(b.conf)
-        if name in CLASSES and c > best.get(name, (0, None))[0]:
-            best[name] = (c, [float(v) for v in b.xyxy[0]])
-    if "nut" not in best or "bolt_tip" not in best:
-        return None, 0.0
-    (nc, n), (tc, t) = best["nut"], best["bolt_tip"]
-    return [(n[0], n[1]), (n[2], n[3]), ((t[0] + t[2]) / 2, t[1])], min(nc, tc)
+        if name in found:
+            found[name].append((float(b.conf), [float(v) for v in b.xyxy[0]]))
+    pts, score, why = pair_boxes(found["nut"], found["bolt_tip"])
+    if pts is None and found["nut"]:
+        # 볼트 끝 학습이 안 된 모델(너트만 앎)이거나 짝을 못 찾은 경우: 너트만 자동, 볼트 끝은 사람이 클릭
+        nc, n = max(found["nut"], key=lambda t: t[0])
+        return [(n[0], n[1]), (n[2], n[3])], nc, "너트만 찾았어요"
+    return pts, score, why
+
+
+# ---------------- I-마킹 (풀림 표시) ----------------
+# 조인 뒤 볼트·너트·와셔(플랜지)에 한 줄로 그은 페인트 선. 너트가 돌면 너트 위 선이 옆으로 밀려 끊어짐.
+# 판정값 gap_pct = (너트 위 마킹과 고정부 마킹 사이 가장 가까운 거리) / (너트 마킹 길이) × 100
+MARK_COLORS = {"빨강": "red", "노랑": "yellow", "흰색": "white", "파랑": "blue", "초록": "green"}
+
+
+def _seg_dist(p, a, b):
+    """점 p 와 선분 ab 사이 거리"""
+    p, a, b = (np.asarray(v, float) for v in (p, a, b))
+    ab = b - a
+    t = 0.0 if not ab.any() else float(np.clip(np.dot(p - a, ab) / np.dot(ab, ab), 0, 1))
+    return float(np.linalg.norm(p - (a + t * ab)))
+
+
+def mark_break_click(n1, n2, r1, r2):
+    """클릭 4점: ①② 너트 위 마킹 양 끝, ③④ 고정부(와셔·플랜지) 마킹 양 끝.
+    반환 dict(gap_pct, gap_px, nut_len_px, pair) — pair 는 가장 가까운 두 점(그림용)"""
+    L = math.dist(n1, n2)
+    if L < 5:
+        raise ValueError("①② 가 너무 가깝습니다. 너트 위 마킹의 양 끝을 찍으세요.")
+    cands = [(_seg_dist(p, r1, r2), p) for p in (n1, n2)] + [(_seg_dist(p, n1, n2), p) for p in (r1, r2)]
+    d, _ = min(cands, key=lambda c: c[0])
+    # 그림용: 너트 끝점 중 고정부 선분에 가장 가까운 점과, 고정부 끝점 중 너트 선분에 가장 가까운 점
+    a = min((n1, n2), key=lambda p: _seg_dist(p, r1, r2))
+    b = min((r1, r2), key=lambda p: _seg_dist(p, n1, n2))
+    return {"gap_pct": round(100 * d / L, 1), "gap_px": round(d, 1), "nut_len_px": round(L, 1), "pair": (a, b)}
+
+
+def color_mask(img, color):
+    """페인트 색에 해당하는 픽셀 = True 인 2차원 배열. (PIL HSV: H 0~255)"""
+    hsv = np.asarray(img.convert("RGB").convert("HSV")).astype(int)
+    H, S, V = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    if color == "red":
+        return ((H <= 10) | (H >= 235)) & (S >= 100) & (V >= 70)
+    if color == "yellow":
+        return (H >= 22) & (H <= 50) & (S >= 100) & (V >= 100)
+    if color == "green":
+        return (H >= 60) & (H <= 115) & (S >= 80) & (V >= 60)
+    if color == "blue":
+        return (H >= 135) & (H <= 185) & (S >= 80) & (V >= 60)
+    if color == "white":
+        return (S <= 35) & (V >= 210)
+    raise ValueError(color)
+
+
+def mark_break_auto(img, nut_box, color, max_pts=3000):
+    """너트 상자(①②)를 알 때, 색으로 마킹을 찾아 끊김을 계산. 사진은 볼트 끝이 '위'를 향해야 함.
+    너트 상자 안 = 너트 마킹, 너트 아래(와셔·플랜지 쪽) = 고정부 마킹.
+    반환 (dict 또는 None, 실패 이유)"""
+    from scipy.spatial import cKDTree
+    m = color_mask(img, color)
+    x1, y1, x2, y2 = nut_box
+    w, h = x2 - x1, y2 - y1
+    ys, xs = np.nonzero(m)
+    inside = (xs >= x1) & (xs <= x2) & (ys >= y1) & (ys <= y2)
+    below = (xs >= x1 - 0.5 * w) & (xs <= x2 + 0.5 * w) & (ys > y2) & (ys <= y2 + h)
+    if inside.sum() > 0.6 * w * h:
+        return None, "너트 전체가 그 색으로 잡혔어요 (너트 색과 마킹 색이 비슷함). 직접 클릭하세요"
+    if inside.sum() < 15:
+        return None, "너트 위에서 마킹 색을 못 찾았어요. 색을 바꾸거나 직접 클릭하세요"
+    if below.sum() < 15:
+        return None, "너트 아래(와셔·플랜지)에서 마킹을 못 찾았어요. 사진 방향(볼트 끝이 위)을 확인하거나 직접 클릭하세요"
+    A = np.column_stack([xs[inside], ys[inside]]).astype(float)
+    B = np.column_stack([xs[below], ys[below]]).astype(float)
+    rng = np.random.default_rng(0)
+    if len(A) > max_pts:
+        A = A[rng.choice(len(A), max_pts, replace=False)]
+    if len(B) > max_pts:
+        B = B[rng.choice(len(B), max_pts, replace=False)]
+    # 1순위: 너트 아랫부분의 선 가운데 x 와, 너트 바로 아래(와셔)의 선 가운데 x 비교 (옆모습 기준)
+    a_band = A[A[:, 1] >= y2 - 0.25 * h]
+    b_band = B[B[:, 1] <= y2 + 0.15 * h]
+    if len(a_band) >= 5 and len(b_band) >= 5:
+        pa = (float(a_band[:, 0].mean()), float(a_band[:, 1].max()))
+        pb = (float(b_band[:, 0].mean()), float(b_band[:, 1].min()))
+        dist = abs(pa[0] - pb[0])
+    else:   # 2순위: 두 색 덩어리 사이 가장 가까운 거리
+        d, j = cKDTree(B).query(A)
+        i = int(np.argmin(d))
+        pa, pb, dist = tuple(A[i]), tuple(B[j[i]]), float(d[i])
+    return {"gap_pct": round(100 * dist / max(h, 5), 1), "gap_px": round(dist, 1),
+            "nut_len_px": round(float(h), 1), "pair": (pa, pb), "inside": A, "below": B}, None
+
+
+def mark_overlay(img, nut_box, res):
+    """자동 검출 결과 그림: 너트 마킹=분홍, 고정부 마킹=하늘, 가장 가까운 두 점 사이=노란 선"""
+    from PIL import ImageDraw
+    im = img.convert("RGB").copy()
+    d = ImageDraw.Draw(im)
+    r = max(1, im.width // 400)
+    for pts, c in ((res["inside"], (236, 72, 153)), (res["below"], (14, 165, 233))):
+        for x, y in pts[:: max(1, len(pts) // 1500)]:
+            d.rectangle([x - r, y - r, x + r, y + r], fill=c)
+    d.rectangle(list(nut_box), outline=(37, 99, 235), width=max(2, im.width // 300))
+    (ax, ay), (bx, by) = res["pair"]
+    d.line([ax, ay, bx, by], fill=(250, 204, 21), width=max(3, im.width // 200))
+    return im

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "bolt-inspect/inspection/1.1",
-  "title": "inspections/{record_id} - 검사 1건 (스키마 v1.1)",
+  "$id": "bolt-inspect/inspection/1.2",
+  "title": "inspections/{record_id} - 검사 1건 (스키마 v1.2)",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -23,7 +23,8 @@
     "schema_version": {
       "enum": [
         "1.0",
-        "1.1"
+        "1.1",
+        "1.2"
       ]
     },
     "record_id": {
@@ -80,10 +81,13 @@
           ],
           "properties": {
             "protrusion_mm": {
-              "type": "number",
+              "type": [
+                "number",
+                "null"
+              ],
               "minimum": -50,
               "maximum": 100,
-              "description": "너트 윗면~볼트 끝. 음수 = 볼트가 너트 안에 묻힘"
+              "description": "너트 윗면~볼트 끝. 음수 = 볼트가 너트 안에 묻힘 / I-마킹만 검사하면 null (v1.2)"
             },
             "thread_count": {
               "type": [
@@ -108,6 +112,51 @@
             },
             "result": {
               "$ref": "#/$defs/result"
+            },
+            "marking": {
+              "description": "v1.2: I-마킹(풀림 표시) 검사. 안 했으면 없음 또는 null",
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "gap_pct",
+                    "method",
+                    "color",
+                    "result"
+                  ],
+                  "properties": {
+                    "gap_pct": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1000,
+                      "description": "너트 마킹과 고정부(와셔·플랜지) 마킹이 끊어진 거리 ÷ 너트 마킹 길이 × 100"
+                    },
+                    "method": {
+                      "enum": [
+                        "auto",
+                        "click"
+                      ],
+                      "description": "auto=색으로 자동 검출, click=사람이 4번 클릭"
+                    },
+                    "color": {
+                      "enum": [
+                        "red",
+                        "yellow",
+                        "white",
+                        "blue",
+                        "green"
+                      ]
+                    },
+                    "result": {
+                      "$ref": "#/$defs/result"
+                    }
+                  }
+                }
+              ]
             }
           }
         }

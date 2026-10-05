@@ -1,7 +1,7 @@
 // 스키마 v1.1 - 웹앱(태블릿)에서 쓰는 공용 상수와 함수.
 // tools/schema_rules.py 와 똑같이 동작해야 합니다. 한쪽을 바꾸면 반드시 다른 쪽도 바꾸세요.
 
-export const SCHEMA_VERSION = "1.1";
+export const SCHEMA_VERSION = "1.2";
 export const APP_VERSION = "0.1";
 export const RESULT_RANK = { OK: 0, CHECK: 1, NG: 2 };
 
