@@ -11,7 +11,7 @@ import streamlit as st
 
 import store
 import ui
-from schema_rules import (FEATURE_KO, SCHEMA_VERSION, calc_tap_ref, features_from_msg,
+from schema_rules import (ACC_DEFAULT_REF, FEATURE_KO, RANGE_RULE, SCHEMA_VERSION, calc_tap_ref, features_from_msg,
                           make_record_id, now_kst_iso, tapping_from_features)
 from sim import CONDITIONS, DEMO_REF, mock_features, mock_spectra
 import audio_features
@@ -179,6 +179,23 @@ if ref:
 else:
     ref, ref_src = DEMO_REF, "데모 기준 (아직 등록 안 됨)"
 
+# 저장된 기준에 진동이 없으면: 지금 모아 둔 정상 샘플(진동 값이 있는 것 3개 이상)로 진동 임시 기준을 계산해서 씀.
+# 숫자를 고정해 두지 않고 샘플을 추가할 때마다 다시 계산됨. '정상 기준 계산 · 저장'을 누르면 저장된 기준이 우선.
+prov_n, acc_default = 0, False
+if ref.get("acc") is None:
+    acc_samples = [x for x in ss.samples if x.get("acc")]
+    if len(acc_samples) >= 3:
+        try:
+            ref = dict(ref, acc=calc_tap_ref(acc_samples, k_sigma)["acc"])
+            prov_n = len(acc_samples)
+            ref_src += f" + 진동 임시 기준(샘플 {prov_n}개, 저장 전)"
+        except ValueError:
+            pass
+    if prov_n == 0:  # 샘플도 3개 미만 → 자리표시용 넓은 기본 범위 (샘플이 모이면 위 계산값으로 자동 교체)
+        ref = dict(ref, acc=ACC_DEFAULT_REF)
+        acc_default = True
+        ref_src += " + 진동 임시 기본 기준(샘플 3개 이상 모이면 자동 교체)"
+
 st.title("타음 검사")
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("검사 대상", f"{fid}-{bolt}")
@@ -253,26 +270,60 @@ if not autosave and ss.last_saved != r["doc"]["record_id"]:
         st.rerun()
 
 # ---------------- 2. 센서별 판정 + 근거 ----------------
+SNAME = {"mic": "음향", "acc": "진동"}
+FMT = {"peak_hz": (" Hz", ".0f"), "mag": ("", ".3f"), "energy_pct": (" %", ".1f")}
+UNIT = {"mic": {"peak_hz": "Hz", "mag": "0~1", "energy_pct": "%"},     # 음향 크기 = 최대치를 1로 본 비율(단위 없음)
+        "acc": {"peak_hz": "Hz", "mag": "g", "energy_pct": "%"}}      # 진동 크기 = g(중력가속도)
+
+
+def fmt_of(sensor, k):
+    """게이지·숫자에 붙일 (단위, 소수점 자리). 진동 크기만 ' g'"""
+    return (" g", ".3f") if (sensor, k) == ("acc", "mag") else FMT[k]
+
+
+def label(sensor, k):
+    """예: Peak Frequency (Hz) / Peak Magnitude (g) / Peak Magnitude (0~1)"""
+    return f"{FEATURE_KO[k]} ({UNIT[sensor][k]})"
+for s in ("mic", "acc"):  # 값은 왔는데 기준이 없어 판정에서 빠진 센서 알림
+    if r["features"].get(s) and not ref.get(s):
+        st.warning(f"{SNAME[s]} 센서 값은 들어왔지만 정상 기준에 {SNAME[s]} 기준이 없어서 판정에서 빠졌어요. "
+                   f"왼쪽에서 정상 볼트를 ESP32 로 측정해 '정상 샘플로 추가'를 3번 이상 하면 "
+                   f"{SNAME[s]} 기준이 샘플대로 계산돼 바로 판정에 쓰이고, '정상 기준 계산 · 저장'을 누르면 저장됩니다.")
+if acc_default and r["features"].get("acc"):
+    st.caption("📳 진동 기준은 아직 임시 기본값(센서 전체 범위)이라 거의 항상 '정상'이 나와요. 정상 볼트를 측정해 "
+               "'➕ 정상 샘플로 추가'를 3번 이상 하면 그 샘플로 기준이 바뀌어요.")
+if prov_n:
+    st.caption(f"📳 진동 기준은 지금 모은 정상 샘플 {prov_n}개로 계산한 임시 기준이에요 (샘플을 추가하면 바뀌고, 저장하면 확정).")
 cols = st.columns(2)
 for col, s in zip(cols, ("mic", "acc")):
     with col:
-        res = tp["sensor_results"][s]
-        if res is None:
-            st.info(f"{ui.KO[None]} · {'음향' if s == 'mic' else '진동'} 센서 데이터 없음")
-            continue
         name = ("🎤 음향 · " + ("PC 마이크" if r.get("source") == "PC 마이크" else "INMP441")) if s == "mic" else "📳 진동 · MPU6050"
+        feats, rr = r["features"].get(s), ref.get(s)
+        if feats is None:
+            st.info(f"{name} · 이번 측정에 {SNAME[s]} 값이 오지 않았어요"
+                    + (" (PC 마이크는 음향만 측정해요)" if r.get("source") == "PC 마이크"
+                       else " (ESP32 시리얼 모니터에서 '# MPU6050 OK' 가 나오는지, 메시지에 af 값이 있는지 확인)"))
+            continue
+        if rr is None:
+            st.info(f"{name} · 값은 들어왔지만 정상 기준이 없어 판정 제외")
+            mc = st.columns(3)
+            for c_, k in zip(mc, ("peak_hz", "mag", "energy_pct")):
+                c_.metric(label(s, k), f"{feats[k]:{fmt_of(s, k)[1]}}{fmt_of(s, k)[0]}")
+            continue
+        res = tp["sensor_results"][s]
         ui.tile(name, res, [" &nbsp;|&nbsp; ".join(
-            f"{FEATURE_KO[k]} {'✓' if ok else '✕'}" for k, ok in tp["checks"][s].items())])
-        feats, rr = r["features"][s], ref[s]
-        fmt = {"peak_hz": (" Hz", ".0f"), "mag": ("", ".3f"), "energy_pct": (" %", ".1f")}
+            f"{label(s, k)} {'✓' if ok else '✕'}" for k, ok in tp["checks"][s].items())])
         for k in ("peak_hz", "mag", "energy_pct"):
-            st.plotly_chart(ui.gauge(FEATURE_KO[k], feats[k], rr[k][0], rr[k][1], *fmt[k]),
+            st.plotly_chart(ui.gauge(label(s, k), feats[k], rr[k][0], rr[k][1], *fmt_of(s, k)),
                             width="stretch", key=f"g_{s}_{k}")
 
 with st.expander("판정 규칙"):
-    st.code("센서마다 특징값 3개(Peak Frequency, Peak Magnitude, Band Energy)를 기준 범위와 비교\n"
-            "  0개 이탈 → 정상 / 1개 이탈 → 재측정 필요 / 2개 이상 이탈 → 체결 이상 의심\n"
-            "종합 판정 = 두 센서 중 더 나쁜 쪽", language=None)
+    st.code("센서 2개(음향 INMP441, 진동 MPU6050)마다 특징값 3개(Peak Frequency, Peak Magnitude, Band Energy)를\n"
+            "정상 기준 범위와 비교해서, 범위를 벗어난 개수로 센서별 판정\n"
+            f"  벗어난 개수 {RANGE_RULE['check'] - 1} 이하 → 정상 / {RANGE_RULE['check']}개 → 재측정 필요 / "
+            f"{RANGE_RULE['ng']}개 이상 → 체결 이상 의심\n"
+            "종합 판정 = 두 센서 중 더 나쁜 쪽 (한 센서만 이상해도 종합이 나빠짐)\n"
+            f"정상 범위 = 정상 샘플 평균 ± k × 표준편차   (지금 이 플랜지: k = {ref.get('k_sigma', '데모')})", language=None)
 
 # ---------------- 3. FFT ----------------
 if r.get("spec"):
@@ -291,9 +342,18 @@ elif r["sim"]:
 
 # ---------------- 4. 등록된 기준 + 이 볼트 이력 ----------------
 with st.expander("현재 판정 기준 보기"):
-    rows = [[("음향" if s == "mic" else "진동"), FEATURE_KO[k], ref[s][k][0], ref[s][k][1]]
-            for s in ("mic", "acc") if ref.get(s) for k in ("peak_hz", "mag", "energy_pct")]
-    st.dataframe(pd.DataFrame(rows, columns=["센서", "특징값", "하한", "상한"]), hide_index=True, width="stretch")
+    rows = []
+    for s in ("mic", "acc"):
+        for k in ("peak_hz", "mag", "energy_pct"):
+            rr, ff = ref.get(s), r["features"].get(s)
+            if rr is None:
+                rows.append([SNAME[s], label(s, k), None, None, ff[k] if ff else None, "기준 없음"])
+            else:
+                v = ff[k] if ff else None
+                rows.append([SNAME[s], label(s, k), rr[k][0], rr[k][1], v,
+                             "-" if v is None else ("범위 안" if rr[k][0] <= v <= rr[k][1] else "범위 밖")])
+    st.dataframe(pd.DataFrame(rows, columns=["센서", "특징값", "하한", "상한", "이번 측정값", "결과"]),
+                 hide_index=True, width="stretch")
 
 st.subheader(f"{fid}-{bolt} 검사 이력")
 hist = [d for d in store.list_inspections() if d["flange_id"] == fid and d["bolt_id"] == bolt]

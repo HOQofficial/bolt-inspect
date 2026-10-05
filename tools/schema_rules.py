@@ -13,6 +13,13 @@ KST = timezone(timedelta(hours=9))
 RESULT_RANK = {"OK": 0, "CHECK": 1, "NG": 2}
 # 화면에 보여줄 한글 (데이터에는 OK/CHECK/NG 로 저장)
 RESULT_KO = {"OK": "정상", "CHECK": "재측정 필요", "NG": "체결 이상 의심"}
+# ★ 타음 판정 규칙: 센서(음향·진동)마다 '정상 범위 밖 특징값 개수'로 판정. 숫자를 바꾸면 판정이 바뀜.
+#    범위 밖 개수 < check → 정상 / check 이상 ~ ng 미만 → 재측정 필요 / ng 이상 → 체결 이상 의심
+RANGE_RULE = {"check": 1, "ng": 2}
+# ★ 진동(MPU6050) 임시 기본 기준: 정상 샘플이 아직 3개 미만이고 저장된 진동 기준도 없을 때만 쓰는 자리표시용 값.
+#    일부러 센서가 낼 수 있는 전체 범위(20~475 Hz, ±16 g)로 넓게 잡아서 거짓 경보가 나지 않게 함 (사실상 항상 정상).
+#    정상 샘플을 3개 이상 모으면 자동으로 샘플 기준으로 바뀌고, 저장하면 저장된 기준이 우선.
+ACC_DEFAULT_REF = {"peak_hz": [20.0, 475.0], "mag": [0.0, 16.0], "energy_pct": [0.0, 100.0]}
 FEATURE_KEYS = ("peak_hz", "mag", "energy_pct")
 FEATURE_KO = {"peak_hz": "Peak Frequency", "mag": "Peak Magnitude", "energy_pct": "Band Energy"}
 SENSOR_KO = {"mic": "음향 · INMP441", "acc": "진동 · MPU6050"}
@@ -85,7 +92,8 @@ def judge_tap_rule(peak_hz, baseline):
 
 def judge_range(features, ref):
     """v1.1 범위 판정 (조원 V3 방식).
-    센서마다 특징값 3개 중 범위 밖 0개=OK, 1개=CHECK, 2개 이상=NG. 최종 = 가장 나쁜 센서.
+    센서(mic, acc)마다 특징값 3개 중 범위 밖 개수로 판정(기준은 위의 RANGE_RULE). 최종 = 가장 나쁜 센서.
+    기준(ref)이나 측정값 중 한쪽이 없는 센서는 판정에서 빠짐(None).
     features = {"mic": {...}, "acc": {...}|None}, ref = flange["tap_ref"]
     반환: (checks, sensor_results, score=범위 밖 개수 합, result)
     """
@@ -97,34 +105,47 @@ def judge_range(features, ref):
         c = {k: bool(r[k][0] <= f[k] <= r[k][1]) for k in FEATURE_KEYS}
         n_out = 3 - sum(c.values())
         checks[s] = c
-        sensor_results[s] = "OK" if n_out == 0 else ("CHECK" if n_out == 1 else "NG")
+        sensor_results[s] = ("OK" if n_out < RANGE_RULE["check"]
+                             else ("CHECK" if n_out < RANGE_RULE["ng"] else "NG"))
         out += n_out
     return checks, sensor_results, out, worst(sensor_results["mic"], sensor_results["acc"])
+
+
+_FLOOR = {"peak_hz": lambda m: m * 0.01, "mag": lambda m: max(m * 0.03, 0.01),
+          "energy_pct": lambda m: max(m * 0.03, 1.0)}  # 표준편차가 너무 작을 때 0폭 방지
+
+
+def _range_from(vals, k_sigma, name):
+    """특징값 dict 목록 -> {특징: [하한, 상한]} (평균 ± k×표준편차)"""
+    import numpy as np
+    out = {}
+    for k in FEATURE_KEYS:
+        v = np.array([float(x[k]) for x in vals], dtype=float)
+        v = v[np.isfinite(v)]
+        if len(v) == 0:
+            raise ValueError(f"{name}.{k} 값이 모두 비정상(NaN)입니다. 샘플 초기화 후 다시 측정하세요.")
+        mean = float(v.mean())
+        sd = float(v.std(ddof=1)) if len(v) > 1 else 0.0
+        w = max(k_sigma * sd, _FLOOR[k](mean))
+        out[k] = [round(max(mean - w, 0.0), 4), round(mean + w, 4)]   # 특징값은 0 이상이라 하한이 음수가 되지 않게
+    return out
 
 
 def calc_tap_ref(samples, k_sigma):
     """정상 샘플 목록 -> tap_ref (평균 ± k×표준편차, 조원 V3의 calc_ref 와 같은 규칙).
     samples = [{"mic": {...}, "acc": {...}|None}, ...] (3개 이상)
     """
-    import numpy as np
-    floor = {"peak_hz": lambda m: m * 0.01, "mag": lambda m: max(m * 0.03, 0.01),
-             "energy_pct": lambda m: max(m * 0.03, 1.0)}  # 표준편차가 너무 작을 때 0폭 방지
     ref = {}
     for s in ("mic", "acc"):
         vals = [x[s] for x in samples if x.get(s)]
-        if len(vals) < len(samples):
-            ref[s] = None
+        if not vals:
+            ref[s] = None          # 이 센서 값이 하나도 없으면 기준 없음 (PC 마이크 샘플 = 진동 없음)
             continue
-        ref[s] = {}
-        for k in FEATURE_KEYS:
-            v = np.array([float(x[k]) for x in vals], dtype=float)
-            v = v[np.isfinite(v)]
-            if len(v) == 0:
-                raise ValueError(f"{s}.{k} 값이 모두 비정상(NaN)입니다. 샘플 초기화 후 다시 측정하세요.")
-            mean = float(v.mean())
-            sd = float(v.std(ddof=1)) if len(v) > 1 else 0.0
-            w = max(k_sigma * sd, floor[k](mean))
-            ref[s][k] = [round(mean - w, 4), round(mean + w, 4)]
+        if len(vals) < len(samples):   # 일부 샘플에만 있으면 조용히 빼지 말고 알림
+            name = "음향" if s == "mic" else "진동"
+            raise ValueError(f"{name} 값이 없는 샘플이 섞여 있어요 ({len(vals)}/{len(samples)}개만 있음). "
+                             "'샘플 초기화' 후 같은 방식(ESP32)으로 처음부터 다시 모으세요.")
+        ref[s] = _range_from(vals, k_sigma, s)
     return {"mic": ref["mic"], "acc": ref["acc"], "n": len(samples), "k_sigma": float(k_sigma),
             "registered_at": now_kst_iso()}
 

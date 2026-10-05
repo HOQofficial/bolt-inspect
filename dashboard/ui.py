@@ -40,21 +40,27 @@ def badge_style(v):
 
 
 def gauge(title, val, lo, hi, suffix="", fmt=".2f"):
-    """기준 범위(초록) 안에 값(파란 막대)이 있는지 보여주는 막대 게이지 (조원 V3)"""
+    """기준 범위(초록) 안에 값(파란 막대)이 있는지 보여주는 막대 게이지 (조원 V3)
+    축은 기준 범위와 '측정값'이 모두 들어오게 잡고, 색 칸은 축 안으로 잘라서 상자 밖으로 안 튀어나오게 함."""
     span = max(hi - lo, 1e-9)
     pad = .65 * span
-    xmin, xmax = max(0, lo - pad), hi + pad
+    xmin, xmax = lo - pad, hi + pad
+    margin = .1 * max(xmax - xmin, 1e-9)
+    xmin, xmax = min(xmin, val - margin), max(xmax, val + margin)   # 측정값이 범위 밖이어도 축 안에 보이게
+    xmin = max(0, xmin)                                              # 특징값은 모두 0 이상
+    if suffix.strip() == "%":
+        xmax = min(xmax, 100)                                        # 에너지 비율은 100% 까지
+    lo_c, hi_c = max(lo, xmin), min(hi, xmax)                        # 초록 칸도 축 안으로
     inside = lo <= val <= hi
+    steps = [{"range": r, "color": c} for r, c in (([xmin, lo_c], "#f1f5f9"), ([lo_c, hi_c], "#bbf7d0"),
+                                                   ([hi_c, xmax], "#f1f5f9")) if r[1] > r[0]]
     f = go.Figure(go.Indicator(
         mode="number+gauge", value=val, domain={"x": [0.32, 1], "y": [0, 1]},
         number={"suffix": suffix, "valueformat": fmt, "font": {"size": 26, "color": COLOR["OK"] if inside else COLOR["NG"]}},
         title={"text": ("✓ " if inside else "✕ ") + title, "font": {"size": 13,
                "color": COLOR["OK"] if inside else COLOR["NG"]}},
         gauge={"shape": "bullet", "axis": {"range": [xmin, xmax]}, "bar": {"color": "#2563eb"},
-               "steps": [{"range": [xmin, lo], "color": "#f1f5f9"},
-                         {"range": [lo, hi], "color": "#bbf7d0"},
-                         {"range": [hi, xmax], "color": "#f1f5f9"}],
-               "threshold": {"line": {"color": "#111827", "width": 3}, "value": val}}))
+               "steps": steps, "threshold": {"line": {"color": "#111827", "width": 3}, "value": val}}))
     f.update_layout(height=90, margin=dict(l=10, r=10, t=10, b=20))
     return f
 
