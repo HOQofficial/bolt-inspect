@@ -1,0 +1,6 @@
+{
+  "appId": "kr.boltinspect.app",
+  "appName": "볼트 타음 검사",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}

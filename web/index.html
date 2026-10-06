@@ -16,23 +16,31 @@
   <p>아래 버튼을 위에서부터 차례대로 눌러 보세요. 결과가 맨 아래 칸에 나옵니다.</p>
   <button id="btnSave">1. 가짜 검사 1건 저장 (Firestore)</button>
   <button id="btnCam">2. 카메라 켜기</button>
-  <button id="btnBle">3. ESP32 블루투스 연결 (5단계 후)</button>
+  <button id="btnBle">3. ESP32 블루투스 연결</button>
   <video id="cam" playsinline autoplay muted hidden></video>
   <div id="log">대기 중...</div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { initializeFirestore, persistentLocalCache, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { firebaseConfig } from "./firebase-config.js";
-    import { newBoltRecord, tappingFromBle } from "./schema.js";
+    import { newBoltRecord, featuresFromBle } from "./schema.js";
 
     const log = (m) => (document.getElementById("log").textContent = m + "\n" + document.getElementById("log").textContent);
-    const app = initializeApp(firebaseConfig);
-    // 오프라인 저장: 통신이 끊겨도 기기에 저장해 두었다가 연결되면 자동 업로드
-    const db = initializeFirestore(app, { localCache: persistentLocalCache() });
-    log("Firebase 연결 준비 완료. 온라인 상태: " + navigator.onLine);
+    // Firebase 는 설정 파일(firebase-config.js)이 있을 때만 켬. 없어도 2·3번(카메라·블루투스) 시험은 가능.
+    let db = null, doc, setDoc;
+    try {
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const fs = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      const { firebaseConfig } = await import("./firebase-config.js");
+      doc = fs.doc; setDoc = fs.setDoc;
+      const app = initializeApp(firebaseConfig);
+      // 오프라인 저장: 통신이 끊겨도 기기에 저장해 두었다가 연결되면 자동 업로드
+      db = fs.initializeFirestore(app, { localCache: fs.persistentLocalCache() });
+      log("Firebase 연결 준비 완료. 온라인 상태: " + navigator.onLine);
+    } catch (e) {
+      log("Firebase 설정 없음 → 1번(저장)은 못 하지만 2·3번(카메라·블루투스)은 됩니다. (" + e.message + ")");
+    }
 
     document.getElementById("btnSave").onclick = () => {
+      if (!db) { log("Firebase 설정(firebase-config.js)이 없어서 저장할 수 없어요."); return; }
       const rec = newBoltRecord({
         flangeId: "FL999", boltId: "B01", inspector: "테스트", deviceId: "TAB-TEST",
         vision: { protrusion_mm: 5.0, thread_count: 2, confidence: 0.9, crop_jpg_b64: null, result: "OK" },
@@ -71,8 +79,11 @@
             const line = pending.slice(0, i).trim();
             pending = pending.slice(i + 1);
             if (!line) continue;
-            try { log("타음 수신: " + JSON.stringify(tappingFromBle(JSON.parse(line)))); }
-            catch (err) { log("BLE 메시지 해석 실패: " + line); }
+            try {
+              const msg = JSON.parse(line), f = featuresFromBle(msg);
+              log(`타음 수신 #${msg.seq ?? "-"} (${msg.src ?? "?"})  음향 ${f.mic.peak_hz}Hz / ${f.mic.mag} / ${f.mic.energy_pct}%` +
+                  (f.acc ? `  |  진동 ${f.acc.peak_hz}Hz / ${f.acc.mag}g / ${f.acc.energy_pct}%` : "  |  진동 없음"));
+            } catch (err) { log("BLE 메시지 해석 실패: " + line + " (" + err.message + ")"); }
           }
         });
         log("BLE 연결 OK: " + dev.name);

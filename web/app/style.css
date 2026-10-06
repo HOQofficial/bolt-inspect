@@ -1,0 +1,96 @@
+:root {
+  --bg: #f4f6fa; --card: #fff; --text: #111827; --muted: #64748b; --line: #dbe1ea; --primary: #1d4ed8;
+  --ok: #15803d; --check: #b45309; --ng: #b91c1c;
+  --ok-soft: #dcfce7; --check-soft: #fef3c7; --ng-soft: #fee2e2;
+  --gauge-bg: #f1f5f9; --gauge-ok: #bbf7d0; --gauge-bar: #2563eb; --gauge-thr: #111827;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0f1522; --card: #182033; --text: #e8edf6; --muted: #93a1b8; --line: #2b3650; --primary: #4f83ff;
+          --ok-soft: #12351f; --check-soft: #3b2a0a; --ng-soft: #3d1414;
+          --gauge-bg: #243049; --gauge-ok: #1c5a35; --gauge-bar: #5b8cff; --gauge-thr: #e8edf6; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: hidden; background: var(--bg); color: var(--text);
+  font-family: system-ui, -apple-system, "Noto Sans KR", "Malgun Gothic", sans-serif; -webkit-text-size-adjust: 100%; }
+body { padding-bottom: env(safe-area-inset-bottom); }
+.top { position: sticky; top: 0; z-index: 5; background: var(--primary); color: #fff;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px; }
+.top h1 { margin: 0 0 6px; font-size: 20px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font-size: 12.5px; padding: 3px 10px; border-radius: 999px; background: #ffffff33; }
+.chip.on { background: #16a34a; } .chip.off { background: #00000033; } .chip.warn { background: #f59e0b; color: #1f1300; }
+main { max-width: 1080px; margin: 0 auto; padding: 14px 16px 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+main > *, #resultCard > * { min-width: 0; }
+#resultCard { display: grid; gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+details.card { padding: 10px 14px; }
+h2 { font-size: 15px; margin: 0 0 8px; }
+label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+select, input:not([type]) { width: 100%; font-size: 17px; padding: 11px 10px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+details > summary { cursor: pointer; font-size: 14px; color: var(--muted); padding: 6px 0; }
+.muted { color: var(--muted); font-size: 13px; }
+.center { text-align: center; padding: 22px 14px; }
+.notice { background: var(--check-soft); border: 1px solid #f59e0b66; border-radius: 12px; padding: 10px 12px; font-size: 14px; }
+.btnrow { display: flex; gap: 8px; }
+button { font: inherit; font-size: 16px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--card); color: var(--text); cursor: pointer; }
+button.primary { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; flex: 1; }
+button.big { padding: 18px 14px; font-size: 19px; }
+button.ghost { flex: 0 0 auto; }
+button:disabled { opacity: .45; cursor: default; }
+
+/* 대시보드의 metric 4개 */
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.metric { padding: 4px 2px; }
+.ml { font-size: 13px; color: var(--muted); }
+.mv { font-size: 26px; line-height: 1.25; overflow-wrap: anywhere; }
+
+/* 큰 판정 배너 (ui.banner) */
+.banner { border-radius: 14px; padding: 22px 28px; color: #fff; background: var(--muted); }
+.banner.OK { background: var(--ok); } .banner.CHECK { background: var(--check); } .banner.NG { background: var(--ng); }
+.btitle { font-size: 15px; opacity: .9; }
+.btext { font-size: 40px; font-weight: 700; line-height: 1.25; }
+.bsub { font-size: 14px; opacity: .9; }
+
+/* 센서 카드 + 게이지 (ui.tile / ui.gauge) */
+.sensors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tile { border: 1px solid var(--line); border-left: 8px solid var(--muted); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; background: var(--card); }
+.tile.OK { border-left-color: var(--ok); } .tile.CHECK { border-left-color: var(--check); } .tile.NG { border-left-color: var(--ng); }
+.tile .tt { font-size: 14px; opacity: .75; }
+.tile .tr { font-size: 24px; font-weight: 700; }
+.tile.OK .tr { color: var(--ok); } .tile.CHECK .tr { color: var(--check); } .tile.NG .tr { color: var(--ng); }
+.tile .tl { font-size: 13px; opacity: .8; margin-top: 4px; }
+.tile.none .tr { font-size: 16px; font-weight: 600; color: var(--muted); }
+.g { display: grid; grid-template-columns: 150px minmax(0, 1fr) 96px; align-items: center; gap: 8px; padding: 6px 0 14px; }
+.gl { font-size: 13px; text-align: right; } .gv { font-size: 24px; text-align: left; white-space: nowrap; }
+.in { color: var(--ok); } .out { color: var(--ng); }
+.gb { position: relative; padding-bottom: 16px; }
+.gb svg { display: block; width: 100%; height: 26px; border: 1px solid var(--line); border-radius: 2px; }
+.gt { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; font-size: 11px; color: var(--muted); }
+.gt span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text); }
+.check input { width: 20px; height: 20px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; font-size: 12.5px; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.badge { border-radius: 6px; padding: 2px 9px; font-size: 12.5px; font-weight: 600; color: #111; }
+.badge.OK { background: var(--ok-soft); color: var(--ok); } .badge.CHECK { background: var(--check-soft); color: var(--check); }
+.badge.NG { background: var(--ng-soft); color: var(--ng); }
+.state { color: var(--muted); font-size: 12.5px; }
+pre { white-space: pre-wrap; font-size: 12.5px; max-height: 240px; overflow: auto; background: var(--bg); padding: 10px; border-radius: 8px; margin: 6px 0 0; }
+
+/* 폰(좁은 화면): 대시보드를 좁게 열었을 때처럼 세로로 쌓임 */
+@media (max-width: 760px) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sensors { grid-template-columns: minmax(0, 1fr); }
+  .btext { font-size: 32px; } .banner { padding: 18px 20px; }
+  .g { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
+  .g .gl { grid-column: 1; grid-row: 1; text-align: left; } .g .gv { grid-column: 2; grid-row: 1; font-size: 22px; }
+  .g .gb { grid-column: 1 / -1; grid-row: 2; }
+}

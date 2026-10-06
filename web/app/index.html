@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d4ed8">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <title>볼트 타음 검사</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>🔩 타음 검사</h1>
+    <div class="chips">
+      <span id="chipBle" class="chip off">블루투스 끊김</span>
+      <span id="chipNet" class="chip">온라인</span>
+      <span id="chipPend" class="chip warn" hidden></span>
+    </div>
+  </header>
+
+  <main>
+    <div id="notice" class="notice" hidden></div>
+
+    <section class="card">
+      <h2>검사 설정</h2>
+      <div class="row2">
+        <label>플랜지
+          <select id="selFlange"></select>
+        </label>
+        <label>볼트 (12시부터 시계방향)
+          <select id="selBolt"></select>
+        </label>
+      </div>
+      <div id="refInfo" class="muted"></div>
+      <button id="btnReload" class="ghost" type="button" style="margin-top:6px">🔄 기준 다시 불러오기</button>
+      <details>
+        <summary>검사자 · 기기 이름</summary>
+        <div class="row2">
+          <label>검사자 <input id="inpInspector" maxlength="20" placeholder="홍길동"></label>
+          <label>기기 이름 <input id="inpDevice" maxlength="40" placeholder="TAB-01"></label>
+        </div>
+      </details>
+    </section>
+
+    <div class="btnrow">
+      <button id="btnConnect" class="primary big">블루투스 연결</button>
+      <button id="btnPick" class="ghost" hidden>다른 기기 선택</button>
+      <button id="btnLed" class="ghost" type="button">💡 LED 시험</button>
+    </div>
+
+    <section class="metrics">
+      <div class="metric"><div class="ml">검사 대상</div><div class="mv" id="mTarget">-</div></div>
+      <div class="metric"><div class="ml">센서</div><div class="mv" id="mSensor">-</div></div>
+      <div class="metric"><div class="ml">판정 기준</div><div class="mv" id="mRef">-</div></div>
+      <div class="metric"><div class="ml">이번 측정 횟수</div><div class="mv" id="mCount">0 회</div></div>
+    </section>
+
+    <section id="waitCard" class="card muted center">
+      블루투스를 연결한 뒤 볼트를 치면 여기에 결과가 나와요.
+    </section>
+
+    <section id="resultCard" hidden>
+      <div id="banner" class="banner">
+        <div id="bTitle" class="btitle"></div>
+        <div id="bText" class="btext"></div>
+        <div id="bSub" class="bsub"></div>
+      </div>
+      <div id="simBanner" class="notice" hidden>시험용 가짜 타격이에요. 저장하지 않아요.</div>
+      <div id="warnSat" class="notice" hidden>소리가 너무 커서 잘렸습니다(Peak Magnitude ≈ 1). 마이크를 조금 떨어뜨리거나 더 약하게 치세요. 이 측정은 정상 샘플로 쓰지 마세요.</div>
+      <div id="sensors" class="sensors"></div>
+      <div class="btnrow">
+        <button id="btnSave" class="primary">💾 저장</button>
+        <button id="btnNext" class="ghost">다음 볼트 ▶</button>
+      </div>
+      <label class="check"><input type="checkbox" id="chkAuto" checked> 측정되면 자동 저장</label>
+      <details class="card">
+        <summary>판정 규칙</summary>
+        <pre id="ruleText"></pre>
+      </details>
+      <details class="card">
+        <summary>현재 판정 기준 보기</summary>
+        <div class="tablewrap"><table id="refTable"></table></div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2 id="histTitle">검사 이력</h2>
+      <div class="tablewrap"><table id="hist"></table></div>
+      <div id="histEmpty" class="muted">아직 이 기기에서 저장한 기록이 없어요.</div>
+    </section>
+
+    <details class="card">
+      <summary>연결 기록 (문제가 생기면 여기 글을 알려 주세요)</summary>
+      <pre id="log"></pre>
+    </details>
+  </main>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>

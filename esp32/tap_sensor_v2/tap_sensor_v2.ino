@@ -16,10 +16,11 @@
 //  - 테스트용: BOOT 짧게 = 가짜 타격(src:"sim"), BOOT 1초 꾹 = 가짜 상태 바꾸기
 //  - 시리얼 모니터 글자: d = 센서 값 계속 보기(배선 확인용) / t = 가짜 타격 / 1 2 3 = 가짜 상태
 //  - Wi-Fi: 이름 TAP-01, 비밀번호 bolt1234, 주소 http://192.168.4.1   (/latest = 최근 측정 JSON)
+//  - 판정 LED: 초록(정상) / 빨강 깜빡임(재측정) / 빨강(체결 이상 의심). 핀·배선은 PIN_LED_* 참고. 폰(블루투스 쓰기)·PC(USB "L,OK")가 판정 결과를 보내 줌
 //  - BLE: 이름 TAP-01 (web/index.html 과 같은 UUID, 20바이트씩 나눠 보내고 줄바꿈으로 끝)
 
-#define USE_WIFI 1          // Wi-Fi(SoftAP) 쓰기  (0 으로 하면 끔)
-#define USE_BLE  0          // 블루투스 쓰기 (1 로 하면 켬). 지금은 Wi-Fi 로 테스트하므로 끔.
+#define USE_WIFI 0          // Wi-Fi(SoftAP) 쓰기 (1 로 하면 켬). 블루투스와 같이 켜면 메모리 부족이라 지금은 끔.
+#define USE_BLE  1          // 블루투스 쓰기 (0 으로 하면 끔). 폰 앱으로 쓰므로 켬.
                             // Wi-Fi + 블루투스를 같이 켜면 메모리가 모자라 재부팅될 수 있어 나중에 따로 시험
 
 #include <Wire.h>
@@ -39,13 +40,22 @@
 const char* NAME = "TAP-01";            // Wi-Fi 이름 = BLE 이름 (장치마다 TAP-01, TAP-02 ...)
 const char* PASS = "bolt1234";          // Wi-Fi 비밀번호 (8자 이상)
 #define SERVICE_UUID "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
-#define CHAR_UUID    "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+#define CHAR_UUID    "6e400003-b5a3-f393-e0a9-e50e24dcca9e"   // 측정값 보내는 통로 (ESP32 → 폰, notify)
+#define RX_UUID      "6e400002-b5a3-f393-e0a9-e50e24dcca9e"   // 판정 받는 통로 (폰 → ESP32, write) : LED 켜기용
 #define PIN_WS 25
 #define PIN_SCK 32
 #define PIN_SD 33
 #define PIN_SDA 21
 #define PIN_SCL 22
 #define BOOT_PIN 0
+// ---- 판정 LED (조원 작성 코드 반영) ----
+// LED 의 (+)쪽: 저항(220~330Ω)을 거쳐 아래 핀에 연결. LED 의 (-)쪽: 아래 '가짜 GND' 핀에 연결 (이 핀을 LOW 로 고정해서 GND 처럼 씀)
+#define PIN_LED_GREEN 13
+#define PIN_LED_RED   14
+#define PIN_GND_GREEN 16
+#define PIN_GND_RED   17
+const unsigned long LED_HOLD_MS = 15000;   // 판정 불빛을 켜 두는 시간 (0 이면 다음 판정·OFF 명령까지 계속)
+const unsigned long LED_BLINK_MS = 400;    // 재측정(CHECK) 은 빨강이 이 간격으로 깜빡임
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 2
 #endif
@@ -179,6 +189,40 @@ float micRead(float* out) {
   return pk;
 }
 
+// ---------------- 판정 LED ----------------
+// 정상(OK)=초록 켜짐 / 재측정(CHECK)=빨강 깜빡임 / 체결 이상 의심(NG)=빨강 켜짐 / OFF=끔
+// 명령은 "L,OK" "L,CHECK" "L,NG" "L,OFF" 한 줄. 폰은 블루투스(RX_UUID)로, PC 대시보드는 USB 시리얼로 보냄.
+enum LedMode { LED_OFF_M, LED_OK_M, LED_CHECK_M, LED_NG_M };
+volatile LedMode ledMode = LED_OFF_M;
+volatile unsigned long ledSince = 0;
+
+void ledCommand(const char* s) {           // s = "OK" / "CHECK" / "NG" / "OFF" (앞의 "L," 은 뺀 것)
+  LedMode m = LED_OFF_M;
+  if (!strcmp(s, "OK")) m = LED_OK_M;
+  else if (!strcmp(s, "CHECK")) m = LED_CHECK_M;
+  else if (!strcmp(s, "NG")) m = LED_NG_M;
+  else if (strcmp(s, "OFF")) return;       // 모르는 글자는 무시
+  ledMode = m;
+  ledSince = millis();
+}
+
+void ledUpdate() {                         // loop 에서 자주 불러 줌 (기다리지 않음)
+  LedMode m = ledMode;
+  if (m != LED_OFF_M && LED_HOLD_MS > 0 && millis() - ledSince > LED_HOLD_MS) { ledMode = m = LED_OFF_M; }
+  bool g = (m == LED_OK_M);
+  bool r = (m == LED_NG_M) || (m == LED_CHECK_M && ((millis() - ledSince) / LED_BLINK_MS) % 2 == 0);
+  digitalWrite(PIN_LED_GREEN, g ? HIGH : LOW);
+  digitalWrite(PIN_LED_RED, r ? HIGH : LOW);
+}
+
+void ledBegin() {
+  pinMode(PIN_GND_GREEN, OUTPUT); pinMode(PIN_GND_RED, OUTPUT);       // 가짜 GND 먼저 LOW 로 고정
+  digitalWrite(PIN_GND_GREEN, LOW); digitalWrite(PIN_GND_RED, LOW);
+  pinMode(PIN_LED_GREEN, OUTPUT); pinMode(PIN_LED_RED, OUTPUT);
+  digitalWrite(PIN_LED_GREEN, HIGH); delay(250); digitalWrite(PIN_LED_GREEN, LOW);   // 켜질 때 한 번씩 깜빡여서 배선 확인
+  digitalWrite(PIN_LED_RED, HIGH);   delay(250); digitalWrite(PIN_LED_RED, LOW);
+}
+
 // ---------------- 보내기 (USB + Wi-Fi + BLE) ----------------
 #if USE_WIFI
 WebServer server(80);
@@ -186,6 +230,14 @@ WebServer server(80);
 #if USE_BLE
 BLECharacteristic* ch = nullptr;
 bool bleConnected = false;
+class RxCB : public BLECharacteristicCallbacks {      // 폰이 보낸 "L,OK" 같은 글자를 받음
+  void onWrite(BLECharacteristic* c) override {
+    auto raw = c->getValue();                             // 코어 버전에 따라 std::string 또는 String
+    String v = String(raw.c_str());
+    v.trim();
+    if (v.startsWith("L,")) ledCommand(v.c_str() + 2);
+  }
+};
 class ServerCB : public BLEServerCallbacks {
   void onConnect(BLEServer*) override { bleConnected = true; Serial.println("# BLE 연결됨"); }
   void onDisconnect(BLEServer*) override { bleConnected = false; Serial.println("# BLE 끊김"); BLEDevice::startAdvertising(); }
@@ -318,6 +370,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(BOOT_PIN, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
+  ledBegin();
   delay(300);
   Serial.println("# tap_sensor_v2 시작");
 #if USE_BLE
@@ -327,6 +380,8 @@ void setup() {
   BLEService* svc = srv->createService(SERVICE_UUID);
   ch = svc->createCharacteristic(CHAR_UUID, BLECharacteristic::PROPERTY_NOTIFY);
   ch->addDescriptor(new BLE2902());
+  BLECharacteristic* rx = svc->createCharacteristic(RX_UUID, BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR);
+  rx->setCallbacks(new RxCB());
   svc->start();
   BLEDevice::getAdvertising()->addServiceUUID(SERVICE_UUID);
   BLEDevice::startAdvertising();
@@ -360,7 +415,7 @@ void setup() {
   micOk = micNonZero > 40 * BLK / 2;                     // 절반 넘게 값이 들어와야 마이크가 있는 것
   Serial.println(micOk ? "# INMP441 OK" : "# INMP441 없음 → 배선 확인 (WS 25, SCK 32, SD 33, L/R GND, VDD 3.3V). 자동 타격 감지 꺼짐");
   Serial.printf("# 남은 메모리 %u bytes\n", (unsigned)ESP.getFreeHeap());
-  Serial.println("# 준비 완료. 볼트를 치세요. (시리얼 글자: d=센서값 보기, t=가짜 타격, 1/2/3=가짜 상태)");
+  Serial.println("# 준비 완료. 볼트를 치세요. (시리얼 글자: d=센서값 보기, t=가짜 타격, 1/2/3=가짜 상태, L,OK / L,CHECK / L,NG / L,OFF = 판정 LED)");
 }
 
 unsigned long lastDbg = 0;
@@ -386,9 +441,18 @@ void loop() {
     Serial.printf("# 마이크 최대 %.4f (소음 %.4f, 타격 기준 %.4f) / 진동 %.3f g\n", dbgPeak, noise, trig, accLast);
     dbgPeak = 0; lastDbg = millis();
   }
+  ledUpdate();
   // 시리얼 글자 명령
   while (Serial.available()) {
     char c = Serial.read();
+    static char cmd[10]; static int ci = -1;               // "L,OK\n" 같은 LED 명령 한 줄 받기
+    if (ci < 0 && c == 'L') { ci = 0; continue; }
+    if (ci >= 0) {
+      if (c == '\n' || c == '\r') { cmd[ci] = 0; if (cmd[0] == ',') ledCommand(cmd + 1); ci = -1; }
+      else if (ci < 9) cmd[ci++] = c;
+      else ci = -1;
+      continue;
+    }
     if (c == 'd' || c == 'D') { debugOn = !debugOn; Serial.println(debugOn ? "# 센서 값 보기 켬" : "# 센서 값 보기 끔"); }
     else if (c == 't' || c == 'T') simTap();
     else if (c >= '1' && c <= '3') setSim(c - '1');

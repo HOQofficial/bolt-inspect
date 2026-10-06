@@ -14,3 +14,7 @@ data/public_zips/
 data/train_set/
 data/train_set.zip
 data/train_set_preview/
+# 앱(Capacitor) 빌드 결과물
+node_modules/
+www/
+web/app/_config.js

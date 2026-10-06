@@ -56,8 +56,12 @@ def log_sample(res, inspector_name, state="normal", torque_pct=100):
     return hit_no
 
 ss = st.session_state
-for k, v in {"result": None, "samples": [], "count": 0, "last_saved": None}.items():
+for k, v in {"result": None, "samples": [], "count": 0, "last_saved": None, "phone_seen": None}.items():
     ss.setdefault(k, v)
+PHONE = "폰·태블릿"
+PC_DEVICES = {"PC-MIC", "TAP-USB", "TAP-WIFI", "PC-SIM"}   # 이 화면이 직접 측정해 저장한 기록의 기기 이름
+if ss.get("pending_sel"):   # 폰에서 측정한 플랜지·볼트로 선택을 맞춤 (위젯을 그리기 전에 바꿔야 함)
+    ss.sel_fid, ss.sel_bolt = ss.pop("pending_sel")
 
 
 @st.cache_data(ttl=15)
@@ -129,11 +133,12 @@ if not FL:
 # ---------------- 사이드바: 검사 설정 + 정상 기준 등록 ----------------
 with st.sidebar:
     st.header("검사 설정")
-    fid = st.selectbox("플랜지", sorted(FL))
+    fid = st.selectbox("플랜지", sorted(FL), key="sel_fid")
     f = FL[fid]
-    bolt = st.selectbox("볼트 (12시부터 시계방향)", [f"B{i:02d}" for i in range(1, f["bolt_count"] + 1)])
+    bolt = st.selectbox("볼트 (12시부터 시계방향)", [f"B{i:02d}" for i in range(1, f["bolt_count"] + 1)],
+                        key="sel_bolt")
     inspector = st.text_input("검사자", value=ss.get("inspector", "홍길동"), key="inspector")
-    source = st.radio("측정 방식", ["가상 데이터", "PC 마이크", "ESP32 (USB)", "ESP32 (Wi-Fi)"], horizontal=True,
+    source = st.radio("측정 방식", ["가상 데이터", "PC 마이크", "ESP32 (USB)", "ESP32 (Wi-Fi)", PHONE], horizontal=True,
                       help="PC 마이크 = 이어폰·헤드셋 마이크로 실제 타격음 테스트 (음향 센서만)")
     if source == "가상 데이터":
         cond = st.selectbox("가상 측정 조건", CONDITIONS)
@@ -155,6 +160,12 @@ with st.sidebar:
             mic_idx = None
         st.caption("측정 시작 후 2초 안에 마이크 가까이(10~20cm)에서 볼트를 한 번 두드리세요. "
                    "처음엔 '정상 기준 등록'부터 하세요 (데모 기준은 가상 데이터용).")
+    elif source == PHONE:
+        phone_every = st.select_slider("폰 측정 확인 간격(초)", [3, 5, 10], value=5,
+                                       help="한 번에 1건만 읽어서 읽기 한도(하루 5만)는 거의 안 써요.")
+        st.caption("폰·태블릿 앱에서 측정하면 이 화면에 자동으로 나타나요. 폰 앱의 '측정되면 자동 저장'이 켜져 있어야 하고, "
+                   "폰은 ESP32 와 블루투스로 연결돼 있어야 해요. 이 화면을 연 뒤에 새로 측정한 것부터 보여요. "
+                   "(저장소가 Firestore 일 때만 폰 기록이 와요)")
     elif source == "ESP32 (Wi-Fi)":
         wifi_addr = st.text_input("ESP32 주소", "192.168.4.1", help="ESP32 SoftAP 기본 주소. 시리얼 모니터 첫 줄에도 나옴")
         wifi_auto = st.toggle("테스트용 가짜 타격 자동 요청", value=False,
@@ -178,6 +189,9 @@ with st.sidebar:
             port = st.text_input("COM 포트 (직접 입력)", "COM3")
         st.caption("Arduino IDE 의 시리얼 모니터는 꼭 닫으세요 (포트를 한 프로그램만 쓸 수 있어요). "
                    "▶ 측정 시작을 누른 뒤 10초 안에 ESP32 의 BOOT 버튼을 짧게 누르세요.")
+    if source == "ESP32 (USB)":
+        led_on = st.toggle("판정 LED 켜기 (ESP32)", value=True,
+                           help="측정 결과에 따라 ESP32 에 연결한 초록(정상)·빨강(재측정 깜빡임 / 이상 켜짐) LED 를 켭니다")
     autosave = st.toggle("측정하면 자동 저장", value=True)
 
     st.divider()
@@ -246,8 +260,40 @@ c2.metric("센서", "음향 + 진동", help="INMP441 마이크 + MPU6050 가속�
 c3.metric("판정 기준", f"실측 n={ref['n']}" if f.get("tap_ref") else "데모 기준", help=ref_src)
 c4.metric("이번 측정 횟수", f"{ss.count} 회")
 
+# ---------------- 폰·태블릿 측정 자동 받기 ----------------
+def phone_poll():
+    """폰 앱이 Firebase 에 저장한 기록 중, 이 방식을 켠 시점(2분 전부터) 이후의 새 기록을 가져옴.
+    '시각 범위'로 읽기 때문에 예전·미래 날짜의 시험 기록이 섞여 있어도 영향이 없음."""
+    now = pd.Timestamp.now(tz="Asia/Seoul")
+    if ss.get("phone_since") is None:
+        ss.phone_since = (now - pd.Timedelta(minutes=2)).isoformat(timespec="seconds")
+    try:
+        recs = store.inspections_between(ss.phone_since, (now + pd.Timedelta(minutes=5)).isoformat(timespec="seconds"), 5)
+    except Exception as e:
+        st.error(f"폰 기록을 읽지 못했어요: {e}")
+        return
+    cand = [r for r in recs if r.get("type") == "BOLT" and r.get("device_id") not in PC_DEVICES
+            and (r.get("tapping") or {}).get("model") == "range" and r["tapping"].get("features")]
+    st.caption(f"📲 폰·태블릿 측정 대기 중 · {now:%H:%M:%S} 에 확인 · 이 시각 이후 폰 기록 {len(cand)}건 확인됨"
+               + ("" if store.KEY.exists() else " · ⚠ key.json 이 없어 폰 기록을 받을 수 없어요"))
+    rec = cand[0] if cand else None
+    if rec and rec["record_id"] != ss.phone_seen:
+        ss.phone_seen = rec["record_id"]
+        ss.result = {"features": rec["tapping"]["features"], "tapping": rec["tapping"], "doc": rec, "sim": False,
+                     "spec": None, "source": PHONE}
+        ss.count += 1
+        ss.last_saved = rec["record_id"]
+        ss.pending_sel = (rec["flange_id"], rec["bolt_id"])
+        st.rerun()                                  # 전체 화면을 다시 그려 아래 판정·게이지를 갱신
+
+
+if source == PHONE:
+    st.fragment(phone_poll, run_every=f"{phone_every}s")()
+else:
+    ss.phone_seen, ss.phone_since = None, None      # 다른 방식으로 바꿨다가 돌아오면 그 시점부터 다시 받음
+
 # ---------------- 측정 ----------------
-if st.button("▶ 측정 시작", type="primary", width="stretch"):
+if source != PHONE and st.button("▶ 측정 시작", type="primary", width="stretch"):
     try:
         spec = None
         with st.spinner("🔴 녹음 중! 지금 볼트를 두드리세요 (2초)" if source == "PC 마이크"
@@ -269,6 +315,11 @@ if st.button("▶ 측정 시작", type="primary", width="stretch"):
             else:
                 feats = read_serial(port)
         tapping = tapping_from_features(feats, ref, ref_src)
+        if source == "ESP32 (USB)" and led_on and ss.get("ser"):   # 판정을 ESP32 LED 로 알림 (실패해도 측정은 계속)
+            try:
+                ss.ser.write(f"L,{tapping['result']}\n".encode())
+            except Exception:
+                pass
         at = now_kst_iso()
         doc = {"schema_version": SCHEMA_VERSION, "record_id": make_record_id(fid, bolt, at), "type": "BOLT",
                "flange_id": fid, "bolt_id": bolt, "inspector": inspector or "미입력", "device_id": {"PC 마이크": "PC-MIC", "ESP32 (USB)": "TAP-USB", "ESP32 (Wi-Fi)": "TAP-WIFI"}.get(source, "PC-SIM"),
@@ -287,7 +338,8 @@ if st.button("▶ 측정 시작", type="primary", width="stretch"):
 
 r = ss.result
 if r is None:
-    st.info("왼쪽에서 플랜지·볼트를 고르고 '측정 시작'을 누르세요.")
+    st.info("폰·태블릿에서 측정하면 여기에 나타나요." if source == PHONE
+            else "왼쪽에서 플랜지·볼트를 고르고 '측정 시작'을 누르세요.")
     st.stop()
 
 # 기준이 바뀌었으면 화면의 결과를 현재 기준으로 다시 판정 (조원 V3 와 같은 동작)
