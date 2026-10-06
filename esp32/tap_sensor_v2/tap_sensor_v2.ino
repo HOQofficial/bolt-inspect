@@ -49,6 +49,7 @@ const char* PASS = "bolt1234";          // Wi-Fi 비밀번호 (8자 이상)
 #define PIN_SCL 22
 #define BOOT_PIN 0
 const int FAKE_GND_MIC_LR = 27;         // 마이크 L/R 핀을 연결한 GPIO. 켜질 때 LOW 로 고정해서 GND 처럼 씀 (LOW = 왼쪽 채널)
+const int MOSFET_GATE = 23;             // MOSFET 게이트 (솔레노이드 스위치). 켜질 때 LOW 로 고정
 // ---- 판정 LED (조원 작성 코드 반영) ----
 // LED 의 (+)쪽: 저항(220~330Ω)을 거쳐 아래 핀에 연결. LED 의 (-)쪽: 아래 '가짜 GND' 핀에 연결 (이 핀을 LOW 로 고정해서 GND 처럼 씀)
 #define PIN_LED_GREEN 13
@@ -368,6 +369,8 @@ void sendLatest() {
 
 // ---------------- setup / loop ----------------
 void setup() {
+  pinMode(MOSFET_GATE, OUTPUT);           // 솔레노이드 오작동 방지: 가장 먼저 LOW
+  digitalWrite(MOSFET_GATE, LOW);
   Serial.begin(115200);
   pinMode(FAKE_GND_MIC_LR, OUTPUT);       // 마이크 L/R 가짜 GND: 마이크를 읽기 전에 가장 먼저 LOW 로 고정
   digitalWrite(FAKE_GND_MIC_LR, LOW);
