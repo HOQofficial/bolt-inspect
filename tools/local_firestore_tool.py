@@ -3,7 +3,8 @@
 사용법 (프로젝트 폴더에서, 가상환경을 켠 상태로):
   python tools/local_firestore_tool.py up        local_db 의 플랜지·기록을 Firestore 로 올림 (local_db 는 그대로 남음)
   python tools/local_firestore_tool.py up --real 가짜 시험 데이터(sample/fake_*.json 에 있는 것)는 빼고 내가 만든 것만 올림
-  python tools/local_firestore_tool.py wipe      Firestore 의 플랜지·기록을 전부 지움 (local_db 는 건드리지 않음)
+  python tools/local_firestore_tool.py wipe          Firestore 의 '검사 기록'만 지움. 플랜지와 정상 기준(tap_ref)은 그대로 남음 (local_db 도 그대로)
+  python tools/local_firestore_tool.py wipe --all    검사 기록 + 플랜지(정상 기준 포함)까지 전부 지움
 
 올리기는 같은 ID 면 덮어쓰기라서 여러 번 해도 중복되지 않아요. 지우기 전에는 '삭제' 를 직접 입력해야 해요.
 """
@@ -52,15 +53,17 @@ def up(real_only):
         print(f"{name}: {n}개 올림" + (f" (형식 오류로 건너뜀 {bad}개)" if bad else ""))
 
 
-def wipe():
+def wipe(everything):
     if not store.KEY.exists():
         sys.exit("key.json 이 없어요.")
     db = store._db()
-    counts = {n: sum(1 for _ in db.collection(n).stream()) for n in KEYS}
-    print(f"Firestore 에 있는 것: 플랜지 {counts['flanges']}개, 검사 기록 {counts['inspections']}개")
-    if input("전부 지우려면 '삭제' 라고 입력하세요 (취소는 그냥 엔터): ").strip() != "삭제":
+    names = list(KEYS) if everything else ["inspections"]
+    counts = {n: sum(1 for _ in db.collection(n).stream()) for n in names}
+    print("Firestore 에 있는 것: " + ", ".join(f"{'플랜지' if n == 'flanges' else '검사 기록'} {c}개" for n, c in counts.items()))
+    print("지우는 대상: " + (" + ".join("플랜지(정상 기준 포함)" if n == "flanges" else "검사 기록" for n in names)))
+    if input("지우려면 '삭제' 라고 입력하세요 (취소는 그냥 엔터): ").strip() != "삭제":
         sys.exit("취소했어요. 아무것도 지우지 않았어요.")
-    for name in KEYS:
+    for name in names:
         docs = list(db.collection(name).stream())
         for i in range(0, len(docs), 400):
             b = db.batch()
@@ -75,6 +78,6 @@ if __name__ == "__main__":
     if a[:1] == ["up"]:
         up("--real" in a)
     elif a[:1] == ["wipe"]:
-        wipe()
+        wipe("--all" in a)
     else:
         print(__doc__)

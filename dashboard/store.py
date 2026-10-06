@@ -109,3 +109,29 @@ def inspections_between(start_iso, end_iso, n=5):
         return [d.to_dict() for d in q.stream()]
     docs = [d for d in _read("inspections") if start_iso <= d["inspected_at"] <= end_iso]
     return sorted(docs, key=lambda d: d["inspected_at"], reverse=True)[:n]
+
+
+def inspections_since(after_iso):
+    """inspected_at 이 after_iso 보다 나중인 기록만 (새로 생긴 것만 읽어서 읽기 한도를 아낌)."""
+    if KEY.exists():
+        c = _db().collection("inspections")
+        try:
+            from google.cloud.firestore_v1.base_query import FieldFilter
+            c = c.where(filter=FieldFilter("inspected_at", ">", after_iso))
+        except ImportError:
+            c = c.where("inspected_at", ">", after_iso)
+        return [d.to_dict() for d in c.order_by("inspected_at").stream()]
+    return [d for d in _read("inspections") if d["inspected_at"] > after_iso]
+
+
+def inspections_for_bolt(flange_id, bolt_id):
+    """한 볼트의 기록만 (그 볼트 기록 수만큼만 읽음)."""
+    if KEY.exists():
+        c = _db().collection("inspections")
+        try:
+            from google.cloud.firestore_v1.base_query import FieldFilter
+            c = c.where(filter=FieldFilter("flange_id", "==", flange_id)).where(filter=FieldFilter("bolt_id", "==", bolt_id))
+        except ImportError:
+            c = c.where("flange_id", "==", flange_id).where("bolt_id", "==", bolt_id)
+        return [d.to_dict() for d in c.stream()]
+    return [d for d in _read("inspections") if d["flange_id"] == flange_id and d["bolt_id"] == bolt_id]

@@ -284,6 +284,7 @@ def phone_poll():
         ss.count += 1
         ss.last_saved = rec["record_id"]
         ss.pending_sel = (rec["flange_id"], rec["bolt_id"])
+        st.cache_data.clear()                       # 새 기록이 이력 표에 바로 보이게
         st.rerun()                                  # 전체 화면을 다시 그려 아래 판정·게이지를 갱신
 
 
@@ -451,7 +452,12 @@ with st.expander("현재 판정 기준 보기"):
                  hide_index=True, width="stretch")
 
 st.subheader(f"{fid}-{bolt} 검사 이력")
-hist = [d for d in store.list_inspections() if d["flange_id"] == fid and d["bolt_id"] == bolt]
+@st.cache_data(ttl=20)
+def bolt_hist(flange_id, bolt_id):      # 이 볼트 기록만 읽음 (전체를 읽으면 Firebase 읽기 한도를 금방 씀)
+    return store.inspections_for_bolt(flange_id, bolt_id)
+
+
+hist = bolt_hist(fid, bolt)
 if hist:
     h = pd.json_normalize(hist).sort_values("inspected_at", ascending=False)
     h["판정"] = h.final_result.map(ui.KO)

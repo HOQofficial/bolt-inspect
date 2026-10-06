@@ -4,7 +4,7 @@
 // 추가 라이브러리 설치 필요 없음 (FFT 도 이 파일 안에 있음)
 //
 // ---------------- 배선 ----------------
-//  INMP441  VDD→3.3V  GND→GND  L/R→GND  WS→GPIO25  SCK→GPIO32  SD→GPIO33
+//  INMP441  VDD→3.3V  GND→GND  L/R→GPIO27 (LOW 로 고정해서 GND 처럼 씀)  WS→GPIO25  SCK→GPIO32  SD→GPIO33
 //  MPU6050  VCC→3.3V  GND→GND  SDA→GPIO21  SCL→GPIO22  (AD0, INT 는 연결 안 함)
 //
 // ---------------- 동작 ----------------
@@ -48,6 +48,7 @@ const char* PASS = "bolt1234";          // Wi-Fi 비밀번호 (8자 이상)
 #define PIN_SDA 21
 #define PIN_SCL 22
 #define BOOT_PIN 0
+const int FAKE_GND_MIC_LR = 27;         // 마이크 L/R 핀을 연결한 GPIO. 켜질 때 LOW 로 고정해서 GND 처럼 씀 (LOW = 왼쪽 채널)
 // ---- 판정 LED (조원 작성 코드 반영) ----
 // LED 의 (+)쪽: 저항(220~330Ω)을 거쳐 아래 핀에 연결. LED 의 (-)쪽: 아래 '가짜 GND' 핀에 연결 (이 핀을 LOW 로 고정해서 GND 처럼 씀)
 #define PIN_LED_GREEN 13
@@ -368,6 +369,8 @@ void sendLatest() {
 // ---------------- setup / loop ----------------
 void setup() {
   Serial.begin(115200);
+  pinMode(FAKE_GND_MIC_LR, OUTPUT);       // 마이크 L/R 가짜 GND: 마이크를 읽기 전에 가장 먼저 LOW 로 고정
+  digitalWrite(FAKE_GND_MIC_LR, LOW);
   pinMode(BOOT_PIN, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
   ledBegin();
@@ -413,7 +416,7 @@ void setup() {
   micNonZero = 0;
   for (int i = 0; i < 40; i++) micRead(curBlk);          // 약 0.3초 동안 마이크 확인 + 소음 측정
   micOk = micNonZero > 40 * BLK / 2;                     // 절반 넘게 값이 들어와야 마이크가 있는 것
-  Serial.println(micOk ? "# INMP441 OK" : "# INMP441 없음 → 배선 확인 (WS 25, SCK 32, SD 33, L/R GND, VDD 3.3V). 자동 타격 감지 꺼짐");
+  Serial.println(micOk ? "# INMP441 OK" : "# INMP441 없음 → 배선 확인 (WS 25, SCK 32, SD 33, L/R GPIO27, VDD 3.3V). 자동 타격 감지 꺼짐");
   Serial.printf("# 남은 메모리 %u bytes\n", (unsigned)ESP.getFreeHeap());
   Serial.println("# 준비 완료. 볼트를 치세요. (시리얼 글자: d=센서값 보기, t=가짜 타격, 1/2/3=가짜 상태, L,OK / L,CHECK / L,NG / L,OFF = 판정 LED)");
 }
