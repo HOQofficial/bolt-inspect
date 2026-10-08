@@ -1,4 +1,5 @@
 // PC 대시보드(dashboard/ui.py 의 gauge)와 같은 막대 게이지: 초록 = 정상 범위, 파란 막대 = 측정값, 검은 선 = 측정값 위치.
+// 폰 화면은 한 줄에 라벨·값, 아래에 막대, 맨 아래에 정상 범위 글자 (gaugeCompactHtml).
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 // ui.py gauge() 와 같은 계산: 축 범위와 색 칸
@@ -38,4 +39,18 @@ export function gaugeHtml(label, val, lo, hi, unit, valueText) {
   return `<div class="g"><div class="gl ${cls}">${inside ? "✓" : "✕"} ${esc(label)}</div>` +
     `<div class="gb"><svg viewBox="0 0 100 10" preserveAspectRatio="none" role="img" aria-label="${esc(label)} ${esc(valueText)}">${rects}${bar}${thr}</svg>` +
     `<div class="gt">${ticks}</div></div><div class="gv ${cls}">${esc(valueText)}</div></div>`;
+}
+
+// 폰용 간결한 게이지: 라벨 + 값 한 줄, 둥근 막대(정상 범위 = 연한 칸, 측정값 = 동그란 점), 정상 범위 글자.
+// 예) rangeText = "정상 280 ~ 340 Hz"
+export function gaugeCompactHtml(label, val, lo, hi, unit, valueText, rangeText) {
+  const { xmin, xmax, loC, hiC } = gaugeRange(val, lo, hi, unit);
+  const inside = lo <= val && val <= hi;
+  const cls = inside ? "in" : "out";
+  const p = (v) => Math.min(100, Math.max(0, ((v - xmin) / (xmax - xmin)) * 100));
+  return `<div class="gc ${cls}"><div class="gc-top"><span class="gc-l">${esc(label)}</span><span class="gc-v">${esc(valueText)}</span></div>` +
+    `<div class="gtrack" role="img" aria-label="${esc(label)} ${esc(valueText)}">` +
+    `<i class="gband" style="left:${p(loC).toFixed(2)}%;width:${(p(hiC) - p(loC)).toFixed(2)}%"></i>` +
+    `<i class="gdot" style="left:${p(val).toFixed(2)}%"></i></div>` +
+    `<div class="gc-r">${inside ? "정상 범위 안" : "정상 범위 밖"} · ${esc(rangeText)}</div></div>`;
 }

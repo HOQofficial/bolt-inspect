@@ -26,19 +26,3 @@ def mock_features(cond="정상 체결", rng=None):
     clip = lambda v: float(np.clip(v, 0, 100))
     return {"mic": {"peak_hz": round(float(mf), 1), "mag": round(float(max(mm, 0)), 3), "energy_pct": round(clip(me), 1)},
             "acc": {"peak_hz": round(float(af), 1), "mag": round(float(max(am, 0)), 3), "energy_pct": round(clip(ae), 1)}}
-
-
-def mock_spectra(features, rng=None):
-    """화면용 FFT 그래프 데이터 (가상). 실제 연결 시에는 ESP32 가 스펙트럼을 보내지 않으므로 생략됨."""
-    g = rng or np.random.default_rng()
-    m, a = features["mic"], features["acc"]
-    fm = np.linspace(0, 8000, 801)
-    ms = g.uniform(.01, .04, len(fm))
-    ms += max(m["mag"], .05) * np.exp(-.5 * ((fm - m["peak_hz"]) / 115) ** 2)
-    ms += .18 * np.exp(-.5 * ((fm - m["peak_hz"] * .52) / 90) ** 2)
-    fa = np.linspace(0, 500, 501)
-    ac = g.uniform(.01, .035, len(fa))
-    if a:
-        ac += max(a["mag"], .05) * np.exp(-.5 * ((fa - a["peak_hz"]) / 14) ** 2)
-        ac += .14 * np.exp(-.5 * ((fa - a["peak_hz"] * .48) / 10) ** 2)
-    return fm, ms, fa, ac

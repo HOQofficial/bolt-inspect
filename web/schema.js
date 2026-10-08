@@ -51,6 +51,47 @@ export function featuresFromBle(msg) {
   return { mic, acc };
 }
 
+// ESP32 가 보내는 FFT 막대의 주파수 범위 (tools/schema_rules.py 의 SP_MIC_FMAX / SP_ACC_FMAX, 펌웨어의 SP_* 와 같아야 함)
+export const SP_MIC_FMAX = 8000, SP_ACC_FMAX = 500;
+
+// ESP32 메시지의 FFT 막대(sm=음향, sa=진동) -> tapping.spectrum. 없으면 null. (tools/schema_rules.py 의 spectrum_from_msg 와 같음)
+export function spectrumFromBle(msg) {
+  const trace = (v, fmax) => ({ f_max: fmax, v: v.map((x) => Math.max(0, Math.min(100, Math.round(Number(x) || 0)))) });
+  if (!Array.isArray(msg.sm) || msg.sm.length < 8) return null;
+  return { mic: trace(msg.sm, SP_MIC_FMAX), acc: Array.isArray(msg.sa) && msg.sa.length >= 8 ? trace(msg.sa, SP_ACC_FMAX) : null };
+}
+
+// 정상 기준 계산 (tools/schema_rules.py 의 calc_tap_ref 와 같은 규칙: 평균 ± k × 표준편차, 폭이 너무 좁으면 최소 폭)
+const FEATURE_KEYS = ["peak_hz", "mag", "energy_pct"];
+const FLOOR = { peak_hz: (m) => m * 0.01, mag: (m) => Math.max(m * 0.03, 0.01), energy_pct: (m) => Math.max(m * 0.03, 1.0) };
+const round4 = (x) => Math.round(x * 1e4) / 1e4;
+function rangeFrom(vals, kSigma) {
+  const out = {};
+  for (const k of FEATURE_KEYS) {
+    const v = vals.map((x) => Number(x[k])).filter(Number.isFinite);
+    if (!v.length) throw new Error(`${k} 값이 모두 비정상입니다. 샘플을 지우고 다시 측정하세요.`);
+    const mean = v.reduce((a, b) => a + b, 0) / v.length;
+    const sd = v.length > 1 ? Math.sqrt(v.reduce((a, b) => a + (b - mean) ** 2, 0) / (v.length - 1)) : 0;
+    const w = Math.max(kSigma * sd, FLOOR[k](mean));
+    out[k] = [round4(Math.max(mean - w, 0)), round4(mean + w)];
+  }
+  return out;
+}
+// samples = [{mic:{...}, acc:{...}|null}, ...] (3개 이상). 돌려주는 값 = flange.tap_ref
+export function calcTapRef(samples, kSigma) {
+  if (samples.length < 3) throw new Error("정상 샘플이 3개 이상 필요해요.");
+  const ref = {};
+  for (const s of ["mic", "acc"]) {
+    const vals = samples.map((x) => x[s]).filter(Boolean);
+    if (!vals.length) { ref[s] = null; continue; }
+    if (vals.length < samples.length) {
+      throw new Error(`${s === "mic" ? "음향" : "진동"} 값이 없는 샘플이 섞여 있어요 (${vals.length}/${samples.length}개만 있음). 샘플을 지우고 같은 방식으로 다시 모으세요.`);
+    }
+    ref[s] = rangeFrom(vals, kSigma);
+  }
+  return { mic: ref.mic, acc: ref.acc, n: samples.length, k_sigma: Number(kSigma), registered_at: nowKstIso() };
+}
+
 // 범위 판정 (tools/schema_rules.py 의 judge_range 와 같음). ref = flange.tap_ref
 export function judgeRange(features, ref) {
   const keys = ["peak_hz", "mag", "energy_pct"];

@@ -16,7 +16,7 @@
 ## 구조
 - `schema/` 스키마 v1.2 (flanges, inspections). 필드 이름 바꾸지 말 것.
   v1.2 변경: vision.marking(I-마킹: gap_pct, method, color, result) 추가, vision.protrusion_mm/thread_count 가 null 허용(마킹만 검사할 때).
-- `tools/schema_rules.py` 공용 판정 규칙, `tools/audio_features.py` 마이크 특징,
+- `tools/schema_rules.py` 공용 판정 규칙, 
   `tools/vision_measure.py` 비전 계산 + YOLO 검출(`detect` → pair_boxes, 너트만 찾으면 점 2개 반환),
   `tools/merge_public_data.py` 공개 데이터 zip 합치기 (class_map.txt, --need-both).
 - `dashboard/` Streamlit: app.py(메뉴) · home.py · tapping.py · vision.py · store.py(key.json 있으면 Firestore, 없으면 local_db/) · ui.py

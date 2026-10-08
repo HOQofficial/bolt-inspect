@@ -2,9 +2,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import { LineAssembler } from "../web/app/lines.js";
-import { featuresFromBle } from "../web/schema.js";
+import { featuresFromBle, spectrumFromBle, calcTapRef } from "../web/schema.js";
 import { tappingFromFeatures, refSourceText, makeRecord } from "../web/app/judge.js";
-import { validateInspection } from "../web/app/validate.js";
+import { validateInspection, validateTapRef } from "../web/app/validate.js";
 
 let n = 0;
 const ok = (name, fn) => { fn(); n++; console.log("  ✔", name); };
@@ -75,6 +75,37 @@ ok("최종 판정을 일부러 틀리게 하면 거부", () => {
   const rec = makeRecord({ flangeId: fl.flange_id, boltId: "B01", inspector: "a", deviceId: "d", tapping: judge(msgAt(fl.tap_ref, { mf: 9999 })) });
   rec.final_result = "OK";
   assert.ok(validateInspection(rec).length > 0);
+});
+
+console.log("정상 기준 등록 · FFT");
+const sampleFrom = (i) => featuresFromBle({ v: 2, mf: 3000 + i * 10, mm: 0.7 + i * 0.005, me: 60 + i * 0.3, af: 420 + i, am: 0.6 + i * 0.004, ae: 62 + i * 0.2 });
+ok("샘플 5개로 계산한 기준이 스키마(tap_ref)를 통과", () => {
+  const ref = calcTapRef([0, 1, 2, 3, 4].map(sampleFrom), 3);
+  assert.deepEqual(validateTapRef(ref), []);
+  assert.equal(ref.n, 5);
+  assert.ok(ref.mic.peak_hz[0] < 3020 && 3020 < ref.mic.peak_hz[1]);
+});
+ok("샘플이 3개 미만이면 기준 계산을 거부", () => {
+  assert.throws(() => calcTapRef([sampleFrom(0), sampleFrom(1)], 3));
+});
+ok("진동 값이 있는 샘플과 없는 샘플이 섞이면 거부", () => {
+  const noAcc = featuresFromBle({ v: 2, mf: 3000, mm: 0.7, me: 60 });
+  assert.throws(() => calcTapRef([sampleFrom(0), sampleFrom(1), noAcc], 3));
+});
+ok("계산한 기준으로 같은 샘플을 판정하면 정상", () => {
+  const ref = calcTapRef([0, 1, 2, 3, 4].map(sampleFrom), 3);
+  assert.equal(tappingFromFeatures(sampleFrom(2), ref, refSourceText(ref)).result, "OK");
+});
+ok("FFT 막대가 기록(tapping.spectrum)에 들어가도 스키마를 통과", () => {
+  const msg = msgAt(fl.tap_ref, { sm: Array.from({ length: 50 }, (_, i) => (i === 20 ? 100 : 8)), sa: Array.from({ length: 32 }, (_, i) => (i === 9 ? 90 : 5)) });
+  const sp = spectrumFromBle(msg);
+  assert.equal(sp.mic.v.length, 50); assert.equal(sp.mic.f_max, 8000);
+  const tp = tappingFromFeatures(featuresFromBle(msg), fl.tap_ref, refSourceText(fl.tap_ref), sp);
+  const rec = makeRecord({ flangeId: fl.flange_id, boltId: "B01", inspector: "a", deviceId: "d", tapping: tp });
+  assert.deepEqual(validateInspection(rec), []);
+});
+ok("FFT 막대가 없는 메시지는 spectrum 이 null", () => {
+  assert.equal(spectrumFromBle(msgAt(fl.tap_ref)), null);
 });
 
 if (process.env.DUMP) writeFileSync(process.env.DUMP, JSON.stringify(dump));

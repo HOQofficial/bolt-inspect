@@ -1,0 +1,4 @@
+아래 파일/폴더는 프로젝트에서 직접 삭제하세요 (더 이상 쓰지 않아요).
+tools/audio_features.py
+tools/mic_test.py
+esp32/tap_wifi_v2/   (폴더 전체)

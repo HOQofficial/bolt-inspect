@@ -2,11 +2,13 @@
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import inspectionSchema from "../../schema/inspection.schema.json" with { type: "json" };
+import flangeSchema from "../../schema/flange.schema.json" with { type: "json" };
 import { worst } from "../schema.js";
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 const check = ajv.compile(inspectionSchema);
+const checkRef = ajv.compile(flangeSchema.properties.tap_ref);   // 플랜지 문서 중 정상 기준(tap_ref) 부분만 검사
 
 // tools/schema_rules.py 의 validate("inspection", doc) 와 같은 규칙 (BOLT 문서 + 타음만 있는 경우)
 export function validateInspection(doc) {
@@ -27,4 +29,10 @@ export function validateInspection(doc) {
   const parts = [doc.vision, doc.gap, doc.tapping].map((x) => (x ? x.result : null));
   if (doc.final_result !== worst(...parts)) errors.push(`final_result 가 ${worst(...parts)} 이어야 함 (가장 나쁜 값)`);
   return errors;
+}
+
+// 정상 기준(flange.tap_ref)을 서버에 올리기 전에 검사. 오류 메시지 목록 (비어 있으면 통과)
+export function validateTapRef(ref) {
+  if (checkRef(ref)) return [];
+  return checkRef.errors.map((e) => `${e.instancePath || "(기준)"}: ${e.message}`);
 }

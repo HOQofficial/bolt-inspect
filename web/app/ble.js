@@ -8,7 +8,7 @@ import { LineAssembler } from "./lines.js";
 
 export const SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 export const CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
-export const RX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";   // 폰 → ESP32: 판정 LED 명령 ("L,OK" 등)
+export const RX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";   // 폰 → ESP32: 명령 ("L,OK" = LED, "S" = 타격, "M" = 손으로 칠게요)
 const LS_DEVICE = "tap_device_id_v1";
 
 export const isNative = () => Capacitor.isNativePlatform();
@@ -31,13 +31,12 @@ export class TapLink {
     this.deviceId = null;
     this.webDevice = null;
     this.rx = null;           // Web Bluetooth 쓰기 통로
-    this._ledWarned = false;
   }
 
-  // 판정 결과를 ESP32 에 보내 LED 를 켬. result = "OK" | "CHECK" | "NG" | "OFF". 실패해도 앱 동작에는 영향 없음.
-  async sendLed(result) {
-    if (this.state !== "connected") return;
-    const bytes = new TextEncoder().encode(`L,${result}\n`);
+  // ESP32 에 짧은 글자 한 줄을 보냄. 실패해도 앱 동작에는 영향 없음. 돌려주는 값 = 보냈으면 true
+  async _send(text, what) {
+    if (this.state !== "connected") return false;
+    const bytes = new TextEncoder().encode(`${text}\n`);
     try {
       if (isNative()) {
         await BleClient.write(this.deviceId, SERVICE_UUID, RX_UUID, new DataView(bytes.buffer));
@@ -45,14 +44,23 @@ export class TapLink {
         if (this.rx.writeValueWithResponse) await this.rx.writeValueWithResponse(bytes);   // 응답을 받는 쓰기가 더 확실함
         else await this.rx.writeValue(bytes);
       } else {
-        this.onLog("LED 통로가 없어요 → ESP32 에 LED 포함 펌웨어를 올렸는지, 폰 블루투스를 껐다 켠 뒤 다시 연결해 보세요");
-        return;
+        this.onLog(`${what} 통로가 없어요 → ESP32 에 최신 펌웨어를 올렸는지, 폰 블루투스를 껐다 켠 뒤 다시 연결해 보세요`);
+        return false;
       }
-      this.onLog(`LED 명령 보냄: ${result}`);
+      this.onLog(`${what} 명령 보냄: ${text}`);
+      return true;
     } catch (e) {
-      this.onLog(`LED 명령 실패: ${e.message || e}`);
+      this.onLog(`${what} 명령 실패: ${e.message || e}`);
+      return false;
     }
   }
+
+  // 판정 결과를 ESP32 에 보내 LED 를 켬. result = "OK" | "CHECK" | "NG" | "OFF"
+  sendLed(result) { return this._send(`L,${result}`, "LED"); }
+  // 솔레노이드로 타격 + 측정 1회 (ESP32 가 'S' 를 받으면 타격하고 소리를 기다림)
+  sendStrike() { return this._send("S", "타격"); }
+  // 손으로 칠 때: ESP32 가 'M' 을 받으면 8초 동안 소리를 기다렸다가 1회 측정
+  sendHandArm() { return this._send("M", "측정 대기"); }
 
   async connect({ pick = false } = {}) {
     if (!bleSupported()) throw new Error("이 브라우저는 블루투스를 지원하지 않아요. 안드로이드 앱이나 크롬을 사용하세요.");

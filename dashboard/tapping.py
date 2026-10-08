@@ -14,9 +14,8 @@ import streamlit as st
 import store
 import ui
 from schema_rules import (ACC_DEFAULT_REF, FEATURE_KO, RANGE_RULE, SCHEMA_VERSION, calc_tap_ref, features_from_msg,
-                          make_record_id, now_kst_iso, tapping_from_features)
-from sim import CONDITIONS, DEMO_REF, mock_features, mock_spectra
-import audio_features
+                          make_record_id, now_kst_iso, spectrum_from_msg, tapping_from_features)
+from sim import CONDITIONS, DEMO_REF, mock_features
 
 APP_VERSION = "1.1"
 
@@ -55,11 +54,46 @@ def log_sample(res, inspector_name, state="normal", torque_pct=100):
         w.writerow(row)
     return hit_no
 
+def csv_record_ids():
+    """data/tap_samples.csv 에 이미 들어간 측정의 record_id 모음 (프로그램을 껐다 켜도 같은 측정을 또 넣지 않기 위함)"""
+    if not SAMPLE_CSV.exists():
+        return set()
+    try:
+        with SAMPLE_CSV.open(encoding="utf-8-sig", newline="") as fh:
+            return {row.get("record_id") for row in csv.DictReader(fh) if row.get("record_id")}
+    except OSError:
+        return set()
+
+
+def already_added(res):
+    """이 측정이 이미 정상 샘플로 들어갔는지. 측정마다 고유한 key(ESP32 의 bootId-seq 또는 기록 ID)로 구분"""
+    return (res.get("key") or res["doc"]["record_id"]) in ss.sample_keys or res["doc"]["record_id"] in csv_record_ids()
+
+
+def add_sample(res, inspector_name):
+    """정상 샘플 추가. 돌려주는 값 = (추가됐는지, 알림 글자)"""
+    if already_added(res):
+        return False, "이미 정상 샘플로 추가한 측정이에요. (같은 측정은 한 번만 들어가요)"
+    mic = res["features"].get("mic")
+    if mic and mic["mag"] >= 0.98:
+        return False, "소리가 너무 커서 잘린 측정(Peak Magnitude ≈ 1)이라 정상 샘플로 넣을 수 없어요."
+    if ss.samples and bool(ss.samples[0].get("acc")) != bool(res["features"].get("acc")):
+        return False, "앞서 모은 샘플과 센서 구성이 달라요(진동 값 유무). '샘플 초기화' 후 같은 방식으로 다시 모으세요."
+    ss.samples.append(res["features"])
+    ss.sample_keys.add(res.get("key") or res["doc"]["record_id"])
+    try:
+        n_hit = log_sample(res, inspector_name)
+        return True, f"정상 샘플 {len(ss.samples)}개째 추가 · data/tap_samples.csv 에 기록 ({n_hit}번째)"
+    except OSError as e:   # 엑셀로 열어 둔 경우 등: 화면 기준 계산은 계속, 기록만 실패
+        return True, f"정상 샘플 {len(ss.samples)}개째 추가됨. 그런데 CSV 기록은 실패: {e}"
+
+
 ss = st.session_state
-for k, v in {"result": None, "samples": [], "count": 0, "last_saved": None, "phone_seen": None}.items():
+for k, v in {"result": None, "samples": [], "count": 0, "last_saved": None, "phone_seen": None,
+             "sample_keys": set(), "phone_recent": []}.items():
     ss.setdefault(k, v)
 PHONE = "폰·태블릿"
-PC_DEVICES = {"PC-MIC", "TAP-USB", "TAP-WIFI", "PC-SIM"}   # 이 화면이 직접 측정해 저장한 기록의 기기 이름
+PC_DEVICES = {"TAP-USB", "PC-SIM"}   # 이 화면이 직접 측정해 저장한 기록의 기기 이름
 if ss.get("pending_sel"):   # 폰에서 측정한 플랜지·볼트로 선택을 맞춤 (위젯을 그리기 전에 바꿔야 함)
     ss.sel_fid, ss.sel_bolt = ss.pop("pending_sel")
 
@@ -69,9 +103,9 @@ def flanges():
     return {f["flange_id"]: f for f in store.list_flanges()}
 
 
-def read_serial(port, timeout=10):
-    """ESP32 가 USB 로 보내는 특징값 메시지 v2 한 줄을 기다림.
-    포트를 매번 열면 ESP32 가 재부팅되므로 한 번 연 포트를 계속 씀."""
+def read_serial(port, cmd="S", timeout=12):
+    """ESP32 에 USB 로 명령을 보내고(S = 솔레노이드 타격 + 측정, M = 손으로 칠 때 8초 대기) 특징값 메시지 v2 한 줄을 기다림.
+    돌려주는 값 = (features, spectrum, 측정 고유키). 포트를 매번 열면 ESP32 가 재부팅되므로 한 번 연 포트를 계속 씀."""
     import serial
     if ss.get("ser_port") != port:
         if ss.get("ser"):
@@ -84,45 +118,21 @@ def read_serial(port, timeout=10):
         ss.ser_port = port
         time.sleep(2)  # 열 때 보드가 재시작하는 시간
     ss.ser.reset_input_buffer()
+    ss.ser.write(f"{cmd}\n".encode())
     end = time.time() + timeout
     while time.time() < end:
         line = ss.ser.readline().decode("utf-8", "ignore").strip()
         if line.startswith("{"):
             try:
                 msg = json.loads(line)
-                if msg.get("v") == 2:
-                    return features_from_msg(msg)
             except ValueError:
-                pass
-    raise TimeoutError(f"{timeout}초 안에 ESP32 특징값(v2 메시지)이 오지 않았습니다. ▶ 측정 시작을 누른 뒤 BOOT 버튼을 짧게 눌렀는지, 올바른 펌웨어(tap_sim_v2)를 올렸는지 확인하세요.")
-
-
-def read_wifi(addr, timeout=10, auto_tap=False):
-    """ESP32 가 자체 Wi-Fi(SoftAP)로 보내는 특징값을 읽음.
-    PC 가 ESP32 Wi-Fi(TAP-01)에 접속한 상태에서 http://<addr>/latest 를 확인해,
-    측정 순번(seq)이 바뀌면 = 새 타격으로 보고 그 값을 돌려줌."""
-    import urllib.request
-    base = "http://" + addr.strip().removeprefix("http://").rstrip("/")
-
-    def get(path):
-        try:
-            with urllib.request.urlopen(base + path, timeout=3) as r:
-                return json.loads(r.read().decode("utf-8"))
-        except OSError as e:
-            raise ValueError(f"ESP32({base})에 연결할 수 없어요. PC 의 Wi-Fi 가 ESP32 Wi-Fi(TAP-01)에 "
-                             f"연결돼 있는지 확인하세요. ({e})")
-
-    start = get("/latest")["msg"].get("seq", 0)
-    if auto_tap:
-        get("/tap")
-    end = time.time() + timeout
-    while time.time() < end:
-        msg = get("/latest")["msg"]
-        if msg.get("seq", 0) != start and msg.get("v") == 2:
-            return features_from_msg(msg)
-        time.sleep(0.3)
-    raise TimeoutError(f"{timeout}초 안에 새 측정이 오지 않았어요. ▶ 측정 시작을 누른 뒤 BOOT 버튼을 짧게 누르거나, "
-                       "'테스트용 가짜 타격 자동 요청'을 켜세요.")
+                continue
+            if msg.get("evt") == "miss":
+                raise TimeoutError("ESP32 가 소리를 듣지 못했어요. 마이크 위치와 솔레노이드 타격(전원·배선)을 확인하세요.")
+            if msg.get("v") == 2 and "mf" in msg:
+                return features_from_msg(msg), spectrum_from_msg(msg), msg.get("k")
+    raise TimeoutError(f"{timeout}초 안에 ESP32 응답이 없어요. 올바른 펌웨어(tap_sensor_v2)를 올렸는지, "
+                       "시리얼 모니터가 닫혀 있는지, 포트가 맞는지 확인하세요.")
 
 
 FL = flanges()
@@ -138,41 +148,17 @@ with st.sidebar:
     bolt = st.selectbox("볼트 (12시부터 시계방향)", [f"B{i:02d}" for i in range(1, f["bolt_count"] + 1)],
                         key="sel_bolt")
     inspector = st.text_input("검사자", value=ss.get("inspector", "홍길동"), key="inspector")
-    source = st.radio("측정 방식", ["가상 데이터", "PC 마이크", "ESP32 (USB)", "ESP32 (Wi-Fi)", PHONE], horizontal=True,
-                      help="PC 마이크 = 이어폰·헤드셋 마이크로 실제 타격음 테스트 (음향 센서만)")
+    source = st.radio("측정 방식", ["가상 데이터", "ESP32 (USB)", PHONE], horizontal=True,
+                      help="폰·태블릿 = 블루투스로 측정한 결과를 실시간으로 받아 봄 (주 사용 방식)")
     if source == "가상 데이터":
         cond = st.selectbox("가상 측정 조건", CONDITIONS)
-    elif source == "PC 마이크":
-        try:
-            if st.button("🔄 마이크 다시 찾기", help="이어폰을 앱을 켠 뒤에 꽂았거나 다시 꽂았을 때"):
-                audio_features.refresh_devices()
-                st.rerun()
-            mics = audio_features.list_mics()
-            if not mics:
-                st.error("마이크가 하나도 안 잡힙니다. ① 이어폰이 끝까지 꽂혔는지 ② Windows 설정 > 소리 > 입력에 "
-                         "마이크가 보이는지 확인한 뒤 '🔄 마이크 다시 찾기'를 누르세요.")
-            mic_idx = st.selectbox("마이크", [i for i, _ in mics], format_func=dict(mics).get,
-                                   help="이어폰/헤드셋 이름이나 '마이크'가 들어간 장치를 고르세요. Stereo Mix 는 마이크가 아닙니다.")
-            if "마이크 아님" in dict(mics).get(mic_idx, ""):
-                st.warning("Stereo Mix 는 PC 스피커 소리를 녹음하는 장치라 볼트 소리가 안 들어갑니다. 다른 마이크를 고르세요.")
-        except Exception as e:
-            st.error(f"마이크를 찾을 수 없습니다: {e}  (pip install sounddevice)")
-            mic_idx = None
-        st.caption("측정 시작 후 2초 안에 마이크 가까이(10~20cm)에서 볼트를 한 번 두드리세요. "
-                   "처음엔 '정상 기준 등록'부터 하세요 (데모 기준은 가상 데이터용).")
     elif source == PHONE:
         phone_every = st.select_slider("폰 측정 확인 간격(초)", [3, 5, 10], value=5,
                                        help="한 번에 1건만 읽어서 읽기 한도(하루 5만)는 거의 안 써요.")
-        st.caption("폰·태블릿 앱에서 측정하면 이 화면에 자동으로 나타나요. 폰 앱의 '측정되면 자동 저장'이 켜져 있어야 하고, "
+        st.caption("폰·태블릿 앱의 '측정' 탭에서 측정하면 이 화면에 자동으로 나타나요. 폰 앱의 '측정되면 자동 저장'이 켜져 있어야 하고, "
                    "폰은 ESP32 와 블루투스로 연결돼 있어야 해요. 이 화면을 연 뒤에 새로 측정한 것부터 보여요. "
-                   "(저장소가 Firestore 일 때만 폰 기록이 와요)")
-    elif source == "ESP32 (Wi-Fi)":
-        wifi_addr = st.text_input("ESP32 주소", "192.168.4.1", help="ESP32 SoftAP 기본 주소. 시리얼 모니터 첫 줄에도 나옴")
-        wifi_auto = st.toggle("테스트용 가짜 타격 자동 요청", value=False,
-                              help="센서 없이 연결만 시험할 때: 측정 시작을 누르면 ESP32 에 /tap 을 보내 가짜 타격 1번을 만듦. "
-                                   "실제 센서로 측정할 때는 끄고, 측정 시작 후 볼트를 치세요.")
-        st.caption("PC 의 Wi-Fi 를 'TAP-01'(비밀번호 bolt1234)에 연결한 상태여야 해요. 이 동안 인터넷은 끊겨요 "
-                   "(저장은 내 PC local_db 에 됨). 브라우저로 http://192.168.4.1 을 열면 ESP32 화면도 볼 수 있어요.")
+                   "(저장소가 Firestore 일 때만 폰 기록이 와요) 폰의 '기준 등록' 탭에서 모은 샘플은 서버로 오지 않아요 → "
+                   "여기서 등록하려면 폰 '측정' 탭의 결과를 아래 '정상 샘플로 추가'로 넣으세요.")
     else:
         try:
             from serial.tools import list_ports
@@ -187,8 +173,10 @@ with st.sidebar:
         else:
             st.warning("USB 로 연결된 장치가 안 보여요. 케이블(데이터용인지)과 드라이버를 확인하세요.")
             port = st.text_input("COM 포트 (직접 입력)", "COM3")
+        usb_cmd = "S" if st.radio("치는 방법", ["솔레노이드가 치기", "손으로 치기"], horizontal=True,
+                                  help="솔레노이드 = ESP32 가 한 번 치고 그 소리만 측정 / 손 = 누른 뒤 8초 안에 직접 치기") == "솔레노이드가 치기" else "M"
         st.caption("Arduino IDE 의 시리얼 모니터는 꼭 닫으세요 (포트를 한 프로그램만 쓸 수 있어요). "
-                   "▶ 측정 시작을 누른 뒤 10초 안에 ESP32 의 BOOT 버튼을 짧게 누르세요.")
+                   "▶ 측정 시작을 누르면 ESP32 에 명령이 가고 한 번만 측정해요.")
     if source == "ESP32 (USB)":
         led_on = st.toggle("판정 LED 켜기 (ESP32)", value=True,
                            help="측정 결과에 따라 ESP32 에 연결한 초록(정상)·빨강(재측정 깜빡임 / 이상 켜짐) LED 를 켭니다")
@@ -201,14 +189,14 @@ with st.sidebar:
     k_sigma = st.select_slider("기준 범위 폭 (평균 ± k×표준편차)", [1.0, 1.5, 2.0, 2.5, 3.0], value=3.0,
                                help="특징값이 6개라 2σ면 정상 볼트도 4번 중 1번꼴로 '재측정'이 나옵니다. 3σ 권장.")
     st.write(f"수집된 정상 샘플: **{len(ss.samples)} / {target_n}**")
-    if st.button("➕ 방금 측정값을 정상 샘플로 추가", width="stretch", disabled=ss.result is None):
-        ss.samples.append(ss.result["features"])
-        try:
-            n_hit = log_sample(ss.result, inspector)
-            st.toast(f"정상 샘플 {len(ss.samples)}개째 추가 · data/tap_samples.csv 에 기록 ({n_hit}번째)")
-        except OSError as e:   # 엑셀로 열어 둔 경우 등: 화면 기준 계산은 계속, 기록만 실패
-            st.toast(f"정상 샘플 {len(ss.samples)}개째 추가됨. 그런데 CSV 기록은 실패: {e}", icon="⚠️")
+    dup = ss.result is not None and already_added(ss.result)
+    if st.button("➕ 방금 측정값을 정상 샘플로 추가", width="stretch", disabled=ss.result is None or dup,
+                 help="같은 측정은 한 번만 들어가요 (측정마다 고유 키로 구분)"):
+        ok, msg_ = add_sample(ss.result, inspector)
+        st.toast(msg_, icon=None if ok else "⚠️")
         st.rerun()
+    if dup:
+        st.caption("✔ 지금 화면의 측정은 이미 정상 샘플로 추가했어요.")
     st.progress(min(len(ss.samples) / target_n, 1.0))
     st.caption("정상 샘플은 추가할 때마다 `data/tap_samples.csv` 에 원본이 기록돼요 (샘플 초기화를 해도 파일은 그대로).")
     if len(ss.samples) < 3:
@@ -220,7 +208,7 @@ with st.sidebar:
                        updated_at=now_kst_iso())
             store.save_flange(new)
             flanges.clear()
-            ss.samples, ss.result = [], None
+            ss.samples, ss.result = [], None   # sample_keys 는 남겨 두어 같은 측정이 다시 들어가지 않게 함
             st.toast(f"{fid} 정상 기준 저장 완료 (n={new['tap_ref']['n']}, ±{k_sigma}σ)")
             st.rerun()
         except ValueError as e:
@@ -261,6 +249,12 @@ c3.metric("판정 기준", f"실측 n={ref['n']}" if f.get("tap_ref") else "데�
 c4.metric("이번 측정 횟수", f"{ss.count} 회")
 
 # ---------------- 폰·태블릿 측정 자동 받기 ----------------
+def phone_result(rec):
+    """폰이 저장한 기록 1건 -> 이 화면의 결과 모양. key = 기록 ID (측정마다 고유)"""
+    return {"features": rec["tapping"]["features"], "tapping": rec["tapping"], "doc": rec, "sim": False,
+            "spectrum": rec["tapping"].get("spectrum"), "source": PHONE, "key": rec["record_id"]}
+
+
 def phone_poll():
     """폰 앱이 Firebase 에 저장한 기록 중, 이 방식을 켠 시점(2분 전부터) 이후의 새 기록을 가져옴.
     '시각 범위'로 읽기 때문에 예전·미래 날짜의 시험 기록이 섞여 있어도 영향이 없음."""
@@ -276,11 +270,11 @@ def phone_poll():
             and (r.get("tapping") or {}).get("model") == "range" and r["tapping"].get("features")]
     st.caption(f"📲 폰·태블릿 측정 대기 중 · {now:%H:%M:%S} 에 확인 · 이 시각 이후 폰 기록 {len(cand)}건 확인됨"
                + ("" if store.KEY.exists() else " · ⚠ key.json 이 없어 폰 기록을 받을 수 없어요"))
+    ss.phone_recent = cand[:8]                      # 아래 '최근 폰 측정' 목록용 (새로 읽지 않고 이 값을 재사용)
     rec = cand[0] if cand else None
     if rec and rec["record_id"] != ss.phone_seen:
         ss.phone_seen = rec["record_id"]
-        ss.result = {"features": rec["tapping"]["features"], "tapping": rec["tapping"], "doc": rec, "sim": False,
-                     "spec": None, "source": PHONE}
+        ss.result = phone_result(rec)
         ss.count += 1
         ss.last_saved = rec["record_id"]
         ss.pending_sel = (rec["flange_id"], rec["bolt_id"])
@@ -296,26 +290,14 @@ else:
 # ---------------- 측정 ----------------
 if source != PHONE and st.button("▶ 측정 시작", type="primary", width="stretch"):
     try:
-        spec = None
-        with st.spinner("🔴 녹음 중! 지금 볼트를 두드리세요 (2초)" if source == "PC 마이크"
-                        else "신호 취득 → FFT → 특징값 추출 → 기준 비교 중... (ESP32 는 볼트를 타격하세요)"):
+        spec, mkey = None, None
+        with st.spinner("신호 취득 → FFT → 특징값 추출 → 기준 비교 중... (ESP32 가 볼트를 한 번 타격해요)"):
             if source == "가상 데이터":
                 time.sleep(.25)
                 feats = mock_features(cond)
-            elif source == "PC 마이크":
-                if mic_idx is None:
-                    raise ValueError("선택된 마이크가 없습니다. 왼쪽에서 마이크를 먼저 고르세요.")
-                x, fs = audio_features.record(2.0, 48000, mic_idx)
-                mic, fr, mg = audio_features.extract(x, fs)
-                if mic is None:
-                    raise ValueError(f"타격음이 감지되지 않았습니다 (최대 음량 {abs(x).max():.3f}). "
-                                     "마이크 가까이에서 더 세게 두드려 보세요.")
-                feats, spec = {"mic": mic, "acc": None}, (fr, mg)
-            elif source == "ESP32 (Wi-Fi)":
-                feats = read_wifi(wifi_addr, auto_tap=wifi_auto)
             else:
-                feats = read_serial(port)
-        tapping = tapping_from_features(feats, ref, ref_src)
+                feats, spec, mkey = read_serial(port, usb_cmd)
+        tapping = tapping_from_features(feats, ref, ref_src, spec)
         if source == "ESP32 (USB)" and led_on and ss.get("ser"):   # 판정을 ESP32 LED 로 알림 (실패해도 측정은 계속)
             try:
                 ss.ser.write(f"L,{tapping['result']}\n".encode())
@@ -323,11 +305,11 @@ if source != PHONE and st.button("▶ 측정 시작", type="primary", width="str
                 pass
         at = now_kst_iso()
         doc = {"schema_version": SCHEMA_VERSION, "record_id": make_record_id(fid, bolt, at), "type": "BOLT",
-               "flange_id": fid, "bolt_id": bolt, "inspector": inspector or "미입력", "device_id": {"PC 마이크": "PC-MIC", "ESP32 (USB)": "TAP-USB", "ESP32 (Wi-Fi)": "TAP-WIFI"}.get(source, "PC-SIM"),
+               "flange_id": fid, "bolt_id": bolt, "inspector": inspector or "미입력", "device_id": "TAP-USB" if source == "ESP32 (USB)" else "PC-SIM",
                "inspected_at": at, "vision": None, "gap": None, "tapping": tapping,
                "final_result": tapping["result"], "app_version": APP_VERSION}
         ss.result = {"features": feats, "tapping": tapping, "doc": doc, "sim": source == "가상 데이터",
-                     "spec": spec, "source": source}
+                     "spectrum": spec, "source": source, "key": mkey or doc["record_id"]}
         ss.count += 1
         if autosave:
             store.save_inspection(doc)
@@ -344,20 +326,15 @@ if r is None:
     st.stop()
 
 # 기준이 바뀌었으면 화면의 결과를 현재 기준으로 다시 판정 (조원 V3 와 같은 동작)
-tp = tapping_from_features(r["features"], ref, ref_src)
+tp = tapping_from_features(r["features"], ref, ref_src, r.get("spectrum"))
 
 # ---------------- 1. 큰 판정 ----------------
 ui.banner(f"{r['doc']['flange_id']}-{r['doc']['bolt_id']} 종합 판정", tp["result"],
           f"범위를 벗어난 특징값 {tp['score']}개 · 기준: {ref_src}"
           + (f" · 저장됨 {ss.last_saved}" if ss.last_saved == r["doc"]["record_id"] else " · 저장 안 됨"))
-if r.get("source") == "PC 마이크":
-    m = r["features"]["mic"]
-    if m["mag"] >= 0.98:
-        st.warning("소리가 너무 커서 잘렸습니다(Peak Magnitude ≈ 1). 마이크를 20~30cm 떨어뜨리거나 더 약하게 치세요. "
-                   "이 측정은 정상 샘플로 추가하지 마세요.")
-    if m["peak_hz"] < 400:
-        st.warning(f"주파수가 {m['peak_hz']:.0f} Hz 로 매우 낮습니다. 금속 '팅' 소리가 아니라 책상이나 이어폰 줄이 "
-                   "부딪힌 '쿵' 소리일 수 있어요. 마이크를 손에 들지 말고 내려놓은 뒤, 쇠붙이를 볼펜으로 톡 쳐 보세요.")
+if r["features"]["mic"]["mag"] >= 0.98:
+    st.warning("소리가 너무 커서 잘렸습니다(Peak Magnitude ≈ 1). 마이크를 조금 떨어뜨리거나 더 약하게 치세요. "
+               "이 측정은 정상 샘플로 추가할 수 없어요.")
 if not autosave and ss.last_saved != r["doc"]["record_id"]:
     if st.button("💾 이 결과 저장"):
         store.save_inspection(r["doc"])
@@ -393,12 +370,11 @@ if prov_n:
 cols = st.columns(2)
 for col, s in zip(cols, ("mic", "acc")):
     with col:
-        name = ("🎤 음향 · " + ("PC 마이크" if r.get("source") == "PC 마이크" else "INMP441")) if s == "mic" else "📳 진동 · MPU6050"
+        name = "🎤 음향 · INMP441" if s == "mic" else "📳 진동 · MPU6050"
         feats, rr = r["features"].get(s), ref.get(s)
         if feats is None:
             st.info(f"{name} · 이번 측정에 {SNAME[s]} 값이 오지 않았어요"
-                    + (" (PC 마이크는 음향만 측정해요)" if r.get("source") == "PC 마이크"
-                       else " (ESP32 시리얼 모니터에서 '# MPU6050 OK' 가 나오는지, 메시지에 af 값이 있는지 확인)"))
+                    " (ESP32 시리얼 모니터에서 '# MPU6050 OK' 가 나오는지, 메시지에 af 값이 있는지 확인)")
             continue
         if rr is None:
             st.info(f"{name} · 값은 들어왔지만 정상 기준이 없어 판정 제외")
@@ -421,20 +397,23 @@ with st.expander("판정 규칙"):
             "종합 판정 = 두 센서 중 더 나쁜 쪽 (한 센서만 이상해도 종합이 나빠짐)\n"
             f"정상 범위 = 정상 샘플 평균 ± k × 표준편차   (지금 이 플랜지: k = {ref.get('k_sigma', '데모')})", language=None)
 
-# ---------------- 3. FFT ----------------
-if r.get("spec"):
-    fr, mg = r["spec"]
-    st.plotly_chart(ui.spectrum(fr, mg, r["features"]["mic"]["peak_hz"],
-                                f"Peak {r['features']['mic']['peak_hz'] / 1000:.2f} kHz"), width="stretch")
-    st.caption("실제로 녹음한 타격음의 FFT 입니다.")
+# ---------------- 3. FFT (ESP32 가 보낸 실제 FFT 막대) ----------------
+spec = tp.get("spectrum")
+if spec:
+    fcols = st.columns(2)
+    for col, s_ in zip(fcols, ("mic", "acc")):
+        tr = spec.get(s_)
+        if not tr or not r["features"].get(s_):
+            continue
+        pk = r["features"][s_]["peak_hz"]
+        band = ref[s_]["peak_hz"] if ref.get(s_) else None
+        col.plotly_chart(ui.spectrum_bars(tr, pk, band, f"Peak {pk / 1000:.2f} kHz" if pk >= 1000 else f"Peak {pk:.0f} Hz"),
+                         width="stretch", key=f"fft_{s_}")
+        col.caption(f"{SNAME[s_]} FFT · 연한 칸 = 정상 Peak 주파수 범위, 세로선 = 이번 Peak")
 elif r["sim"]:
-    fm, ms, fa, ac = mock_spectra(r["features"])
-    a, b = st.columns(2)
-    a.plotly_chart(ui.spectrum(fm, ms, r["features"]["mic"]["peak_hz"],
-                               f"Peak {r['features']['mic']['peak_hz'] / 1000:.2f} kHz"), width="stretch")
-    b.plotly_chart(ui.spectrum(fa, ac, r["features"]["acc"]["peak_hz"],
-                               f"Peak {r['features']['acc']['peak_hz']:.0f} Hz"), width="stretch")
-    st.caption("FFT 그래프는 가상 데이터 화면용입니다. 실제 ESP32 는 특징값만 보냅니다.")
+    st.caption("가상 데이터에는 FFT 그래프가 없어요. 실제 ESP32·폰 측정에서만 나와요.")
+else:
+    st.caption("이 측정에는 FFT 데이터가 없어요 (예전 펌웨어/앱으로 측정한 기록).")
 
 # ---------------- 4. 등록된 기준 + 이 볼트 이력 ----------------
 with st.expander("현재 판정 기준 보기"):
@@ -450,6 +429,21 @@ with st.expander("현재 판정 기준 보기"):
                              "-" if v is None else ("범위 안" if rr[k][0] <= v <= rr[k][1] else "범위 밖")])
     st.dataframe(pd.DataFrame(rows, columns=["센서", "특징값", "하한", "상한", "이번 측정값", "결과"]),
                  hide_index=True, width="stretch")
+
+if source == PHONE and ss.phone_recent:
+    st.subheader("최근 폰 측정 (정상 샘플로 추가)")
+    st.caption("정상 볼트를 측정한 기록만 골라 추가하세요. 이미 추가한 측정은 눌리지 않아요.")
+    for rec in ss.phone_recent:
+        res_ = phone_result(rec)
+        mic_ = rec["tapping"]["features"]["mic"]
+        c_a, c_b, c_c = st.columns([3, 2, 2])
+        c_a.write(f"{rec['inspected_at'][11:19]} · {rec['flange_id']}-{rec['bolt_id']} · 음향 {mic_['peak_hz']:.0f} Hz")
+        c_b.write(ui.KO[rec["final_result"]])
+        done = already_added(res_)
+        if c_c.button("✔ 추가됨" if done else "➕ 샘플로 추가", key=f"addp_{rec['record_id']}", disabled=done):
+            ok, msg_ = add_sample(res_, inspector)
+            st.toast(msg_, icon=None if ok else "⚠️")
+            st.rerun()
 
 st.subheader(f"{fid}-{bolt} 검사 이력")
 @st.cache_data(ttl=20)

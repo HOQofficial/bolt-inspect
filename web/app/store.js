@@ -3,11 +3,14 @@
 //  - 설정이 없으면 '시험 모드': 가짜 플랜지로 블루투스·판정만 시험하고 서버에는 아무것도 올리지 않음.
 import { initializeApp } from "firebase/app";
 import { initializeFirestore, persistentLocalCache, doc, setDoc, collection, getDocs, waitForPendingWrites } from "firebase/firestore";
+import { nowKstIso } from "../schema.js";
 import { firebaseConfig } from "./_config.js";
 
 const LS_FLANGES = "bolt_flanges_v1";
 const LS_HIST = "bolt_hist_v1";
 const HIST_MAX = 200;
+const LS_SAMPLES = "bolt_ref_samples_v1";     // 정상 기준 등록 중에 모아 둔 샘플 { 플랜지: [ ... ] }
+const LS_USED = "bolt_ref_used_keys_v1";      // 이미 정상 샘플로 쓴 측정의 고유 키 (같은 측정을 또 넣지 않게)
 
 export const hasServer = !!(firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("여기에"));
 let db = null;
@@ -83,4 +86,29 @@ function markSent(id) {
 function syncSent() {            // 앱을 껐다 켠 뒤에도 대기 중이던 기록이 올라갔는지 확인
   if (!db) return;
   waitForPendingWrites(db).then(() => setHist(getHist().map((h) => ({ ...h, sent: true })))).catch(() => {});
+}
+
+// ---------- 정상 기준 등록 ----------
+// 모아 둔 정상 샘플 (플랜지마다 따로). 앱을 닫았다 열어도 남아 있음
+export const getSamples = (flangeId) => (ls.get(LS_SAMPLES, {})[flangeId] || []);
+export function setSamples(flangeId, list) { const all = ls.get(LS_SAMPLES, {}); all[flangeId] = list; ls.set(LS_SAMPLES, all); }
+export const getUsedKeys = () => ls.get(LS_USED, []);
+export function addUsedKeys(keys) { ls.set(LS_USED, [...new Set([...getUsedKeys(), ...keys])].slice(-500)); }
+
+// 계산한 정상 기준을 플랜지 문서에 저장 (flanges/{id} 의 tap_ref, updated_at 만 바꿈).
+// 돌려주는 값: { flange: 바뀐 플랜지, queued: 인터넷이 없어 올리기 대기 중이면 true }
+export async function saveTapRef(flange, tapRef) {
+  const updated_at = nowKstIso();
+  const flangeNew = { ...flange, tap_ref: tapRef, updated_at };
+  let queued = false;
+  if (db) {
+    const p = setDoc(doc(db, "flanges", flange.flange_id), { tap_ref: tapRef, updated_at }, { merge: true });
+    try { await withTimeout(p, 8000); } catch (e) {
+      if (!/시간 초과/.test(e.message)) throw e;       // 인터넷이 없으면 연결될 때 Firestore 가 알아서 올림
+      queued = true; p.catch(() => {});
+    }
+    const cached = ls.get(LS_FLANGES, []);
+    if (cached.length) ls.set(LS_FLANGES, cached.map((f) => (f.flange_id === flange.flange_id ? flangeNew : f)));
+  }
+  return { flange: flangeNew, queued };
 }

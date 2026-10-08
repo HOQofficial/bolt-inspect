@@ -162,12 +162,32 @@ def features_from_msg(msg: dict) -> dict:
     return {"mic": mic, "acc": acc}
 
 
-def tapping_from_features(features, ref, ref_source):
-    """features + tap_ref -> 스키마의 tapping 객체 (model='range')"""
+# ESP32 가 보내는 FFT 막대의 주파수 범위 (esp32/tap_sensor_v2 의 SP_MIC_FMAX / SP_ACC_FMAX 와 같아야 함)
+SP_MIC_FMAX = 8000.0
+SP_ACC_FMAX = 500.0
+
+
+def spectrum_from_msg(msg: dict):
+    """ESP32 메시지의 FFT 막대(sm=음향, sa=진동) -> tapping.spectrum. 막대가 없으면 None.
+    판정에는 쓰지 않고 화면의 FFT 그래프에만 씀."""
+    def trace(v, fmax):
+        return {"f_max": fmax, "v": [int(max(0, min(100, round(x)))) for x in v]}
+    sm, sa = msg.get("sm"), msg.get("sa")
+    if not isinstance(sm, list) or len(sm) < 8:
+        return None
+    return {"mic": trace(sm, SP_MIC_FMAX),
+            "acc": trace(sa, SP_ACC_FMAX) if isinstance(sa, list) and len(sa) >= 8 else None}
+
+
+def tapping_from_features(features, ref, ref_source, spectrum=None):
+    """features + tap_ref -> 스키마의 tapping 객체 (model='range'). spectrum 이 있으면 FFT 그래프용으로 같이 저장"""
     checks, sres, score, result = judge_range(features, ref)
-    return {"peak_hz": round(features["mic"]["peak_hz"], 1), "decay_ms": None, "score": score,
-            "model": "range", "result": result, "features": features, "checks": checks,
-            "sensor_results": sres, "ref_source": ref_source}
+    tp = {"peak_hz": round(features["mic"]["peak_hz"], 1), "decay_ms": None, "score": score,
+          "model": "range", "result": result, "features": features, "checks": checks,
+          "sensor_results": sres, "ref_source": ref_source}
+    if spectrum:
+        tp["spectrum"] = spectrum
+    return tp
 
 
 def validate(kind: str, doc: dict) -> list:

@@ -12,10 +12,11 @@ export function refSourceText(ref) {
 
 // 특징값 + 정상 기준 -> 스키마의 tapping 객체 (tools/schema_rules.py 의 tapping_from_features 와 같음)
 // 기준이 없어서 판정할 센서가 하나도 없으면 null
-export function tappingFromFeatures(features, ref, refSource) {
+// spectrum = ESP32 가 보낸 FFT 막대 (없으면 null). 판정에는 쓰지 않고 화면의 FFT 그래프용으로 같이 저장
+export function tappingFromFeatures(features, ref, refSource, spectrum = null) {
   const j = judgeRange(features, ref);
   if (!j.result) return null;
-  return {
+  const tp = {
     peak_hz: Math.round(features.mic.peak_hz * 10) / 10,
     decay_ms: null,
     score: j.score,
@@ -26,6 +27,8 @@ export function tappingFromFeatures(features, ref, refSource) {
     sensor_results: j.sensor_results,
     ref_source: refSource,
   };
+  if (spectrum) tp.spectrum = spectrum;
+  return tp;
 }
 
 export function kstIso(ms) {

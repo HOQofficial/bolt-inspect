@@ -3,98 +3,166 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#1d4ed8">
+  <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
-  <title>볼트 타음 검사</title>
+  <title>RE:SOUND 볼트 타음 검사</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="top">
-    <h1>🔩 타음 검사</h1>
+  <header class="appbar">
+    <div class="brand">RE<b>:</b>SOUND</div>
     <div class="chips">
-      <span id="chipBle" class="chip off">블루투스 끊김</span>
+      <span id="chipBle" class="chip off">끊김</span>
       <span id="chipNet" class="chip">온라인</span>
       <span id="chipPend" class="chip warn" hidden></span>
     </div>
   </header>
 
+  <div id="notice" class="notice" hidden></div>
+
+  <!-- 검사 대상 (측정·기준 등록 탭에서 보임) -->
+  <section id="target" class="target">
+    <label>플랜지<select id="selFlange"></select></label>
+    <label>볼트<select id="selBolt"></select></label>
+    <div id="refInfo" class="refinfo"></div>
+  </section>
+
   <main>
-    <div id="notice" class="notice" hidden></div>
-
-    <section class="card">
-      <h2>검사 설정</h2>
-      <div class="row2">
-        <label>플랜지
-          <select id="selFlange"></select>
-        </label>
-        <label>볼트 (12시부터 시계방향)
-          <select id="selBolt"></select>
-        </label>
+    <!-- ================= 측정 ================= -->
+    <section id="tab-measure" class="tab">
+      <div class="card conn">
+        <button id="btnConnect" class="btn primary big" type="button">블루투스 연결</button>
+        <button id="btnPick" class="btn ghost" type="button" hidden>다른 기기 선택</button>
       </div>
-      <div id="refInfo" class="muted"></div>
-      <button id="btnReload" class="ghost" type="button" style="margin-top:6px">🔄 기준 다시 불러오기</button>
-      <details>
-        <summary>검사자 · 기기 이름</summary>
-        <div class="row2">
-          <label>검사자 <input id="inpInspector" maxlength="20" placeholder="홍길동"></label>
-          <label>기기 이름 <input id="inpDevice" maxlength="40" placeholder="TAB-01"></label>
+
+      <div id="actions" class="card actions" hidden>
+        <button id="btnStrike" class="btn primary big" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(40 12 12)"><rect x="5" y="2.5" width="14" height="7" rx="1.6"/><line x1="12" y1="9.5" x2="12" y2="21.5"/></g></svg>
+          타격 + 측정
+        </button>
+        <button id="btnHand" class="btn" type="button">손으로 칠게요</button>
+        <div id="statusLine" class="statusline">연결됨 · 버튼을 눌러 측정하세요</div>
+      </div>
+
+      <div id="waitCard" class="card empty">
+        <div class="empty-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div>블루투스를 연결하고 <b>타격 + 측정</b>을 누르면<br>여기에 결과가 나와요.</div>
+      </div>
+
+      <div id="resultCard" hidden>
+        <div id="hero" class="hero">
+          <div id="heroIc" class="hero-ic"></div>
+          <div class="hero-tx">
+            <div id="heroSub" class="hero-sub"></div>
+            <div id="heroRes" class="hero-res"></div>
+            <div id="heroMeta" class="hero-meta"></div>
+          </div>
         </div>
-      </details>
-    </section>
-
-    <div class="btnrow">
-      <button id="btnConnect" class="primary big">블루투스 연결</button>
-      <button id="btnPick" class="ghost" hidden>다른 기기 선택</button>
-      <button id="btnLed" class="ghost" type="button">💡 LED 시험</button>
-    </div>
-
-    <section class="metrics">
-      <div class="metric"><div class="ml">검사 대상</div><div class="mv" id="mTarget">-</div></div>
-      <div class="metric"><div class="ml">센서</div><div class="mv" id="mSensor">-</div></div>
-      <div class="metric"><div class="ml">판정 기준</div><div class="mv" id="mRef">-</div></div>
-      <div class="metric"><div class="ml">이번 측정 횟수</div><div class="mv" id="mCount">0 회</div></div>
-    </section>
-
-    <section id="waitCard" class="card muted center">
-      블루투스를 연결한 뒤 볼트를 치면 여기에 결과가 나와요.
-    </section>
-
-    <section id="resultCard" hidden>
-      <div id="banner" class="banner">
-        <div id="bTitle" class="btitle"></div>
-        <div id="bText" class="btext"></div>
-        <div id="bSub" class="bsub"></div>
+        <div id="warnSat" class="notice" hidden>소리가 너무 커서 잘렸어요(Peak Magnitude ≈ 1). 마이크를 조금 떨어뜨리거나 더 약하게 치세요. 이 측정은 정상 샘플로 쓰지 마세요.</div>
+        <div id="sensors" class="sensors"></div>
+        <div class="btnrow">
+          <button id="btnSave" class="btn primary" type="button">💾 저장</button>
+          <button id="btnNext" class="btn" type="button">다음 볼트 ▶</button>
+        </div>
       </div>
-      <div id="simBanner" class="notice" hidden>시험용 가짜 타격이에요. 저장하지 않아요.</div>
-      <div id="warnSat" class="notice" hidden>소리가 너무 커서 잘렸습니다(Peak Magnitude ≈ 1). 마이크를 조금 떨어뜨리거나 더 약하게 치세요. 이 측정은 정상 샘플로 쓰지 마세요.</div>
-      <div id="sensors" class="sensors"></div>
-      <div class="btnrow">
-        <button id="btnSave" class="primary">💾 저장</button>
-        <button id="btnNext" class="ghost">다음 볼트 ▶</button>
+    </section>
+
+    <!-- ================= 기준 등록 ================= -->
+    <section id="tab-register" class="tab" hidden>
+      <div class="card">
+        <h2>정상 기준 등록</h2>
+        <p class="hint">정상으로 조여진 볼트를 같은 힘으로 여러 번 쳐서 값을 모으면, 그 평균으로 정상 범위가 만들어져요. 같은 측정은 두 번 들어가지 않아요.</p>
+        <div class="progress"><div id="regBar" class="progress-bar"></div></div>
+        <div id="regCount" class="regcount">0 / 10</div>
+        <div class="row2">
+          <label>목표 횟수<select id="regTarget"></select></label>
+          <label>범위 폭 (평균 ± k×σ)<select id="regK"></select></label>
+        </div>
+        <div id="regConnHint" class="hint" hidden>먼저 <b>측정</b> 탭에서 블루투스를 연결하세요.</div>
+        <div class="btnrow">
+          <button id="btnRegStrike" class="btn primary" type="button" disabled>타격 + 측정</button>
+          <button id="btnRegHand" class="btn" type="button" disabled>손으로 칠게요</button>
+        </div>
+        <div id="regStatus" class="statusline"></div>
       </div>
-      <label class="check"><input type="checkbox" id="chkAuto" checked> 측정되면 자동 저장</label>
+
+      <div class="card">
+        <h2>방금 측정한 값</h2>
+        <div id="regLast" class="reglast"></div>
+        <div class="btnrow">
+          <button id="btnAddSample" class="btn primary" type="button" disabled>➕ 정상 샘플로 추가</button>
+        </div>
+        <label class="switch"><input type="checkbox" id="chkRegAuto"> 측정되면 자동으로 추가</label>
+      </div>
+
+      <div class="card">
+        <h2>모은 샘플 <span id="regListN" class="sub"></span></h2>
+        <div id="regList" class="samples"></div>
+        <div id="regPreview" class="preview"></div>
+        <div class="btnrow">
+          <button id="btnRegSave" class="btn primary" type="button" disabled>🎯 기준 계산 · 저장</button>
+          <button id="btnRegClear" class="btn" type="button">샘플 비우기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 기록 ================= -->
+    <section id="tab-history" class="tab" hidden>
+      <div class="card">
+        <h2 id="histTitle">검사 기록</h2>
+        <div id="hist" class="hist"></div>
+        <div id="histEmpty" class="hint">아직 이 기기에서 저장한 기록이 없어요.</div>
+      </div>
+    </section>
+
+    <!-- ================= 설정 ================= -->
+    <section id="tab-settings" class="tab" hidden>
+      <div class="card">
+        <h2>검사자 · 기기</h2>
+        <div class="row2">
+          <label>검사자<input id="inpInspector" maxlength="20" placeholder="홍길동"></label>
+          <label>기기 이름<input id="inpDevice" maxlength="40" placeholder="TAB-01"></label>
+        </div>
+        <label class="switch"><input type="checkbox" id="chkAuto" checked> 측정되면 자동 저장</label>
+      </div>
+      <div class="card">
+        <h2>도구</h2>
+        <div class="btnrow wrap">
+          <button id="btnReload" class="btn" type="button">🔄 기준 다시 불러오기</button>
+          <button id="btnLed" class="btn" type="button">💡 LED 시험</button>
+        </div>
+      </div>
       <details class="card">
         <summary>판정 규칙</summary>
         <pre id="ruleText"></pre>
       </details>
       <details class="card">
-        <summary>현재 판정 기준 보기</summary>
+        <summary>현재 판정 기준</summary>
         <div class="tablewrap"><table id="refTable"></table></div>
       </details>
+      <details class="card">
+        <summary>연결 기록 (문제가 생기면 여기 글을 알려 주세요)</summary>
+        <pre id="log"></pre>
+      </details>
     </section>
-
-    <section class="card">
-      <h2 id="histTitle">검사 이력</h2>
-      <div class="tablewrap"><table id="hist"></table></div>
-      <div id="histEmpty" class="muted">아직 이 기기에서 저장한 기록이 없어요.</div>
-    </section>
-
-    <details class="card">
-      <summary>연결 기록 (문제가 생기면 여기 글을 알려 주세요)</summary>
-      <pre id="log"></pre>
-    </details>
   </main>
+
+  <nav class="tabbar" aria-label="메뉴">
+    <button class="tabbtn active" data-tab="measure" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>측정</span>
+    </button>
+    <button class="tabbtn" data-tab="register" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>기준 등록</span>
+    </button>
+    <button class="tabbtn" data-tab="history" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>기록</span>
+    </button>
+    <button class="tabbtn" data-tab="settings" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><span>설정</span>
+    </button>
+  </nav>
 
   <script src="app.js" type="module"></script>
 </body>

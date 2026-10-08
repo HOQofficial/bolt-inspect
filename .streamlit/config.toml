@@ -1,3 +1,7 @@
-# 측정 버튼을 파란색으로 (빨간색은 '이상' 판정에만 쓰기 위해)
+# 폰 앱(RE:SOUND)과 같은 주황 포인트 색. 빨간색은 '이상' 판정에만 쓰고, 버튼·진행 막대는 주황.
 [theme]
-primaryColor = "#2563eb"
+primaryColor = "#ff5900"
+backgroundColor = "#f4f5f7"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#0f1a2b"
+baseRadius = "large"

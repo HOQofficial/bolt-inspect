@@ -418,6 +418,37 @@
               ],
               "maxLength": 80,
               "description": "v1.1: 어떤 기준으로 판정했는지. 예: 실측 등록 n=10 ±2σ"
+            },
+            "spectrum": {
+              "description": "v1.2 추가(선택): ESP32 가 보낸 FFT 막대. 폰·PC 화면의 FFT 그래프용 (판정에는 쓰지 않음). 없어도 됨",
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "mic",
+                    "acc"
+                  ],
+                  "properties": {
+                    "mic": {
+                      "$ref": "#/$defs/spectrumTrace"
+                    },
+                    "acc": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "$ref": "#/$defs/spectrumTrace"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
             }
           }
         }
@@ -443,6 +474,31 @@
         "CHECK",
         "NG"
       ]
+    },
+    "spectrumTrace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "f_max",
+        "v"
+      ],
+      "description": "FFT 막대 한 줄: 0~f_max Hz 를 v 의 칸 수로 나눈 값 (가장 큰 칸 = 99)",
+      "properties": {
+        "f_max": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "v": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 128,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      }
     }
   }
 }
