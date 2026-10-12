@@ -16,13 +16,24 @@ writeFileSync(resolve(app, "_config.js"),
   hasCfg ? 'export { firebaseConfig } from "../firebase-config.js";\n' : "export const firebaseConfig = null;\n");
 console.log(hasCfg ? "Firebase 설정: web/firebase-config.js 사용" : "Firebase 설정 파일 없음 → 시험 모드로 빌드 (web/firebase-config.js 를 만들면 서버 저장이 켜져요)");
 
+// 사용: npm run build            → 인터넷 배포용 (첫 화면 = 소개 페이지, 앱 = /app/)
+//       npm run build -- --app-root → 안드로이드 앱용 (앱이 바로 첫 화면)
+const appRoot = process.argv.includes("--app-root");
+const dest = appRoot ? out : resolve(out, "app");
 rmSync(out, { recursive: true, force: true });
-mkdirSync(out, { recursive: true });
+mkdirSync(dest, { recursive: true });
 await build({
-  entryPoints: [resolve(app, "app.js")], outfile: resolve(out, "app.js"),
+  entryPoints: [resolve(app, "app.js")], outfile: resolve(dest, "app.js"),
   bundle: true, format: "esm", target: ["chrome100"], minify: true, loader: { ".json": "json" }, logLevel: "warning",
 });
-for (const f of ["index.html", "style.css", "manifest.webmanifest"]) cpSync(resolve(app, f), resolve(out, f));
-cpSync(resolve(app, "icons"), resolve(out, "icons"), { recursive: true });
-writeFileSync(resolve(out, "sw.js"), readFileSync(resolve(app, "sw.js"), "utf8").replace("__BUILD__", String(Date.now())));
-console.log("www/ 빌드 완료");
+for (const f of ["index.html", "style.css", "manifest.webmanifest"]) cpSync(resolve(app, f), resolve(dest, f));
+cpSync(resolve(app, "icons"), resolve(dest, "icons"), { recursive: true });
+writeFileSync(resolve(dest, "sw.js"), readFileSync(resolve(app, "sw.js"), "utf8").replace("__BUILD__", String(Date.now())));
+if (!appRoot) {
+  cpSync(resolve(web, "landing.html"), resolve(out, "index.html"));
+  // 예전에 첫 화면(/)에 설치돼 있던 앱 캐시를 지우고 스스로 사라지는 파일 (없으면 옛 화면이 계속 보일 수 있음)
+  writeFileSync(resolve(out, "sw.js"),
+    'self.addEventListener("install",()=>self.skipWaiting());\n' +
+    'self.addEventListener("activate",(e)=>e.waitUntil(caches.keys().then((ks)=>Promise.all(ks.map((k)=>caches.delete(k)))).then(()=>self.registration.unregister())));\n');
+}
+console.log(appRoot ? "www/ 빌드 완료 (앱 전용: 앱이 첫 화면)" : "www/ 빌드 완료 (소개 페이지 + www/app/ 앱)");

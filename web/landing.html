@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ecedfb">
+<title>RE:SOUND · 볼트 타음 검사</title>
+<link rel="icon" href="app/icons/icon-192.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+html{scroll-behavior:smooth}
+a{color:inherit;text-decoration:none}
+@keyframes tum1{to{transform:rotate3d(1,0.7,0.2,360deg)}}
+@keyframes tum2{to{transform:rotate3d(0.3,1,0.5,360deg)}}
+@keyframes tum3{to{transform:rotate3d(0.6,-0.4,1,360deg)}}
+@keyframes tum4{to{transform:rotate3d(1,-0.8,0.4,360deg)}}
+@keyframes tum5{to{transform:rotate3d(-0.5,1,0.7,-360deg)}}
+.tum{animation-timing-function:linear;animation-iteration-count:infinite}
+@keyframes d1{0%,100%{translate:0 0}25%{translate:26px -30px}50%{translate:-20px -44px}75%{translate:-30px -10px}}
+@keyframes d2{0%,100%{translate:0 0}30%{translate:-28px -22px}60%{translate:24px -40px}80%{translate:30px -6px}}
+@keyframes d3{0%,100%{translate:0 0}20%{translate:20px 22px}55%{translate:-26px -34px}80%{translate:16px -18px}}
+.part{animation-timing-function:ease-in-out;animation-iteration-count:infinite}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.drift{animation:drift 12s linear infinite}
+.drift-b{animation:drift 18s linear infinite;animation-direction:reverse}
+.drift-c{animation:drift 8s linear infinite}
+@keyframes draw{from{stroke-dashoffset:0.94}to{stroke-dashoffset:0}}
+.scrib{stroke-dasharray:1 1;stroke-dashoffset:0}
+@supports (animation-timeline: scroll()){.scrib{animation:draw linear both;animation-timeline:scroll(root)}}
+.pill{transition:transform .2s ease, background .2s ease}
+.pill:hover{transform:translateY(-2px)}
+.tile{transition:transform .25s ease}
+.tile:hover{transform:translateY(-5px)}
+@media (max-width:760px){.stage{height:440px !important}.hide-s{display:none !important}}
+</style>
+
+</head>
+<body>
+<div id="root">
+
+<div onMouseMove="{{onMove}}" onMouseLeave="{{onLeave}}" style="position: relative; width: 100%; box-sizing: border-box; overflow: hidden; background: #ECEEFB; color: #0B0F1E; font-family: 'Noto Sans KR', sans-serif">
+
+<svg width="0" height="0" aria-hidden="true" style="position: absolute">
+<defs>
+<filter id="warp" x="-30%" y="-300%" width="160%" height="700%">
+<feTurbulence type="fractalNoise" baseFrequency="0.006 0.02" numOctaves="2" seed="3" result="n">
+<animate attributeName="baseFrequency" dur="9s" values="0.006 0.02;0.011 0.035;0.006 0.02" repeatCount="indefinite"></animate>
+</feTurbulence>
+<feDisplacementMap in="SourceGraphic" in2="n" scale="56" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+</filter>
+<filter id="refract" x="0%" y="0%" width="100%" height="100%">
+<feTurbulence type="fractalNoise" baseFrequency="0.01 0.014" numOctaves="2" seed="8" result="m"></feTurbulence>
+<feDisplacementMap in="SourceGraphic" in2="m" scale="36" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+</filter>
+</defs>
+</svg>
+
+<svg width="100%" height="2400" viewBox="0 0 1440 2400" preserveAspectRatio="xMidYMin slice" fill="none" aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none">
+<defs>
+<linearGradient id="rib" gradientUnits="userSpaceOnUse" x1="200" y1="0" x2="1240" y2="2400">
+<stop offset="0" stop-color="#92FAFC"/>
+<stop offset="0.45" stop-color="#4FD8F2"/>
+<stop offset="1" stop-color="#2A9FE2"/>
+</linearGradient>
+</defs>
+<path class="scrib" pathLength="1" d="{{scribble}}" stroke="url(#rib)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+<div style="position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; box-sizing: border-box">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 28px 0 24px 0">
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 24px; letter-spacing: 0.02em">RE<span style="color: #FF5900">:</span>SOUND</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<div class="hide-s" style="max-width: 300px; font-size: 15px; line-height: 1.45; color: #3A4056; margin-right: 12px">볼트를 두드린 소리와 진동으로 조임 상태를 확인합니다</div>
+<a href="app/" class="pill" style="display: flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 22px; background: #0B0F1E; color: #F5F6FF; font-size: 14px; font-weight: 500">앱 열기</a>
+<a href="#how" class="pill" style="display: flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 22px; background: #FFFFFF; font-size: 14px; font-weight: 500">작동 방식</a>
+</div>
+</div>
+
+<div class="stage" style="position: relative; height: 560px; border-radius: 32px; overflow: hidden; background: radial-gradient(ellipse at 50% 38%, #24349A 0%, #121A52 52%, #0B0F1E 100%); perspective: 1400px; perspective-origin: 50% 40%">
+<div style="position: absolute; left: 50%; top: 50%; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(255,89,0,0.18), rgba(255,89,0,0) 62%)"></div>
+
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 170px; overflow: hidden">
+<svg class="drift-b" width="200%" height="170" viewBox="0 0 2304 170" preserveAspectRatio="none" fill="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 0">
+<path d="{{waveFillB}}" fill="rgba(51,71,255,0.22)"/>
+</svg>
+<svg class="drift" width="200%" height="170" viewBox="0 0 2304 170" preserveAspectRatio="none" fill="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 0">
+<path d="{{waveFillA}}" fill="rgba(255,89,0,0.24)"/>
+<path d="{{waveLineA}}" stroke="#FF8A3D" stroke-width="2.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+</svg>
+<svg class="drift-c" width="200%" height="170" viewBox="0 0 2304 170" preserveAspectRatio="none" fill="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 0">
+<path d="{{waveLineC}}" stroke="rgba(245,246,255,0.5)" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+</svg>
+</div>
+
+<div class="part hide-s" style="position: absolute; left: 40%; top: 295px; margin: {{p12.my}}px 0 0 {{p12.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-100px); scale: {{p12.sc}}; animation-name: d3; animation-duration: 15s; animation-delay: -6s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum2; animation-duration: 26s; animation-delay: -18s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum4; animation-duration: 10s; animation-delay: -3s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p12.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p12.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p12.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p12.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p12.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 12%; top: 150px; margin: {{p1.my}}px 0 0 {{p1.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-80px); scale: {{p1.sc}}; animation-name: d1; animation-duration: 9s; animation-delay: -0s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum1; animation-duration: 14s; animation-delay: -0s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum3; animation-duration: 9s; animation-delay: -0s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p1.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p1.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p1.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p1.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p1.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 50%; top: 195px; margin: {{p5.my}}px 0 0 {{p5.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-60px); scale: {{p5.sc}}; animation-name: d2; animation-duration: 15s; animation-delay: -3s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum5; animation-duration: 16s; animation-delay: -0s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum2; animation-duration: 11s; animation-delay: -1s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p5.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p5.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p5.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p5.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p5.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 88%; top: 170px; margin: {{p9.my}}px 0 0 {{p9.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-40px); scale: {{p9.sc}}; animation-name: d3; animation-duration: 14s; animation-delay: -6s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum4; animation-duration: 18s; animation-delay: -14s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum1; animation-duration: 13s; animation-delay: -11s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p9.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p9.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p9.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p9.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p9.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 26%; top: 400px; margin: {{p2.my}}px 0 0 {{p2.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-20px); scale: {{p2.sc}}; animation-name: d2; animation-duration: 14s; animation-delay: -3s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum2; animation-duration: 21s; animation-delay: -4s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum4; animation-duration: 14s; animation-delay: -3s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p2.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p2.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p2.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p2.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p2.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 63%; top: 400px; margin: {{p6.my}}px 0 0 {{p6.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(0px); scale: {{p6.sc}}; animation-name: d3; animation-duration: 13s; animation-delay: -6s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum1; animation-duration: 23s; animation-delay: -20s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum3; animation-duration: 16s; animation-delay: -15s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p6.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p6.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p6.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p6.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p6.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 36%; top: 170px; margin: {{p3.my}}px 0 0 {{p3.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(40px); scale: {{p3.sc}}; animation-name: d3; animation-duration: 12s; animation-delay: -6s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum3; animation-duration: 15s; animation-delay: -8s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum5; animation-duration: 10s; animation-delay: -6s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p3.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p3.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p3.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p3.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p3.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 80%; top: 385px; margin: {{p8.my}}px 0 0 {{p8.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(40px); scale: {{p8.sc}}; animation-name: d2; animation-duration: 9s; animation-delay: -3s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum3; animation-duration: 24s; animation-delay: -4s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum5; animation-duration: 17s; animation-delay: -4s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p8.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p8.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p8.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p8.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p8.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 66%; top: 160px; margin: {{p7.my}}px 0 0 {{p7.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(80px); scale: {{p7.sc}}; animation-name: d1; animation-duration: 11s; animation-delay: -0s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum2; animation-duration: 17s; animation-delay: -7s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum4; animation-duration: 12s; animation-delay: -6s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p7.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p7.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p7.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p7.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p7.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part" style="position: absolute; left: 48%; top: 415px; margin: {{p4.my}}px 0 0 {{p4.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(90px); scale: {{p4.sc}}; animation-name: d1; animation-duration: 10s; animation-delay: -0s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum4; animation-duration: 22s; animation-delay: -12s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum1; animation-duration: 15s; animation-delay: -9s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p4.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p4.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p4.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p4.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p4.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part hide-s" style="position: absolute; left: 20%; top: 290px; margin: {{p10.my}}px 0 0 {{p10.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(120px); scale: {{p10.sc}}; animation-name: d1; animation-duration: 12s; animation-delay: -0s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum5; animation-duration: 25s; animation-delay: -11s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum2; animation-duration: 9s; animation-delay: -0s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p10.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p10.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p10.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p10.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p10.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="part hide-s" style="position: absolute; left: 73%; top: 290px; margin: {{p11.my}}px 0 0 {{p11.mx}}px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(140px); scale: {{p11.sc}}; animation-name: d2; animation-duration: 10s; animation-delay: -3s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum1; animation-duration: 19s; animation-delay: -2s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum3; animation-duration: 14s; animation-delay: -2s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{p11.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{p11.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{p11.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{p11.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{p11.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="position: absolute; left: 28px; bottom: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: rgba(245,246,255,0.75)">SCROLL TO EXPLORE</div>
+<div style="position: absolute; right: 28px; bottom: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: rgba(245,246,255,0.75)">거제 2조</div>
+</div>
+
+<div style="padding: 96px 0 40px 0">
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500; font-size: clamp(48px, 9vw, 128px); line-height: 0.98; letter-spacing: -0.04em">Tap it. Hear it.<br><span style="display: inline-block; margin-left: 12%">Verify it again.</span></h1>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px; padding-bottom: 120px">
+<div style="flex: 1 1 380px; max-width: 520px; font-size: 18px; line-height: 1.7; color: #3A4056">선박 기관부 플랜지 볼트를 두드렸을 때 나는 소리와 진동을 읽어서 정상, 재측정, 이상 의심으로 알려줘요. 폰이나 태블릿으로 바로 측정할 수 있어요.</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="app/" class="pill" style="display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 30px; border-radius: 30px; background: #FF5900; color: #FFFFFF; font-size: 17px; font-weight: 700; box-shadow: 0 12px 32px rgba(255,89,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)">
+<span>검사 시작하기</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>
+<a href="app/?tab=history" class="pill" style="display: flex; align-items: center; height: 60px; padding: 0 28px; border-radius: 30px; background: #FFFFFF; font-size: 16px; font-weight: 500">검사 현황 보기</a>
+</div>
+</div>
+
+<div id="how" style="padding-bottom: 120px; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.12em; color: #C93E00">작동 방식</div>
+<h2 style="margin: 0; font-size: clamp(34px, 5vw, 60px); font-weight: 300; line-height: 1.2; letter-spacing: -0.02em">두드리고, 듣고,<br><span style="font-weight: 900">다시 확인합니다.</span></h2>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+<div class="tile" style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 18px; padding: 32px; box-sizing: border-box; border-radius: 32px; background: #FFFFFF">
+<div style="align-self: flex-start; padding: 6px 14px; border-radius: 16px; background: #ECEEFB; font-family: 'IBM Plex Mono', monospace; font-size: 12px">01</div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -0.03em">TAP</div>
+<div style="font-size: 16px; line-height: 1.7; color: #3A4056">솔레노이드가 볼트를 매번 같은 세기로 한 번 칩니다. 손으로 칠 때는 8초 동안 기다려요.</div>
+</div>
+<div class="tile" style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 18px; padding: 32px; box-sizing: border-box; border-radius: 32px; background: #FFFFFF">
+<div style="align-self: flex-start; padding: 6px 14px; border-radius: 16px; background: #ECEEFB; font-family: 'IBM Plex Mono', monospace; font-size: 12px">02</div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -0.03em">HEAR</div>
+<div style="font-size: 16px; line-height: 1.7; color: #3A4056">마이크와 진동센서의 신호를 주파수로 바꿔 Peak 주파수, Peak 크기, 대역 에너지를 뽑아냅니다.</div>
+</div>
+<div class="tile" style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 18px; padding: 32px; box-sizing: border-box; border-radius: 32px; background: #0B0F1E; color: #F5F6FF">
+<div style="align-self: flex-start; padding: 6px 14px; border-radius: 16px; background: rgba(255,255,255,0.12); font-family: 'IBM Plex Mono', monospace; font-size: 12px">03</div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: #FF8A3D">VERIFY</div>
+<div style="font-size: 16px; line-height: 1.7; color: rgba(245,246,255,0.72)">정상 볼트로 만든 기준 범위와 비교해 정상, 재측정 필요, 체결 이상 의심 중 하나로 알려줘요.</div>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 26px; background: #D9F2E4; font-size: 15px; font-weight: 700; color: #14633F"><div style="width: 10px; height: 10px; border-radius: 5px; background: #2FA66A"></div>정상 · 벗어난 항목 0개</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 26px; background: #FFEBC2; font-size: 15px; font-weight: 700; color: #7A5200"><div style="width: 10px; height: 10px; border-radius: 5px; background: #E0A020"></div>재측정 필요 · 1개</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 26px; background: #FFD9D6; font-size: 15px; font-weight: 700; color: #8E2019"><div style="width: 10px; height: 10px; border-radius: 5px; background: #D8433A"></div>체결 이상 의심 · 2개 이상</div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; padding: 64px 56px; box-sizing: border-box; border-radius: 40px; background: #0B0F1E; color: #F5F6FF; margin-bottom: 40px">
+<div style="flex: 1 1 380px; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(36px, 5vw, 64px); font-weight: 500; line-height: 1.05; letter-spacing: -0.03em">지금 볼트를<br>두드려 볼까요?</div>
+<a href="app/" class="pill" style="display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 32px; border-radius: 32px; background: #FF5900; color: #FFFFFF; font-size: 18px; font-weight: 700">
+<span>검사 시작하기</span>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 8px 0 40px 0; font-size: 13px; color: #5A6076">
+<div>RE:SOUND · 거제 2조</div>
+<div>배정호 · 송건호 · 안지민 · 양세영 · 오대관 · 이승현 · 이현태</div>
+</div>
+
+</div>
+
+<svg width="100%" height="2400" fill="none" aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none">
+<defs>
+<linearGradient id="irid" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#FFC4E6"/>
+<stop offset="0.35" stop-color="#CDBFFF"/>
+<stop offset="0.7" stop-color="#A9E4FF"/>
+<stop offset="1" stop-color="#C4FFE4"/>
+</linearGradient>
+<filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+<feGaussianBlur stdDeviation="12"></feGaussianBlur>
+</filter>
+</defs>
+<sc-for list="{{wl}}" as="w" hint-placeholder-count="3">
+<g style="opacity: {{w.op}}; filter: {{w.fl}}">
+<path d="{{w.wash}}" fill="rgba(206,196,255,0.45)" filter="url(#soft)"/>
+<path d="{{w.r1}}" fill="rgba(255,255,255,0.28)" stroke="url(#irid)" stroke-width="0.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<path d="{{w.r2}}" fill="rgba(255,255,255,0.16)" stroke="url(#irid)" stroke-width="0.7" stroke-opacity="0.4" stroke-linejoin="round"/>
+<path d="{{w.r3}}" fill="rgba(255,255,255,0.1)" stroke="url(#irid)" stroke-width="0.7" stroke-opacity="0.3" stroke-linejoin="round"/>
+</g>
+</sc-for>
+</svg>
+
+</div>
+</div>
+<script>
+
+// 아주 작은 템플릿 실행기: {{값}} 자리 채우기, <sc-for> 반복, onXxx 이벤트 연결 (시안과 같은 문법을 일반 웹 페이지에서 돌리기 위함)
+class DCLogic {
+  constructor(props) { this.props = props || {}; this.state = {}; this._q = false; }
+  setState(p) { this.state = Object.assign({}, this.state, typeof p === 'function' ? p(this.state) : p); this._schedule && this._schedule(); }
+}
+(function () {
+  const get = (scope, path) => {
+    const parts = path.trim().split('.');
+    let v = scope;
+    for (const k of parts) { if (v == null) return undefined; v = v[k]; }
+    return v;
+  };
+  const HOLE = /\{\{\s*([\w.$]+)\s*\}\}/g;
+  const hasHole = (t) => t.indexOf('{{') >= 0;
+  function compile(node, ups) {                       // 돌려주는 값: (scope) => 화면 갱신
+    const tasks = [];
+    if (node.nodeType === 3) {
+      const t = node.nodeValue;
+      if (hasHole(t)) { let last = null; tasks.push((sc) => { const v = t.replace(HOLE, (m, p) => { const r = get(sc, p); return r == null ? '' : r; }); if (v !== last) { node.nodeValue = v; last = v; } }); }
+    } else if (node.nodeType === 1) {
+      if (node.tagName.toUpperCase() === 'SC-FOR') return compileFor(node);
+      for (const a of Array.from(node.attributes)) {
+        if (a.name.indexOf('hint-') === 0) { node.removeAttribute(a.name); continue; }
+        const m = /^on([A-Z]\w+)$/i.exec(a.name);
+        if (m && /^\{\{\s*[\w.$]+\s*\}\}$/.test(a.value)) {
+          const path = a.value.replace(/[{}\s]/g, ''), ev = m[1].toLowerCase();
+          node.removeAttribute(a.name);
+          let cur = null;
+          node.addEventListener(ev, (e) => { if (cur) cur(e); });
+          tasks.push((sc) => { const f = get(sc, path); cur = typeof f === 'function' ? f : null; });
+        } else if (hasHole(a.value)) {
+          const name = a.name, tpl = a.value; let last = null;
+          tasks.push((sc) => { const v = tpl.replace(HOLE, (mm, p) => { const r = get(sc, p); return r == null ? '' : r; }); if (v !== last) { node.setAttribute(name, v); last = v; } });
+        }
+      }
+      const kids = Array.from(node.childNodes).map((c) => compile(c)).filter(Boolean);
+      kids.forEach((k) => tasks.push(k));
+    }
+    if (!tasks.length) return null;
+    return (sc) => { for (const t of tasks) t(sc); };
+  }
+  function compileFor(node) {
+    const listPath = node.getAttribute('list').replace(/[{}\s]/g, ''), as = node.getAttribute('as');
+    const tpl = document.createElement('template');
+    const inSvg = !!node.closest('svg');                 // SVG 안에서 반복할 때는 SVG 로 읽어야 화면에 그려짐
+    tpl.innerHTML = inSvg ? '<svg>' + node.innerHTML + '</svg>' : node.innerHTML;
+    const anchor = document.createComment('for');
+    node.replaceWith(anchor);
+    const inst = [];
+    return (sc) => {
+      const list = get(sc, listPath) || [];
+      while (inst.length < list.length) {
+        let frag = tpl.content.cloneNode(true);
+        if (inSvg) { const w = frag.firstChild; frag = document.createDocumentFragment(); while (w.firstChild) frag.appendChild(w.firstChild); }
+        const nodes = Array.from(frag.childNodes);
+        const ups = nodes.map((n) => compile(n)).filter(Boolean);
+        const parent = anchor.parentNode, before = inst.length ? inst[inst.length - 1].nodes[inst[inst.length - 1].nodes.length - 1].nextSibling : anchor.nextSibling;
+        parent.insertBefore(frag, before);
+        inst.push({ nodes, ups });
+      }
+      while (inst.length > list.length) { const g = inst.pop(); g.nodes.forEach((n) => n.remove()); }
+      list.forEach((item, i) => { const sc2 = Object.create(sc); sc2[as] = item; inst[i].ups.forEach((u) => u(sc2)); });
+    };
+  }
+  window.DCMount = function (rootEl, Comp) {
+    const inst = new Comp({});
+    const up = compile(rootEl);
+    let queued = false;
+    const render = () => { queued = false; up(inst.renderVals()); };
+    inst._schedule = () => { if (!queued) { queued = true; requestAnimationFrame(render); } };
+    render();
+    window.addEventListener('pagehide', () => { if (inst.componentWillUnmount) inst.componentWillUnmount(); });
+    return inst;
+  };
+})();
+
+</script>
+<script>
+
+const HOLD = 150, DUR = 1500, MAXLEN = 240;
+const PARTS = [[12, 150, 0.8], [26, 400, 1.05], [36, 170, 1.1], [48, 415, 1.2], [50, 195, 0.9], [63, 400, 1.0], [66, 160, 1.15], [80, 385, 1.1], [88, 170, 0.85], [20, 290, 0.7], [73, 290, 0.65], [40, 295, 0.7]];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { wisps: [], now: 0, last: 0 };
+    this.running = false;
+  }
+  componentWillUnmount() {
+    this.dead = true;
+    if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this.raf);
+  }
+  renderVals() {
+    const base = this._base || (this._base = (() => {
+    const hsl = (h, s, l) => 'hsl(' + h + ' ' + s + '% ' + Math.max(4, Math.min(97, l)).toFixed(0) + '%)';
+    const rad = (d) => (d * Math.PI) / 180;
+    const COL = [[225, 14, 84], [228, 24, 11], [226, 92, 46], [20, 100, 50]];
+    const jack = (c, n) => {
+      const h = c[0], s = c[1], L = c[2], arm = [];
+      const dark = L < 30;
+      for (let k = 0; k < 8; k++) {
+        const a = k * 45;
+        const l = L + (dark ? 7 : 9) * Math.cos(rad(a - 40));
+        const sx = 34 + ((k * 17) % 28);
+        arm.push({
+          a, hw: 7.04, w: 14.08, r: 17,
+          bg: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,' + (dark ? 0.42 : 0.7) + ') ' + sx + '%, rgba(255,255,255,0) ' + (sx + 34) + '%), linear-gradient(180deg, ' +
+            hsl(h, s, l - 24) + ' 0%, ' + hsl(h, s, l + 4) + ' 9%, ' + hsl(h, s, l + 12) + ' 30%, ' + hsl(h, s, l - 3) + ' 68%, ' + hsl(h, s, l + 8) + ' 91%, ' + hsl(h, s, l - 28) + ' 100%)'
+        });
+      }
+      const cap = 'radial-gradient(circle at 36% 32%, ' + hsl(h, s, L + 30) + ', ' + hsl(h, s, L + 2) + ' 52%, ' + hsl(h, s, L - 24) + ' 100%)';
+      const hub = 'radial-gradient(circle at 34% 30%, rgba(255,255,255,' + (dark ? 0.65 : 0.95) + ') 0%, ' + hsl(h, s, L + 14) + ' 22%, ' + hsl(h, s, L) + ' 56%, ' + hsl(h, s, L - 26) + ' 100%)';
+      return { arm, cap, hub };
+    };
+    const bolt = (c, dim) => {
+      const hs = (h, s, l) => hsl(h, Math.round(s * (0.72 + 0.28 * dim)), l * dim);
+      const h = c[0], s = c[1], base = c[2] > 80 ? 66 : c[2] < 30 ? 20 : c[2] - 8;
+      const faces = [];
+      const sh = (a, k) => k * Math.cos(rad(a - 40));
+      for (let k = 0; k < 16; k++) {
+        const a = k * 22.5, d = sh(a, 14);
+        faces.push({
+          a, hw: 8.5, y: 66, w: 17, h: 186, r: 41.2,
+          bg: 'repeating-linear-gradient(168deg, rgba(255,255,255,0.32) 0px, rgba(255,255,255,0.32) 3px, rgba(0,0,0,0.4) 3px, rgba(0,0,0,0.4) 7px), linear-gradient(90deg, ' + hs(h, s, base + 16 + d) + ', ' + hs(h, s, base - 6 + d) + ')'
+        });
+      }
+      for (let k = 0; k < 6; k++) {
+        const a = k * 60, d = sh(a, 12);
+        faces.push({
+          a, hw: 46.2, y: 0, w: 92.4, h: 52, r: 80,
+          bg: 'linear-gradient(180deg, ' + hs(h, s, base + 28 + d) + ' 0%, ' + hs(h, s, base + 8 + d) + ' 36%, ' + hs(h, s, base - 22 + d) + ' 50%, ' + hs(h, s, base - 4 + d) + ' 68%, ' + hs(h, s, base - 16 + d) + ' 100%)'
+        });
+      }
+      for (let k = 0; k < 16; k++) {
+        const a = k * 22.5, d = sh(a, 12);
+        faces.push({
+          a, hw: 21.5, y: 52, w: 43, h: 10, r: 106,
+          bg: 'linear-gradient(180deg, ' + hs(h, s, base + 30 + d) + ', ' + hs(h, s, base - 12 + d) + ')'
+        });
+      }
+      const cap = 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 58%, rgba(0,0,0,0.3) 100%), conic-gradient(from 20deg at 50% 50%, ' +
+        [base + 30, base + 2, base + 34, base - 10, base + 26, base - 6, base + 32, base + 30].map((l) => hs(h, s, l)).join(', ') + ')';
+      const washCap = 'conic-gradient(from 0deg at 50% 50%, ' +
+        [base + 24, base - 8, base + 28, base - 12, base + 24, base - 8, base + 28, base - 12, base + 24].map((l) => hs(h, s, l)).join(', ') + ')';
+      return { faces, cap, washCap };
+    };
+    const cfg = [["b", 1, 0.635], ["b", 0, 0.744], ["b", 2, 0.854], ["b", 3, 0.945], ["b", 0, 0.671], ["b", 1, 0.781], ["b", 2, 0.927], ["b", 0, 0.854], ["b", 1, 0.708], ["b", 2, 1.0], ["b", 3, 1.0], ["b", 1, 0.598]];
+    const out = {};
+    cfg.forEach(([kind, ci, dm], i) => { out['p' + (i + 1)] = kind === 'j' ? jack(COL[ci]) : bolt(COL[ci], dm); });
+
+    const scribble = (() => {
+      const H = 2400, T = 34, pts = [];
+      for (let t = -1.5; t <= T; t += 0.04) {
+        const R = 175 + 45 * Math.sin(t * 0.6) + 25 * Math.sin(t * 1.7);
+        const cx = 720 + 430 * Math.sin(t * 0.19 + 0.5) + 120 * Math.sin(t * 0.53);
+        const x = cx + R * Math.cos(t);
+        const y = t * (H / T) + R * Math.sin(t);
+        pts.push((pts.length ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1));
+      }
+      return pts.join(' ');
+    })();
+
+    const wave = (amp, period, phase, base, total, close) => {
+      const pts = [];
+      for (let x = 0; x <= total; x += 8) {
+        const y = base + amp * Math.sin((2 * Math.PI * x) / period + phase);
+        pts.push((pts.length ? 'L' : 'M') + x + ' ' + y.toFixed(1));
+      }
+      return pts.join(' ') + (close ? ' L' + total + ' 170 L0 170 Z' : '');
+    };
+    const T2 = 2304;
+    return { out, scribble, waves: { waveFillA: wave(26, 576, 0, 92, T2, true), waveLineA: wave(26, 576, 0, 92, T2, false), waveFillB: wave(34, 384, 1.3, 110, T2, true), waveLineC: wave(18, 288, 2.1, 70, T2, false) } };
+    })());
+    const outP = Object.assign({}, base.out);
+    const ph = this.ph || [];
+    PARTS.forEach((pp, i) => {
+      const h = ph[i] || { dx: 0, dy: 0, vx: 0, vy: 0 };
+      outP['p' + (i + 1)] = Object.assign({}, base.out['p' + (i + 1)], { mx: h.dx.toFixed(1), my: h.dy.toFixed(1), sc: (pp[2] * (1 + 0.12 * Math.min(1, Math.hypot(h.vx, h.vy) / 7))).toFixed(3) });
+    });
+    const st = this.state || {};
+    const now = st.now || 0;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const ribbon = (w, W, phase, off) => {
+      const pts = w.pts;
+      if (pts.length < 3) return '';
+      const age = w.det == null ? 0 : Math.max(0, now - w.det);
+      const e = Math.min(1, age / DUR);
+      const mix = w.det == null ? 0 : Math.min(1, age / 350);
+      const P = pts.slice().reverse();
+      const S = [];
+      const dx = (seg) => Math.sin(age * 0.004 + phase + seg * 0.25) * age * 0.02;
+      const dy = (seg) => -age * 0.03 + Math.cos(age * 0.003 + seg * 0.3 + phase) * age * 0.012;
+      for (let i = 0; i < P.length - 1; i++) {
+        const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || P[i + 1];
+        for (let k = 0; k < 6; k++) {
+          const u = k / 6, u2 = u * u, u3 = u2 * u, seg = i * 6 + k;
+          S.push({
+            x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * u + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * u2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * u3) + dx(seg),
+            y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * u + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * u2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * u3) + dy(seg)
+          });
+        }
+      }
+      const lp = P[P.length - 1], n0 = S.length;
+      S.push({ x: lp.x + dx(n0), y: lp.y + dy(n0) });
+      const n = S.length, L = [], R = [];
+      for (let j = 0; j < n; j++) {
+        const t = j / (n - 1);
+        const a = S[j - 1] || S[j], b = S[j + 1] || S[j];
+        const tx = b.x - a.x, ty = b.y - a.y, len = Math.hypot(tx, ty) || 1;
+        const nx = -ty / len, ny = tx / len;
+        const life = w.det == null ? 1 : clamp((t - e * 1.25 + 0.25) / 0.25, 0, 1);
+        const prof = (1 - mix) * Math.pow(t, 1.1) + mix * Math.pow(Math.sin(Math.PI * Math.min(1, t)), 0.7);
+        const hw = W * prof * (0.6 + 0.4 * Math.sin(j * 0.33 + phase)) * life;
+        const wob = (0.4 * W * Math.sin(j * 0.45 + phase * 1.3) * t + off * t) * life;
+        L.push((S[j].x + nx * (hw + wob)).toFixed(1) + ' ' + (S[j].y + ny * (hw + wob)).toFixed(1));
+        R.push((S[j].x - nx * (hw - wob)).toFixed(1) + ' ' + (S[j].y - ny * (hw - wob)).toFixed(1));
+      }
+      return 'M' + L.join(' L') + ' L' + R.reverse().join(' L') + ' Z';
+    };
+    const wl = (st.wisps || []).map((w) => {
+      const age = w.det == null ? 0 : Math.max(0, now - w.det);
+      const e = Math.min(1, age / DUR);
+      const op = w.det == null ? Math.min(1, (now - w.born) / 350) : Math.pow(1 - e, 1.2);
+      return {
+        wash: ribbon(w, 30, 0.8, 0), r1: ribbon(w, 13, 0, 0), r2: ribbon(w, 9, 1.9, 7), r3: ribbon(w, 6, 3.4, -8),
+        op: op.toFixed(3), fl: 'blur(' + (1 + e * 6).toFixed(1) + 'px)'
+      };
+    });
+    const tick = () => {
+      if (this.dead) return;
+      const tn = performance.now();
+      const ph2 = this.ph || (this.ph = PARTS.map(() => ({ dx: 0, dy: 0, vx: 0, vy: 0 })));
+      let moving = false;
+      ph2.forEach((h) => {
+        h.vx = (h.vx - 0.012 * h.dx) * 0.92;
+        h.vy = (h.vy - 0.012 * h.dy) * 0.92;
+        h.dx += h.vx;
+        h.dy += h.vy;
+        if (Math.abs(h.dx) + Math.abs(h.dy) + Math.abs(h.vx) + Math.abs(h.vy) > 0.2) moving = true;
+        else { h.dx = 0; h.dy = 0; h.vx = 0; h.vy = 0; }
+      });
+      this.setState((s) => {
+        let ws = (s && s.wisps) || [];
+        const act = ws[ws.length - 1];
+        if (act && act.det == null && tn - ((s && s.last) || 0) > HOLD) {
+          ws = ws.map((w) => (w === act ? Object.assign({}, w, { det: tn }) : w));
+        }
+        ws = ws.filter((w) => w.det == null || tn - w.det < DUR);
+        this.alive = ws.length > 0;
+        return { wisps: ws, now: tn };
+      });
+      if (moving || this.alive) this.raf = requestAnimationFrame(tick);
+      else this.running = false;
+    };
+    return Object.assign(outP, base.waves, {
+      wl,
+      scribble: base.scribble,
+      onMove: (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const tn = performance.now();
+        let ws = ((this.state && this.state.wisps) || []).slice();
+        let act = ws[ws.length - 1];
+        if (!act || act.det != null) {
+          act = { pts: [], len: 0, born: tn, det: null };
+          ws.push(act);
+        } else {
+          act = Object.assign({}, act, { pts: act.pts.slice() });
+          ws[ws.length - 1] = act;
+        }
+        const lastp = act.pts[0];
+        const d = lastp ? Math.hypot(x - lastp.x, y - lastp.y) : 0;
+        if (!lastp || d > 9) { act.len += d; act.pts.unshift({ x, y }); }
+        else act.pts[0] = { x, y };
+        if (act.len > MAXLEN || act.pts.length >= 18) {
+          const h = act.pts[0];
+          ws[ws.length - 1] = Object.assign({}, act, { det: tn });
+          ws.push({ pts: [{ x: h.x, y: h.y }], len: 0, born: tn, det: null });
+        }
+        const st0 = e.currentTarget.querySelector('.stage');
+        if (st0) {
+          const sr = st0.getBoundingClientRect();
+          const mx = e.clientX - sr.left, my = e.clientY - sr.top;
+          if (mx > 0 && my > 0 && mx < sr.width && my < sr.height) {
+            const sp = this.lastM ? Math.hypot(e.clientX - this.lastM.x, e.clientY - this.lastM.y) : 0;
+            const ph3 = this.ph || (this.ph = PARTS.map(() => ({ dx: 0, dy: 0, vx: 0, vy: 0 })));
+            PARTS.forEach((pp, i) => {
+              const h = ph3[i];
+              const cx = (pp[0] / 100) * sr.width + h.dx, cy = pp[1] + h.dy;
+              const ddx = cx - mx, ddy = cy - my, dd = Math.hypot(ddx, ddy) || 1;
+              const R = 150 * pp[2] + 70;
+              if (dd < R) {
+                const f = Math.pow(1 - dd / R, 1.4) * (0.8 + Math.min(sp, 40) * 0.14);
+                h.vx += (ddx / dd) * f;
+                h.vy += (ddy / dd) * f;
+              }
+            });
+          }
+        }
+        this.lastM = { x: e.clientX, y: e.clientY };
+        this.setState({ wisps: ws.slice(-8), now: tn, last: tn });
+        if (!this.running) { this.running = true; this.raf = requestAnimationFrame(tick); }
+      },
+      onLeave: () => {}
+    });
+  }
+}
+
+DCMount(document.getElementById('root').firstElementChild, Component);
+</script>
+</body>
+</html>

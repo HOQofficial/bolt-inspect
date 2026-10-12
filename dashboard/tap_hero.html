@@ -1,0 +1,353 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+html{scroll-behavior:smooth}
+a{color:inherit;text-decoration:none}
+@keyframes tum1{to{transform:rotate3d(1,0.7,0.2,360deg)}}
+@keyframes tum2{to{transform:rotate3d(0.3,1,0.5,360deg)}}
+@keyframes tum3{to{transform:rotate3d(0.6,-0.4,1,360deg)}}
+.tum{animation-timing-function:linear;animation-iteration-count:infinite}
+@keyframes d1{0%,100%{translate:0 0}25%{translate:22px -26px}50%{translate:-18px -38px}75%{translate:-26px -8px}}
+.part{animation-timing-function:ease-in-out;animation-iteration-count:infinite}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.drift{animation:drift 12s linear infinite}
+.drift-b{animation:drift 18s linear infinite;animation-direction:reverse}
+.drift-c{animation:drift 8s linear infinite}
+@keyframes draw{from{stroke-dashoffset:0.94}to{stroke-dashoffset:0}}
+.scrib{stroke-dasharray:1 1;stroke-dashoffset:0}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rise{from{opacity:0;transform:translateY(70px) scale(0.97)}to{opacity:1;transform:none}}
+@keyframes sweep{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.live{animation:blink 1.4s ease-in-out infinite}
+@keyframes eq{0%,100%{transform:scaleY(0.2)}50%{transform:scaleY(1)}}
+@property --v{syntax:'<integer>';inherits:false;initial-value:0}
+.cnt{counter-reset:v var(--v)}
+.cnt::after{content:counter(v)}
+@supports (animation-timeline: scroll()){
+.scrib{animation:draw linear both;animation-timeline:scroll(root)}
+.prog{animation:grow linear both;animation-timeline:scroll(root)}
+}
+@supports (animation-timeline: view()){
+.rv{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 55%}
+.sw{animation:sweep linear both;animation-timeline:view();animation-range:entry 10% cover 55%}
+}
+.pill{transition:transform .2s ease, background .2s ease, box-shadow .2s ease}
+.pill:hover{transform:translateY(-2px)}
+.tile{transition:transform .25s ease}
+.tile:hover{transform:translateY(-5px)}
+.snap{scrollbar-width:none}
+.snap::-webkit-scrollbar{display:none}
+@media (max-width:760px){.hide-s{display:none !important}}
+.pkt{opacity:0;transform:translateY(6px) scale(0.96);transition:opacity .18s ease, transform .18s ease}
+.pkw:hover .pkt{opacity:1;transform:none}
+.pkd{transition:transform .18s ease}
+.pkw:hover .pkd{transform:scale(1.4)}
+</style>
+
+<style>html,body{margin:0;height:100%;background:transparent;overflow:hidden}</style></head>
+<body><div id="root"><div style="width:100%;height:100vh"><div class="stage" style="position: relative; width: 100%; min-height: 100vh; height: 100vh; border-radius: 0; border-radius: 40px; overflow: hidden; background: radial-gradient(ellipse at 50% 38%, #24349A 0%, #121A52 52%, #0B0F1E 100%); perspective: 1400px; perspective-origin: 50% 40%">
+<div style="position: absolute; left: 50%; top: 50%; width: 760px; height: 760px; margin: -380px 0 0 -380px; border-radius: 50%; background: radial-gradient(circle, rgba(255,89,0,0.2), rgba(255,89,0,0) 62%)"></div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 170px; overflow: hidden">
+<svg class="drift-b" width="200%" height="170" viewBox="0 0 2304 170" preserveAspectRatio="none" fill="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 0"><path d="{{waveB}}" fill="rgba(51,71,255,0.22)"/></svg>
+<svg class="drift" width="200%" height="170" viewBox="0 0 2304 170" preserveAspectRatio="none" fill="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 0"><path d="{{waveA}}" fill="rgba(255,89,0,0.22)"/><path d="{{waveALine}}" stroke="#FF8A3D" stroke-width="2.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+</div>
+<div class="part" style="position: absolute; left: 50%; top: 46%; width: 0; height: 0; transform-style: preserve-3d; scale: 1.2; animation-name: d1; animation-duration: 11s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum1; animation-duration: 22s">
+<div class="tum" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; animation-name: tum3; animation-duration: 15s; animation-delay: -4s">
+<div style="position: absolute; left: 0; top: -126px; width: 0; height: 0; transform-style: preserve-3d">
+<sc-for list="{{pb.faces}}" as="f" hint-placeholder-count="38">
+<div style="position: absolute; left: -{{f.hw}}px; top: {{f.y}}px; width: {{f.w}}px; height: {{f.h}}px; backface-visibility: hidden; transform: rotateY({{f.a}}deg) translateZ({{f.r}}px); background: {{f.bg}}"></div>
+</sc-for>
+<div style="position: absolute; left: -41px; top: -41px; width: 82px; height: 82px; border-radius: 50%; backface-visibility: hidden; transform: translateY(252px) rotateX(-90deg); background: {{pb.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: rotateX(90deg); background: {{pb.washCap}}"></div>
+<div style="position: absolute; left: -108px; top: -56px; width: 216px; height: 216px; border-radius: 50%; backface-visibility: hidden; transform: translateY(7px) rotateX(-90deg); background: {{pb.washCap}}"></div>
+<div style="position: absolute; left: -92.4px; top: -80px; width: 184.8px; height: 160px; transform: rotateX(90deg); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); background: {{pb.cap}}"></div>
+<div style="position: absolute; left: -58px; top: -58px; width: 116px; height: 116px; border-radius: 50%; transform: rotateX(90deg) translateZ(1px); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28); background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.4), rgba(255,255,255,0) 62%)"></div>
+</div>
+</div>
+</div>
+</div>
+<div style="position: absolute; left: 28px; top: 26px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: rgba(245,246,255,0.8)">__LABEL__</div>
+<div style="position: absolute; right: 28px; top: 20px; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #F5F6FF; font-size: 13px"><div class="live" style="width: 8px; height: 8px; border-radius: 4px; background: #8EF0BE"></div>__STATUS__</div>
+<div style="position: absolute; left: 28px; bottom: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: rgba(245,246,255,0.75)">__FOOT__</div>
+</div></div></div>
+<script>
+// 아주 작은 템플릿 실행기: {{값}} 자리 채우기, <sc-for> 반복, onXxx 이벤트 연결 (시안과 같은 문법을 일반 웹 페이지에서 돌리기 위함)
+class DCLogic {
+  constructor(props) { this.props = props || {}; this.state = {}; this._q = false; }
+  setState(p) { this.state = Object.assign({}, this.state, typeof p === 'function' ? p(this.state) : p); this._schedule && this._schedule(); }
+}
+(function () {
+  const get = (scope, path) => {
+    const parts = path.trim().split('.');
+    let v = scope;
+    for (const k of parts) { if (v == null) return undefined; v = v[k]; }
+    return v;
+  };
+  const HOLE = /\{\{\s*([\w.$]+)\s*\}\}/g;
+  const hasHole = (t) => t.indexOf('{{') >= 0;
+  function compile(node, ups) {                       // 돌려주는 값: (scope) => 화면 갱신
+    const tasks = [];
+    if (node.nodeType === 3) {
+      const t = node.nodeValue;
+      if (hasHole(t)) { let last = null; tasks.push((sc) => { const v = t.replace(HOLE, (m, p) => { const r = get(sc, p); return r == null ? '' : r; }); if (v !== last) { node.nodeValue = v; last = v; } }); }
+    } else if (node.nodeType === 1) {
+      if (node.tagName.toUpperCase() === 'SC-FOR') return compileFor(node);
+      for (const a of Array.from(node.attributes)) {
+        if (a.name.indexOf('hint-') === 0) { node.removeAttribute(a.name); continue; }
+        const m = /^on([A-Z]\w+)$/i.exec(a.name);
+        if (m && /^\{\{\s*[\w.$]+\s*\}\}$/.test(a.value)) {
+          const path = a.value.replace(/[{}\s]/g, ''), ev = m[1].toLowerCase();
+          node.removeAttribute(a.name);
+          let cur = null;
+          node.addEventListener(ev, (e) => { if (cur) cur(e); });
+          tasks.push((sc) => { const f = get(sc, path); cur = typeof f === 'function' ? f : null; });
+        } else if (hasHole(a.value)) {
+          const name = a.name, tpl = a.value; let last = null;
+          tasks.push((sc) => { const v = tpl.replace(HOLE, (mm, p) => { const r = get(sc, p); return r == null ? '' : r; }); if (v !== last) { node.setAttribute(name, v); last = v; } });
+        }
+      }
+      const kids = Array.from(node.childNodes).map((c) => compile(c)).filter(Boolean);
+      kids.forEach((k) => tasks.push(k));
+    }
+    if (!tasks.length) return null;
+    return (sc) => { for (const t of tasks) t(sc); };
+  }
+  function compileFor(node) {
+    const listPath = node.getAttribute('list').replace(/[{}\s]/g, ''), as = node.getAttribute('as');
+    const tpl = document.createElement('template');
+    const inSvg = !!node.closest('svg');                 // SVG 안에서 반복할 때는 SVG 로 읽어야 화면에 그려짐
+    tpl.innerHTML = inSvg ? '<svg>' + node.innerHTML + '</svg>' : node.innerHTML;
+    const anchor = document.createComment('for');
+    node.replaceWith(anchor);
+    const inst = [];
+    return (sc) => {
+      const list = get(sc, listPath) || [];
+      while (inst.length < list.length) {
+        let frag = tpl.content.cloneNode(true);
+        if (inSvg) { const w = frag.firstChild; frag = document.createDocumentFragment(); while (w.firstChild) frag.appendChild(w.firstChild); }
+        const nodes = Array.from(frag.childNodes);
+        const ups = nodes.map((n) => compile(n)).filter(Boolean);
+        const parent = anchor.parentNode, before = inst.length ? inst[inst.length - 1].nodes[inst[inst.length - 1].nodes.length - 1].nextSibling : anchor.nextSibling;
+        parent.insertBefore(frag, before);
+        inst.push({ nodes, ups });
+      }
+      while (inst.length > list.length) { const g = inst.pop(); g.nodes.forEach((n) => n.remove()); }
+      list.forEach((item, i) => { const sc2 = Object.create(sc); sc2[as] = item; inst[i].ups.forEach((u) => u(sc2)); });
+    };
+  }
+  window.DCMount = function (rootEl, Comp) {
+    const inst = new Comp({});
+    const up = compile(rootEl);
+    let queued = false;
+    const render = () => { queued = false; up(inst.renderVals()); };
+    inst._schedule = () => { if (!queued) { queued = true; requestAnimationFrame(render); } };
+    render();
+    window.addEventListener('pagehide', () => { if (inst.componentWillUnmount) inst.componentWillUnmount(); });
+    return inst;
+  };
+})();
+</script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { z: {}, drag: null };
+  }
+  renderVals() {
+    const hsl = (h, s, l) => 'hsl(' + h + ' ' + s + '% ' + Math.max(4, Math.min(97, l)).toFixed(0) + '%)';
+    const rad = (d) => (d * Math.PI) / 180;
+    const COL = [[225, 14, 84], [228, 24, 11], [226, 92, 46], [20, 100, 50]];
+    const bolt = (c, dim) => {
+      const hs = (h, s, l) => hsl(h, Math.round(s * (0.72 + 0.28 * dim)), l * dim);
+      const h = c[0], s = c[1], base = c[2] > 80 ? 66 : c[2] < 30 ? 20 : c[2] - 8;
+      const faces = [];
+      const sh = (a, k) => k * Math.cos(rad(a - 40));
+      for (let k = 0; k < 16; k++) {
+        const a = k * 22.5, d = sh(a, 14);
+        faces.push({
+          a, hw: 8.5, y: 66, w: 17, h: 186, r: 41.2,
+          bg: 'repeating-linear-gradient(168deg, rgba(255,255,255,0.32) 0px, rgba(255,255,255,0.32) 3px, rgba(0,0,0,0.4) 3px, rgba(0,0,0,0.4) 7px), linear-gradient(90deg, ' + hs(h, s, base + 16 + d) + ', ' + hs(h, s, base - 6 + d) + ')'
+        });
+      }
+      for (let k = 0; k < 6; k++) {
+        const a = k * 60, d = sh(a, 12);
+        faces.push({
+          a, hw: 46.2, y: 0, w: 92.4, h: 52, r: 80,
+          bg: 'linear-gradient(180deg, ' + hs(h, s, base + 28 + d) + ' 0%, ' + hs(h, s, base + 8 + d) + ' 36%, ' + hs(h, s, base - 22 + d) + ' 50%, ' + hs(h, s, base - 4 + d) + ' 68%, ' + hs(h, s, base - 16 + d) + ' 100%)'
+        });
+      }
+      for (let k = 0; k < 16; k++) {
+        const a = k * 22.5, d = sh(a, 12);
+        faces.push({
+          a, hw: 21.5, y: 52, w: 43, h: 10, r: 106,
+          bg: 'linear-gradient(180deg, ' + hs(h, s, base + 30 + d) + ', ' + hs(h, s, base - 12 + d) + ')'
+        });
+      }
+      const cap = 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 58%, rgba(0,0,0,0.3) 100%), conic-gradient(from 20deg at 50% 50%, ' +
+        [base + 30, base + 2, base + 34, base - 10, base + 26, base - 6, base + 32, base + 30].map((l) => hs(h, s, l)).join(', ') + ')';
+      const washCap = 'conic-gradient(from 0deg at 50% 50%, ' +
+        [base + 24, base - 8, base + 28, base - 12, base + 24, base - 8, base + 28, base - 12, base + 24].map((l) => hs(h, s, l)).join(', ') + ')';
+      return { faces, cap, washCap };
+    };
+
+    const pb = bolt(COL[0], 1);
+    const scribble = (() => {
+      const H = 4900, T = 58, pts = [];
+      for (let t = -1.5; t <= T; t += 0.04) {
+        const R = 150 + 40 * Math.sin(t * 0.6) + 22 * Math.sin(t * 1.7);
+        const cx = 720 + 470 * Math.sin(t * 0.19 + 0.5) + 120 * Math.sin(t * 0.53);
+        pts.push((pts.length ? 'L' : 'M') + (cx + R * Math.cos(t)).toFixed(1) + ' ' + (t * (H / T) + R * Math.sin(t)).toFixed(1));
+      }
+      return pts.join(' ');
+    })();
+    const wave = (amp, period, phase, base, total, close) => {
+      const pts = [];
+      for (let x = 0; x <= total; x += 8) pts.push((pts.length ? 'L' : 'M') + x + ' ' + (base + amp * Math.sin((2 * Math.PI * x) / period + phase)).toFixed(1));
+      return pts.join(' ') + (close ? ' L' + total + ' 170 L0 170 Z' : '');
+    };
+
+    const rnd = (i, k) => { const x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); };
+    const NS = 3000;
+    this._d = this._d || {};
+    const dataOf = (key, f1, decay, k, second, peak) => {
+      if (this._d[key]) return this._d[key];
+      const arr = [];
+      let mx = 0, mi = 0;
+      for (let i = 0; i < NS; i++) {
+        const t = i / NS;
+        const u = Math.max(0, t - 0.1);
+        let env = Math.exp(-u * decay) * (1 - Math.exp(-u * 70));
+        if (t > second) env += 0.38 * Math.exp(-(t - second) * decay * 1.3) * (1 - Math.exp(-(t - second) * 70));
+        const osc = 0.7 * Math.abs(Math.sin(t * f1 * 6.2832)) + 0.3 * Math.abs(Math.sin(t * f1 * 2.1 * 6.2832 + 1));
+        const a = 2 + 70 * env * osc * (0.7 + 0.3 * rnd(i, k)) + 2.5 * rnd(i, k + 3);
+        arr.push(a);
+        if (a > mx) { mx = a; mi = i; }
+      }
+      const sc = peak / mx;
+      return (this._d[key] = { arr: arr.map((v) => v * sc), mi });
+    };
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const mkChart = (key, f1, decay, k, second, peak, lo, hi, col, pf) => {
+      const D = dataOf(key, f1, decay, k, second, peak);
+      const zs = (this.state && this.state.z) || {};
+      const zoomed = !!zs[key];
+      const view = zs[key] || { x0: 0, x1: 1, v0: 0, v1: hi * 180 / 170 };
+      const span = view.x1 - view.x0, vs = view.v1 - view.v0;
+      const yOf = (v) => 190 - ((v - view.v0) / vs) * 180;
+      const pc = (y) => (y / 196 * 100).toFixed(2) + '%';
+      const i0 = Math.max(0, Math.floor(view.x0 * (NS - 1))), i1 = Math.min(NS - 1, Math.ceil(view.x1 * (NS - 1)));
+      const M = 520, step = Math.max(1, (i1 - i0) / M);
+      let d = '';
+      for (let j = 0; j <= M; j++) {
+        const i = Math.round(i0 + j * step);
+        if (i > i1) break;
+        const x = ((i / (NS - 1) - view.x0) / span) * 600;
+        const y = yOf(D.arr[i]);
+        if (y < 190) d += 'M' + x.toFixed(1) + ' 190L' + x.toFixed(1) + ' ' + Math.max(-4, y).toFixed(1);
+      }
+      const pad = 0.025;
+      const bt = clamp(yOf(hi + pad), 0, 190), bb = clamp(yOf(lo - pad), 0, 190);
+      const pxf = (D.mi / (NS - 1) - view.x0) / span, pyy = yOf(peak);
+      const pvis = pxf >= 0.01 && pxf <= 0.99 && pyy >= 4 && pyy <= 188;
+      const dr = this.state && this.state.drag && this.state.drag.key === key ? this.state.drag : null;
+      const frac = (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        return { fx: clamp((e.clientX - r.left) / r.width, 0, 1), fy: clamp((e.clientY - r.top) / r.height, 0, 1) };
+      };
+      const ms = (f) => Math.round((view.x0 + f * span) * 500) + ' ms';
+      return {
+        wave: d, col, hi: hi.toFixed(2), lo: lo.toFixed(2), pk: peak.toFixed(2), pf,
+        bt: pc(bt), bh: pc(bb - bt), bshow: bb - bt > 2 ? 'block' : 'none',
+        pt: pc(yOf(hi)), pb: pc(yOf(lo)),
+        hop: yOf(hi) > 6 && yOf(hi) < 186 ? 1 : 0, lop: yOf(lo) > 6 && yOf(lo) < 186 ? 1 : 0,
+        px: (pxf * 100).toFixed(2) + '%', py: pc(pyy), pkop: pvis ? 1 : 0, pkpe: pvis ? 'auto' : 'none',
+        tl: pxf > 0.6 ? 'auto' : '16px', tr: pxf > 0.6 ? '16px' : 'auto',
+        t0: ms(0), t1: ms(0.5), t2: ms(1), zoomd: zoomed ? 'block' : 'none',
+        dshow: dr ? 'block' : 'none',
+        dl: dr ? (Math.min(dr.sx, dr.cx) * 100).toFixed(2) + '%' : '0%', dt: dr ? (Math.min(dr.sy, dr.cy) * 100).toFixed(2) + '%' : '0%',
+        dw: dr ? (Math.abs(dr.cx - dr.sx) * 100).toFixed(2) + '%' : '0%', dh: dr ? (Math.abs(dr.cy - dr.sy) * 100).toFixed(2) + '%' : '0%',
+        down: (e) => { const f = frac(e); this.setState({ drag: { key, sx: f.fx, sy: f.fy, cx: f.fx, cy: f.fy } }); },
+        move: (e) => {
+          const dd = this.state && this.state.drag;
+          if (!dd || dd.key !== key) return;
+          const f = frac(e);
+          this.setState({ drag: Object.assign({}, dd, { cx: f.fx, cy: f.fy }) });
+        },
+        up: () => {
+          const dd = this.state && this.state.drag;
+          if (!dd || dd.key !== key) return;
+          const x0 = Math.min(dd.sx, dd.cx), x1 = Math.max(dd.sx, dd.cx), y0 = Math.min(dd.sy, dd.cy), y1 = Math.max(dd.sy, dd.cy);
+          const toV = (fy) => view.v0 + ((190 - fy * 196) / 180) * vs;
+          const nv0 = Math.max(0, toV(y1)), nv1 = toV(y0);
+          if (x1 - x0 > 0.03 && y1 - y0 > 0.05 && nv1 - nv0 > 0.02) {
+            const nz = Object.assign({}, (this.state && this.state.z) || {});
+            nz[key] = { x0: view.x0 + x0 * span, x1: view.x0 + x1 * span, v0: nv0, v1: nv1 };
+            this.setState({ drag: null, z: nz });
+          } else this.setState({ drag: null });
+        },
+        reset: () => {
+          const nz = Object.assign({}, (this.state && this.state.z) || {});
+          delete nz[key];
+          this.setState({ z: nz, drag: null });
+        }
+      };
+    };
+    const ac = mkChart('ac', 46, 5.2, 1, 0.48, 0.82, 0.73, 0.91, '#FF6A1F', '2,140 Hz');
+    const vb = mkChart('vb', 30, 3.6, 5, 0.55, 0.61, 0.54, 0.68, '#3347FF', '312 Hz');
+    const acl = [
+      { name: 'Peak 주파수', val: '2,140 Hz', left: '30%', width: '44%', dot: '52%' },
+      { name: 'Peak 크기', val: '0.82', left: '38%', width: '40%', dot: '60%' },
+      { name: '대역 에너지', val: '0.34', left: '24%', width: '46%', dot: '47%' }
+    ];
+    const vbl = [
+      { name: 'Peak 주파수', val: '312 Hz', left: '26%', width: '46%', dot: '48%' },
+      { name: 'Peak 크기', val: '0.61', left: '34%', width: '42%', dot: '56%' },
+      { name: '대역 에너지', val: '0.28', left: '28%', width: '44%', dot: '45%' }
+    ];
+    const eqs = [];
+    for (let i = 0; i < 26; i++) {
+      const g = Math.exp(-Math.pow((i - 12.5) / 6, 2));
+      eqs.push({ h: Math.round(40 + 170 * g * (0.75 + 0.25 * Math.sin(i * 1.9))), t: (0.9 + ((i * 37) % 10) / 10).toFixed(2), d: (-((i * 53) % 14) / 10).toFixed(2) });
+    }
+    const dots = [];
+    for (let i = 1; i <= 10; i++) {
+      dots.push(i <= 7 ? { n: i, bg: '#FF5900', fg: '#FFFFFF', bd: 'none' } : { n: i, bg: 'transparent', fg: '#8A90B0', bd: '1.5px dashed #B9BEDD' });
+    }
+    const refs = [
+      { src: '음향', name: 'Peak 주파수', val: '2,140 ± 160 Hz', bg: '#F4F5FD' },
+      { src: '음향', name: 'Peak 크기', val: '0.82 ± 0.09', bg: '#FFFFFF' },
+      { src: '음향', name: '대역 에너지', val: '0.34 ± 0.05', bg: '#F4F5FD' },
+      { src: '진동', name: 'Peak 주파수', val: '312 ± 22 Hz', bg: '#FFFFFF' },
+      { src: '진동', name: 'Peak 크기', val: '0.61 ± 0.07', bg: '#F4F5FD' },
+      { src: '진동', name: '대역 에너지', val: '0.28 ± 0.04', bg: '#FFFFFF' }
+    ];
+    const V = {
+      ok: { label: '정상', bg: '#D9F2E4', fg: '#14633F', bar: '#2FA66A' },
+      chk: { label: '재측정 필요', bg: '#FFEBC2', fg: '#7A5200', bar: '#E0A020' },
+      ng: { label: '체결 이상 의심', bg: '#FFD9D6', fg: '#8E2019', bar: '#D8433A' }
+    };
+    const rows = [
+      ['ok', 'F-03 · B04', '14:22', 2140, 312], ['ok', 'F-03 · B03', '14:19', 2095, 305], ['chk', 'F-03 · B02', '14:15', 1960, 298],
+      ['ok', 'F-03 · B01', '14:11', 2160, 318], ['ng', 'F-02 · B07', '13:58', 1710, 262], ['ok', 'F-02 · B06', '13:54', 2120, 309],
+      ['chk', 'F-02 · B05', '13:50', 2230, 331], ['ok', 'F-02 · B04', '13:46', 2150, 314]
+    ];
+    const recent = rows.map(([k, id, time, af, vf], i) => ({
+      bg: V[k].bg, fg: V[k].fg, bar: V[k].bar, label: V[k].label, id, time,
+      af: af.toLocaleString() + ' Hz', vf: vf + ' Hz',
+      ...Object.fromEntries(Array.from({ length: 12 }, (_, j) => ['h' + j, Math.round(18 + 80 * Math.exp(-Math.pow((j - (3 + (i % 4))) / 2.2, 2)) * (0.8 + 0.2 * Math.sin(j * 2 + i)))]))
+    }));
+    const T2 = 2304;
+    return {
+      pb, scribble, ac, vb, acl, vbl, eqs, dots, refs, recent,
+      waveB: wave(34, 384, 1.3, 110, T2, true),
+      waveA: wave(26, 576, 0, 92, T2, true),
+      waveALine: wave(26, 576, 0, 92, T2, false)
+    };
+  }
+}
+
+DCMount(document.getElementById('root').firstElementChild, Component);</script></body></html>

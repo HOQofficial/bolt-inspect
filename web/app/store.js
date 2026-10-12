@@ -64,12 +64,14 @@ export const onHistChange = (fn) => listeners.add(fn);
 function setHist(h) { ls.set(LS_HIST, h.slice(0, HIST_MAX)); listeners.forEach((f) => f()); }
 export const pendingCount = () => getHist().filter((h) => !h.sent && !h.test).length;
 
-export function saveInspection(rec) {
+export function saveInspection(rec, extra = {}) {
   const item = {
     id: rec.record_id, at: rec.inspected_at, flange_id: rec.flange_id, bolt_id: rec.bolt_id,
     result: rec.final_result, sent: false, test: !hasServer,
     inspector: rec.inspector, score: rec.tapping.score, ref: rec.tapping.ref_source,
     mic_peak: rec.tapping.features.mic.peak_hz, acc_peak: rec.tapping.features.acc ? rec.tapping.features.acc.peak_hz : null,
+    // (선택) 기록 탭 상세 패널의 게이지용: 이 기기 안에만 저장되고 서버 기록(스키마)에는 들어가지 않음
+    feat: rec.tapping.features, rng: extra.rng ? { mic: extra.rng.mic || null, acc: extra.rng.acc || null } : null,
   };
   setHist([item, ...getHist()]);
   if (!db) return "test";

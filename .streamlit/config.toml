@@ -1,7 +1,7 @@
-# 폰 앱(RE:SOUND)과 같은 주황 포인트 색. 빨간색은 '이상' 판정에만 쓰고, 버튼·진행 막대는 주황.
+# 폰 앱(RE:SOUND)과 같은 톤: 연보라 바탕 + 흰 카드 + 주황 포인트. 빨간색은 '이상' 판정에만 쓰고, 버튼·진행 막대는 주황.
 [theme]
 primaryColor = "#ff5900"
-backgroundColor = "#f4f5f7"
+backgroundColor = "#ecedfb"
 secondaryBackgroundColor = "#ffffff"
-textColor = "#0f1a2b"
+textColor = "#0b0f1e"
 baseRadius = "large"

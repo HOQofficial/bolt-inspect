@@ -8,8 +8,8 @@
     "build": "node scripts/build-web.mjs",
     "serve": "node scripts/build-web.mjs && node scripts/serve.mjs",
     "test": "node scripts/test-logic.mjs",
-    "android:add": "node scripts/build-web.mjs && cap add android",
-    "android:sync": "node scripts/build-web.mjs && cap sync android",
+    "android:add": "node scripts/build-web.mjs --app-root && cap add android",
+    "android:sync": "node scripts/build-web.mjs --app-root && cap sync android",
     "android:open": "cap open android"
   },
   "dependencies": {

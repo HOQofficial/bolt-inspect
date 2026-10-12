@@ -140,6 +140,32 @@ if not FL:
     st.error("등록된 플랜지가 없습니다. python tools/seed_firestore.py 로 가짜 플랜지를 먼저 올리세요.")
     st.stop()
 
+MODES = {"가상 데이터": "가상", "ESP32 (USB)": "ESP32 USB", PHONE: "폰 · 태블릿 실시간"}
+
+
+def _mode_picker():
+    """시안 E 의 '가상 | ESP32 USB | 폰·태블릿 실시간' 알약 선택"""
+    opts = list(MODES)
+    if hasattr(st, "segmented_control"):
+        return st.segmented_control("측정 방식", opts, default=opts[0], format_func=MODES.get, key="mode_src",
+                                    label_visibility="collapsed") or opts[0]
+    return st.radio("측정 방식", opts, format_func=MODES.get, horizontal=True, label_visibility="collapsed")
+
+
+# 화면 맨 위 구성(시안 E): 왼쪽 = 큰 문장 + 측정 방식 + 버튼, 오른쪽 = 3D 볼트 카드. 칸만 먼저 만들고 내용은 아래에서 채움
+ui.page_css()
+_hl, _hr = st.columns([1.08, 1], gap="large")
+with _hl:
+    hero_head = st.container()
+    hero_ctl = st.container(key="herocontrols")
+with _hr:
+    hero_card = st.container(key="herocard")
+slot_result = st.container()                       # 측정 결과 (두 가지 증거)
+slot_flow = st.container()                         # TAP / HEAR / VERIFY
+slot_base = st.container(key="basecard")           # 기준 만들기
+slot_recent = st.container()                       # 최근 측정 카드
+slot_tail = st.container()                         # 상세 기록 (접어 둠)
+
 # ---------------- 사이드바: 검사 설정 + 정상 기준 등록 ----------------
 with st.sidebar:
     st.header("검사 설정")
@@ -148,8 +174,8 @@ with st.sidebar:
     bolt = st.selectbox("볼트 (12시부터 시계방향)", [f"B{i:02d}" for i in range(1, f["bolt_count"] + 1)],
                         key="sel_bolt")
     inspector = st.text_input("검사자", value=ss.get("inspector", "홍길동"), key="inspector")
-    source = st.radio("측정 방식", ["가상 데이터", "ESP32 (USB)", PHONE], horizontal=True,
-                      help="폰·태블릿 = 블루투스로 측정한 결과를 실시간으로 받아 봄 (주 사용 방식)")
+    with hero_ctl:
+        source = _mode_picker()
     if source == "가상 데이터":
         cond = st.selectbox("가상 측정 조건", CONDITIONS)
     elif source == PHONE:
@@ -176,46 +202,54 @@ with st.sidebar:
         usb_cmd = "S" if st.radio("치는 방법", ["솔레노이드가 치기", "손으로 치기"], horizontal=True,
                                   help="솔레노이드 = ESP32 가 한 번 치고 그 소리만 측정 / 손 = 누른 뒤 8초 안에 직접 치기") == "솔레노이드가 치기" else "M"
         st.caption("Arduino IDE 의 시리얼 모니터는 꼭 닫으세요 (포트를 한 프로그램만 쓸 수 있어요). "
-                   "▶ 측정 시작을 누르면 ESP32 에 명령이 가고 한 번만 측정해요.")
+                   "'타격 + 측정'을 누르면 ESP32 에 명령이 가고 한 번만 측정해요.")
     if source == "ESP32 (USB)":
         led_on = st.toggle("판정 LED 켜기 (ESP32)", value=True,
                            help="측정 결과에 따라 ESP32 에 연결한 초록(정상)·빨강(재측정 깜빡임 / 이상 켜짐) LED 를 켭니다")
     autosave = st.toggle("측정하면 자동 저장", value=True)
 
-    st.divider()
-    st.subheader("정상 기준 등록")
-    st.caption(f"{fid} 에 저장됩니다. 정상 체결 볼트를 여러 번 측정한 뒤 등록하세요.")
-    target_n = st.number_input("기준 측정 목표 횟수", 3, 100, 10)
-    k_sigma = st.select_slider("기준 범위 폭 (평균 ± k×표준편차)", [1.0, 1.5, 2.0, 2.5, 3.0], value=3.0,
-                               help="특징값이 6개라 2σ면 정상 볼트도 4번 중 1번꼴로 '재측정'이 나옵니다. 3σ 권장.")
-    st.write(f"수집된 정상 샘플: **{len(ss.samples)} / {target_n}**")
+
+# ---------------- 기준 만들기 카드 (시안 E): 왼쪽 = 번호 원 + 버튼, 오른쪽 = 평균 ± 표준편차 표 ----------------
+ss.setdefault("target_n", 10)
+ss.setdefault("k_sigma", 3.0)
+with slot_base:
+    bl, br = st.columns([1, 1.05], gap="large")
+with bl:
+    n_t, n_s = int(ss.target_n), len(ss.samples)
+    st.markdown(f'<div class="rs-base"><small>기준 만들기</small><h2>정상 볼트를<br><b>{n_t}번 두드립니다.</b></h2></div>'
+                + ui.base_circles(n_t, n_s), unsafe_allow_html=True)
     dup = ss.result is not None and already_added(ss.result)
-    if st.button("➕ 방금 측정값을 정상 샘플로 추가", width="stretch", disabled=ss.result is None or dup,
-                 help="같은 측정은 한 번만 들어가요 (측정마다 고유 키로 구분)"):
+    bb1, bb2 = st.columns(2)
+    if bb1.button("샘플 추가", type="primary", key="btn_add", width="stretch", disabled=ss.result is None or dup,
+                  help="방금 측정한 값을 정상 샘플로 추가해요. 같은 측정은 한 번만 들어가요."):
         ok, msg_ = add_sample(ss.result, inspector)
         st.toast(msg_, icon=None if ok else "⚠️")
         st.rerun()
-    if dup:
-        st.caption("✔ 지금 화면의 측정은 이미 정상 샘플로 추가했어요.")
-    st.progress(min(len(ss.samples) / target_n, 1.0))
-    st.caption("정상 샘플은 추가할 때마다 `data/tap_samples.csv` 에 원본이 기록돼요 (샘플 초기화를 해도 파일은 그대로).")
-    if len(ss.samples) < 3:
-        st.caption("샘플이 3개 이상 모여야 아래 '정상 기준 계산 · 저장' 버튼이 눌립니다. "
-                   "샘플을 추가해도 위 판정은 바뀌지 않고, 저장해야 새 기준이 적용됩니다.")
-    if st.button("🎯 정상 기준 계산 · 저장", width="stretch", disabled=len(ss.samples) < 3):
+    if bb2.button("기준 저장", key="btn_save", width="stretch", disabled=len(ss.samples) < 3,
+                  help="샘플이 3개 이상 모이면 눌려요. 저장해야 새 기준이 판정에 적용돼요."):
         try:
-            new = dict(f, schema_version=SCHEMA_VERSION, tap_ref=calc_tap_ref(ss.samples, k_sigma),
+            new = dict(f, schema_version=SCHEMA_VERSION, tap_ref=calc_tap_ref(ss.samples, ss.k_sigma),
                        updated_at=now_kst_iso())
             store.save_flange(new)
             flanges.clear()
             ss.samples, ss.result = [], None   # sample_keys 는 남겨 두어 같은 측정이 다시 들어가지 않게 함
-            st.toast(f"{fid} 정상 기준 저장 완료 (n={new['tap_ref']['n']}, ±{k_sigma}σ)")
+            st.toast(f"{fid} 정상 기준 저장 완료 (n={new['tap_ref']['n']}, ±{ss.k_sigma}σ)")
             st.rerun()
         except ValueError as e:
             st.error(f"기준 저장 실패: {e}")
-    if st.button("샘플 초기화", width="stretch"):
-        ss.samples = []
-        st.rerun()
+    if dup:
+        st.caption("✔ 지금 화면의 측정은 이미 정상 샘플로 추가했어요.")
+    elif len(ss.samples) < 3:
+        st.caption("샘플이 3개 이상 모이면 '기준 저장'이 눌려요. 샘플을 추가해도 저장하기 전에는 위 판정이 바뀌지 않아요.")
+    with st.expander("기준 설정 · 샘플 초기화"):
+        st.number_input("기준 측정 목표 횟수", 3, 100, key="target_n")
+        st.select_slider("기준 범위 폭 (평균 ± k×표준편차)", [1.0, 1.5, 2.0, 2.5, 3.0], key="k_sigma",
+                         help="특징값이 6개라 2σ면 정상 볼트도 4번 중 1번꼴로 '재측정'이 나옵니다. 3σ 권장.")
+        st.caption(f"{fid} 에 저장됩니다. 샘플 원본은 `data/tap_samples.csv` 에 기록돼요 (초기화해도 파일은 그대로).")
+        if st.button("샘플 초기화", key="btn_reset"):
+            ss.samples = []
+            st.rerun()
+target_n, k_sigma = int(ss.target_n), ss.k_sigma
 
 # ---------------- 기준 ----------------
 ref = f.get("tap_ref")
@@ -241,12 +275,34 @@ if ref.get("acc") is None:
         acc_default = True
         ref_src += " + 진동 임시 기본 기준(샘플 3개 이상 모이면 자동 교체)"
 
-st.title("타음 검사")
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("검사 대상", f"{fid}-{bolt}")
-c2.metric("센서", "음향 + 진동", help="INMP441 마이크 + MPU6050 가속도계")
-c3.metric("판정 기준", f"실측 n={ref['n']}" if f.get("tap_ref") else "데모 기준", help=ref_src)
-c4.metric("이번 측정 횟수", f"{ss.count} 회")
+with br:
+    _kk = ref.get("k_sigma") or 3.0
+    _rows = []
+    for _s in ("mic", "acc"):
+        if not ref.get(_s):
+            continue
+        for _k, _nm in (("peak_hz", "Peak 주파수"), ("mag", "Peak 크기"), ("energy_pct", "대역 에너지")):
+            _lo, _hi = ref[_s][_k]
+            _m, _sd = (_lo + _hi) / 2, (_hi - _lo) / 2 / _kk
+            _txt = f"{_m:,.0f} ± {_sd:,.0f} Hz" if _k == "peak_hz" else (f"{_m:.1f} ± {_sd:.1f} %" if _k == "energy_pct" else f"{_m:.2f} ± {_sd:.2f}")
+            _rows.append(("음향" if _s == "mic" else "진동", _nm, _txt))
+    ui.base_stats(_rows)
+    st.caption(f"현재 판정 기준: {ref_src}")
+
+SNAME_ = {"mic": "음향", "acc": "진동"}
+with hero_ctl:
+    measure_clicked = hand_clicked = False
+    if source == PHONE:
+        st.caption("폰·태블릿 앱에서 측정하면 이 화면에 자동으로 나타나요.")
+    else:
+        bc1, bc2 = st.columns([1, 1] if source == "ESP32 (USB)" else [1, 0.001])
+        measure_clicked = bc1.button("타격 + 측정  →", type="primary", key="btn_measure")
+        if source == "ESP32 (USB)":
+            hand_clicked = bc2.button("손으로 · 8초 대기", key="btn_hand")
+with hero_card:
+    ui.tap_hero(f"{fid} · BOLT {int(bolt[1:]):02d}", "수신 중" if source == PHONE else ("측정 완료" if ss.get("result") else "대기 중"),
+                "TAP · HEAR · VERIFY")
+st.caption(f"기준: {ref_src} · 이번 측정 횟수 {ss.count}회")
 
 # ---------------- 폰·태블릿 측정 자동 받기 ----------------
 def phone_result(rec):
@@ -288,7 +344,7 @@ else:
     ss.phone_seen, ss.phone_since = None, None      # 다른 방식으로 바꿨다가 돌아오면 그 시점부터 다시 받음
 
 # ---------------- 측정 ----------------
-if source != PHONE and st.button("▶ 측정 시작", type="primary", width="stretch"):
+if source != PHONE and (measure_clicked or hand_clicked):
     try:
         spec, mkey = None, None
         with st.spinner("신호 취득 → FFT → 특징값 추출 → 기준 비교 중... (ESP32 가 볼트를 한 번 타격해요)"):
@@ -296,7 +352,7 @@ if source != PHONE and st.button("▶ 측정 시작", type="primary", width="str
                 time.sleep(.25)
                 feats = mock_features(cond)
             else:
-                feats, spec, mkey = read_serial(port, usb_cmd)
+                feats, spec, mkey = read_serial(port, "M" if hand_clicked else usb_cmd)
         tapping = tapping_from_features(feats, ref, ref_src, spec)
         if source == "ESP32 (USB)" and led_on and ss.get("ser"):   # 판정을 ESP32 LED 로 알림 (실패해도 측정은 계속)
             try:
@@ -320,148 +376,188 @@ if source != PHONE and st.button("▶ 측정 시작", type="primary", width="str
         st.error(f"측정 실패: {e}")
 
 r = ss.result
-if r is None:
-    st.info("폰·태블릿에서 측정하면 여기에 나타나요." if source == PHONE
-            else "왼쪽에서 플랜지·볼트를 고르고 '측정 시작'을 누르세요.")
-    st.stop()
-
-# 기준이 바뀌었으면 화면의 결과를 현재 기준으로 다시 판정 (조원 V3 와 같은 동작)
-tp = tapping_from_features(r["features"], ref, ref_src, r.get("spectrum"))
-
-# ---------------- 1. 큰 판정 ----------------
-ui.banner(f"{r['doc']['flange_id']}-{r['doc']['bolt_id']} 종합 판정", tp["result"],
-          f"범위를 벗어난 특징값 {tp['score']}개 · 기준: {ref_src}"
-          + (f" · 저장됨 {ss.last_saved}" if ss.last_saved == r["doc"]["record_id"] else " · 저장 안 됨"))
-if r["features"]["mic"]["mag"] >= 0.98:
-    st.warning("소리가 너무 커서 잘렸습니다(Peak Magnitude ≈ 1). 마이크를 조금 떨어뜨리거나 더 약하게 치세요. "
-               "이 측정은 정상 샘플로 추가할 수 없어요.")
-if not autosave and ss.last_saved != r["doc"]["record_id"]:
-    if st.button("💾 이 결과 저장"):
-        store.save_inspection(r["doc"])
-        ss.last_saved = r["doc"]["record_id"]
-        st.cache_data.clear()
-        st.rerun()
-
-# ---------------- 2. 센서별 판정 + 근거 ----------------
 SNAME = {"mic": "음향", "acc": "진동"}
 FMT = {"peak_hz": (" Hz", ".0f"), "mag": ("", ".3f"), "energy_pct": (" %", ".1f")}
 UNIT = {"mic": {"peak_hz": "Hz", "mag": "0~1", "energy_pct": "%"},     # 음향 크기 = 최대치를 1로 본 비율(단위 없음)
         "acc": {"peak_hz": "Hz", "mag": "g", "energy_pct": "%"}}      # 진동 크기 = g(중력가속도)
+SLIDER_NAME = {"peak_hz": "Peak 주파수", "mag": "Peak 크기", "energy_pct": "대역 에너지"}
 
 
 def fmt_of(sensor, k):
-    """게이지·숫자에 붙일 (단위, 소수점 자리). 진동 크기만 ' g'"""
+    """숫자에 붙일 (단위, 소수점 자리). 진동 크기만 ' g'"""
     return (" g", ".3f") if (sensor, k) == ("acc", "mag") else FMT[k]
 
 
 def label(sensor, k):
     """예: Peak Frequency (Hz) / Peak Magnitude (g) / Peak Magnitude (0~1)"""
     return f"{FEATURE_KO[k]} ({UNIT[sensor][k]})"
-for s in ("mic", "acc"):  # 값은 왔는데 기준이 없어 판정에서 빠진 센서 알림
-    if r["features"].get(s) and not ref.get(s):
-        st.warning(f"{SNAME[s]} 센서 값은 들어왔지만 정상 기준에 {SNAME[s]} 기준이 없어서 판정에서 빠졌어요. "
-                   f"왼쪽에서 정상 볼트를 ESP32 로 측정해 '정상 샘플로 추가'를 3번 이상 하면 "
-                   f"{SNAME[s]} 기준이 샘플대로 계산돼 바로 판정에 쓰이고, '정상 기준 계산 · 저장'을 누르면 저장됩니다.")
-if acc_default and r["features"].get("acc"):
-    st.caption("📳 진동 기준은 아직 임시 기본값(센서 전체 범위)이라 거의 항상 '정상'이 나와요. 정상 볼트를 측정해 "
-               "'➕ 정상 샘플로 추가'를 3번 이상 하면 그 샘플로 기준이 바뀌어요.")
-if prov_n:
-    st.caption(f"📳 진동 기준은 지금 모은 정상 샘플 {prov_n}개로 계산한 임시 기준이에요 (샘플을 추가하면 바뀌고, 저장하면 확정).")
-cols = st.columns(2)
-for col, s in zip(cols, ("mic", "acc")):
-    with col:
-        name = "🎤 음향 · INMP441" if s == "mic" else "📳 진동 · MPU6050"
-        feats, rr = r["features"].get(s), ref.get(s)
-        if feats is None:
-            st.info(f"{name} · 이번 측정에 {SNAME[s]} 값이 오지 않았어요"
-                    " (ESP32 시리얼 모니터에서 '# MPU6050 OK' 가 나오는지, 메시지에 af 값이 있는지 확인)")
-            continue
-        if rr is None:
-            st.info(f"{name} · 값은 들어왔지만 정상 기준이 없어 판정 제외")
-            mc = st.columns(3)
-            for c_, k in zip(mc, ("peak_hz", "mag", "energy_pct")):
-                c_.metric(label(s, k), f"{feats[k]:{fmt_of(s, k)[1]}}{fmt_of(s, k)[0]}")
-            continue
-        res = tp["sensor_results"][s]
-        ui.tile(name, res, [" &nbsp;|&nbsp; ".join(
-            f"{label(s, k)} {'✓' if ok else '✕'}" for k, ok in tp["checks"][s].items())])
-        for k in ("peak_hz", "mag", "energy_pct"):
-            st.plotly_chart(ui.gauge(label(s, k), feats[k], rr[k][0], rr[k][1], *fmt_of(s, k)),
-                            width="stretch", key=f"g_{s}_{k}")
 
-with st.expander("판정 규칙"):
-    st.code("센서 2개(음향 INMP441, 진동 MPU6050)마다 특징값 3개(Peak Frequency, Peak Magnitude, Band Energy)를\n"
-            "정상 기준 범위와 비교해서, 범위를 벗어난 개수로 센서별 판정\n"
-            f"  벗어난 개수 {RANGE_RULE['check'] - 1} 이하 → 정상 / {RANGE_RULE['check']}개 → 재측정 필요 / "
-            f"{RANGE_RULE['ng']}개 이상 → 체결 이상 의심\n"
-            "종합 판정 = 두 센서 중 더 나쁜 쪽 (한 센서만 이상해도 종합이 나빠짐)\n"
-            f"정상 범위 = 정상 샘플 평균 ± k × 표준편차   (지금 이 플랜지: k = {ref.get('k_sigma', '데모')})", language=None)
 
-# ---------------- 3. FFT (ESP32 가 보낸 실제 FFT 막대) ----------------
-spec = tp.get("spectrum")
-if spec:
-    fcols = st.columns(2)
-    for col, s_ in zip(fcols, ("mic", "acc")):
-        tr = spec.get(s_)
-        if not tr or not r["features"].get(s_):
-            continue
-        pk = r["features"][s_]["peak_hz"]
-        band = ref[s_]["peak_hz"] if ref.get(s_) else None
-        col.plotly_chart(ui.spectrum_bars(tr, pk, band, f"Peak {pk / 1000:.2f} kHz" if pk >= 1000 else f"Peak {pk:.0f} Hz"),
-                         width="stretch", key=f"fft_{s_}")
-        col.caption(f"{SNAME[s_]} FFT · 연한 칸 = 정상 Peak 주파수 범위, 세로선 = 이번 Peak")
-elif r["sim"]:
-    st.caption("가상 데이터에는 FFT 그래프가 없어요. 실제 ESP32·폰 측정에서만 나와요.")
+tp = None
+if r is None:
+    with hero_head:
+        ui.verdict_hero(f"{fid} · BOLT {int(bolt[1:]):02d}", None, [], bolt_no=int(bolt[1:]))
+    with slot_result:
+        st.info("폰·태블릿에서 측정하면 여기에 나타나요." if source == PHONE
+                else "위에서 '타격 + 측정'을 누르면 결과가 여기에 나타나요.")
 else:
-    st.caption("이 측정에는 FFT 데이터가 없어요 (예전 펌웨어/앱으로 측정한 기록).")
+    # 기준이 바뀌었으면 화면의 결과를 현재 기준으로 다시 판정 (조원 V3 와 같은 동작)
+    tp = tapping_from_features(r["features"], ref, ref_src, r.get("spectrum"))
+    _sr, _ck = tp["sensor_results"], tp["checks"]
+    with hero_head:
+        ui.verdict_hero(f"{r['doc']['flange_id']} · BOLT {int(r['doc']['bolt_id'][1:]):02d}", tp["result"],
+                        [f"벗어난 항목 {tp['score']}개"] + [f"{SNAME[s]} {sum(_ck[s].values())} / {len(_ck[s])}" for s in ("mic", "acc") if s in _ck],
+                        bolt_no=int(r["doc"]["bolt_id"][1:]))
+    with slot_result:
+        if r["features"]["mic"]["mag"] >= 0.98:
+            st.warning("소리가 너무 커서 잘렸습니다(Peak Magnitude ≈ 1). 마이크를 조금 떨어뜨리거나 더 약하게 치세요. "
+                       "이 측정은 정상 샘플로 추가할 수 없어요.")
+        if not autosave and ss.last_saved != r["doc"]["record_id"]:
+            if st.button("💾 이 결과 저장"):
+                store.save_inspection(r["doc"])
+                ss.last_saved = r["doc"]["record_id"]
+                st.cache_data.clear()
+                st.rerun()
+        for s in ("mic", "acc"):  # 값은 왔는데 기준이 없어 판정에서 빠진 센서 알림
+            if r["features"].get(s) and not ref.get(s):
+                st.warning(f"{SNAME[s]} 센서 값은 들어왔지만 정상 기준에 {SNAME[s]} 기준이 없어서 판정에서 빠졌어요. "
+                           f"정상 볼트를 ESP32 로 측정해 '샘플 추가'를 3번 이상 하면 {SNAME[s]} 기준이 샘플대로 계산돼 바로 판정에 쓰이고, "
+                           "'기준 저장'을 누르면 저장됩니다.")
+        if acc_default and r["features"].get("acc"):
+            st.caption("📳 진동 기준은 아직 임시 기본값(센서 전체 범위)이라 거의 항상 '정상'이 나와요. 정상 볼트를 측정해 "
+                       "'샘플 추가'를 3번 이상 하면 그 샘플로 기준이 바뀌어요.")
+        if prov_n:
+            st.caption(f"📳 진동 기준은 지금 모은 정상 샘플 {prov_n}개로 계산한 임시 기준이에요 (샘플을 추가하면 바뀌고, 저장하면 확정).")
 
-# ---------------- 4. 등록된 기준 + 이 볼트 이력 ----------------
-with st.expander("현재 판정 기준 보기"):
-    rows = []
-    for s in ("mic", "acc"):
-        for k in ("peak_hz", "mag", "energy_pct"):
-            rr, ff = ref.get(s), r["features"].get(s)
-            if rr is None:
-                rows.append([SNAME[s], label(s, k), None, None, ff[k] if ff else None, "기준 없음"])
-            else:
-                v = ff[k] if ff else None
-                rows.append([SNAME[s], label(s, k), rr[k][0], rr[k][1], v,
-                             "-" if v is None else ("범위 안" if rr[k][0] <= v <= rr[k][1] else "범위 밖")])
-    st.dataframe(pd.DataFrame(rows, columns=["센서", "특징값", "하한", "상한", "이번 측정값", "결과"]),
-                 hide_index=True, width="stretch")
+        ui.h2("측정 결과", "소리와 진동,", "두 가지 증거.")
+        spec = tp.get("spectrum")
+        cols = st.columns(2, gap="medium")
+        for col, s in zip(cols, ("mic", "acc")):
+            with col, st.container(key=f"evc_{s}"):
+                ui.ev_head(SNAME[s], "INMP441 · FFT" if s == "mic" else "MPU6050 · FFT")
+                feats, rr = r["features"].get(s), ref.get(s)
+                if feats is None:
+                    st.info(f"이번 측정에 {SNAME[s]} 값이 오지 않았어요 (ESP32 시리얼 모니터에서 '# MPU6050 OK' 가 나오는지, 메시지에 af 값이 있는지 확인)")
+                    continue
+                tr_ = (spec or {}).get(s)
+                if tr_:
+                    pk_ = feats["peak_hz"]
+                    st.plotly_chart(ui.spectrum_bars(tr_, pk_, rr["peak_hz"] if rr else None,
+                                                     f"Peak {pk_ / 1000:.2f} kHz" if pk_ >= 1000 else f"Peak {pk_:.0f} Hz",
+                                                     mag=feats["mag"], mag_band=rr["mag"] if rr else None,
+                                                     color="#ff6a1f" if s == "mic" else "#3347ff", compact=True),
+                                    width="stretch", key=f"fft_{s}", config={"displayModeBar": False})
+                elif r["sim"]:
+                    st.caption("가상 데이터에는 FFT 그래프가 없어요. 실제 ESP32·폰 측정에서만 나와요.")
+                else:
+                    st.caption("이 측정에는 FFT 데이터가 없어요 (예전 펌웨어/앱으로 측정한 기록).")
+                if rr is None:
+                    st.caption("정상 기준이 없어 범위 비교는 하지 않았어요.")
+                    ui.slider_rows([(SLIDER_NAME[k], f"{feats[k]:{fmt_of(s, k)[1]}}{fmt_of(s, k)[0]}", feats[k], feats[k], feats[k], False)
+                                    for k in ("peak_hz", "mag", "energy_pct")])
+                else:
+                    ui.slider_rows([(SLIDER_NAME[k], f"{feats[k]:{fmt_of(s, k)[1]}}{fmt_of(s, k)[0]}", feats[k], rr[k][0], rr[k][1], k == "energy_pct")
+                                    for k in ("peak_hz", "mag", "energy_pct")])
+        if spec:
+            st.caption("연두 박스 = 정상 범위(Peak 주파수 × Peak 크기), 핑크 점 = 이번 Peak · 그래프를 끌면 확대, 더블클릭하면 원래대로 · 아래 막대의 연두 칸 = 정상 범위, 주황 점 = 이번 값")
+        ui.rule_tiles(tp["score"], RANGE_RULE["check"], RANGE_RULE["ng"])
+        with st.expander("판정 규칙 · 현재 판정 기준 표"):
+            st.code("센서 2개(음향 INMP441, 진동 MPU6050)마다 특징값 3개(Peak Frequency, Peak Magnitude, Band Energy)를\n"
+                    "정상 기준 범위와 비교해서, 범위를 벗어난 개수로 센서별 판정\n"
+                    f"  벗어난 개수 {RANGE_RULE['check'] - 1} 이하 → 정상 / {RANGE_RULE['check']}개 → 재측정 필요 / "
+                    f"{RANGE_RULE['ng']}개 이상 → 체결 이상 의심\n"
+                    "종합 판정 = 두 센서 중 더 나쁜 쪽 (한 센서만 이상해도 종합이 나빠짐)\n"
+                    f"정상 범위 = 정상 샘플 평균 ± k × 표준편차   (지금 이 플랜지: k = {ref.get('k_sigma', '데모')})", language=None)
+            rows = []
+            for s in ("mic", "acc"):
+                for k in ("peak_hz", "mag", "energy_pct"):
+                    rr, ff = ref.get(s), r["features"].get(s)
+                    if rr is None:
+                        rows.append([SNAME[s], label(s, k), None, None, ff[k] if ff else None, "기준 없음"])
+                    else:
+                        v = ff[k] if ff else None
+                        rows.append([SNAME[s], label(s, k), rr[k][0], rr[k][1], v,
+                                     "-" if v is None else ("범위 안" if rr[k][0] <= v <= rr[k][1] else "범위 밖")])
+            st.dataframe(pd.DataFrame(rows, columns=["센서", "특징값", "하한", "상한", "이번 측정값", "결과"]),
+                         hide_index=True, width="stretch")
 
-if source == PHONE and ss.phone_recent:
-    st.subheader("최근 폰 측정 (정상 샘플로 추가)")
-    st.caption("정상 볼트를 측정한 기록만 골라 추가하세요. 이미 추가한 측정은 눌리지 않아요.")
-    for rec in ss.phone_recent:
-        res_ = phone_result(rec)
-        mic_ = rec["tapping"]["features"]["mic"]
-        c_a, c_b, c_c = st.columns([3, 2, 2])
-        c_a.write(f"{rec['inspected_at'][11:19]} · {rec['flange_id']}-{rec['bolt_id']} · 음향 {mic_['peak_hz']:.0f} Hz")
-        c_b.write(ui.KO[rec["final_result"]])
-        done = already_added(res_)
-        if c_c.button("✔ 추가됨" if done else "➕ 샘플로 추가", key=f"addp_{rec['record_id']}", disabled=done):
-            ok, msg_ = add_sample(res_, inspector)
-            st.toast(msg_, icon=None if ok else "⚠️")
-            st.rerun()
+# ---------------- 작동 흐름: 스크롤하면 카드가 한 장씩 넘어감 ----------------
+with slot_flow:
+    ui.h2("작동 흐름", "두드리고, 듣고,", "다시 확인합니다.")
+    ui.flow_stack()
 
-st.subheader(f"{fid}-{bolt} 검사 이력")
+# ---------------- 최근 측정: 옆으로 넘겨 보는 카드 ----------------
+@st.cache_data(ttl=20)
+def recent_docs():
+    return store.latest_inspections(24)
+
+
+with slot_recent:
+    with st.container(key="recenthead"):
+        rh1, rh2 = st.columns([3, 1], vertical_alignment="bottom")
+        with rh1:
+            ui.h2("", "최근 측정", "옆으로 넘겨보세요.")
+        with rh2:
+            with st.container(key="allbtn"):
+                st.page_link("home.py", label="전체 현황  →")
+    items = []
+    for rec in recent_docs():
+        tpp = rec.get("tapping") or {}
+        if rec.get("type") != "BOLT" or not tpp.get("features"):
+            continue
+        bars = []
+        sp = ((tpp.get("spectrum") or {}).get("mic") or {}).get("v")
+        if sp:
+            n = len(sp)
+            bars = [max(sp[i * n // 12:(i + 1) * n // 12] or [0]) / 100 for i in range(12)]
+        mic_ = (tpp["features"].get("mic") or {}).get("peak_hz")
+        acc_ = (tpp["features"].get("acc") or {}).get("peak_hz")
+        items.append({"res": rec.get("final_result"), "time": rec["inspected_at"][11:16],
+                      "name": f"{rec['flange_id']} · {rec['bolt_id']}", "bars": bars,
+                      "mic_hz": mic_, "acc_hz": acc_, "mic": f"{mic_:,.0f} Hz" if mic_ else "-", "acc": f"{acc_:,.0f} Hz" if acc_ else "-"})
+        if len(items) >= 10:
+            break
+    if items:
+        ui.recent_cards(items)
+    else:
+        st.caption("아직 저장된 타음 측정이 없어요.")
+
+# ---------------- 상세 기록 (접어 둠) ----------------
 @st.cache_data(ttl=20)
 def bolt_hist(flange_id, bolt_id):      # 이 볼트 기록만 읽음 (전체를 읽으면 Firebase 읽기 한도를 금방 씀)
     return store.inspections_for_bolt(flange_id, bolt_id)
 
 
-hist = bolt_hist(fid, bolt)
-if hist:
-    h = pd.json_normalize(hist).sort_values("inspected_at", ascending=False)
-    h["판정"] = h.final_result.map(ui.KO)
-    show = {"inspected_at": "시간", "inspector": "검사자", "판정": "판정",
-            "tapping.features.mic.peak_hz": "음향 Peak(Hz)", "tapping.features.acc.peak_hz": "진동 Peak(Hz)",
-            "tapping.score": "이탈 수", "tapping.ref_source": "기준"}
-    t = h[[c for c in show if c in h.columns]].rename(columns=show)
-    t["시간"] = pd.to_datetime(t["시간"]).dt.strftime("%m/%d %H:%M:%S")
-    st.dataframe(t.style.map(ui.badge_style, subset=["판정"]).format(
-        {c: "{:.1f}" for c in ("음향 Peak(Hz)", "진동 Peak(Hz)") if c in t} | {"이탈 수": "{:.0f}"}, na_rep="-"),
-        hide_index=True, width="stretch")
-else:
-    st.caption("아직 이 볼트의 저장된 기록이 없습니다.")
+with slot_tail:
+    if source == PHONE and ss.phone_recent:
+        with st.expander("폰 측정 → 정상 샘플로 추가", expanded=False):
+            st.caption("정상 볼트를 측정한 기록만 골라 추가하세요. 이미 추가한 측정은 눌리지 않아요.")
+            for rec in ss.phone_recent:
+                res_ = phone_result(rec)
+                mic_ = rec["tapping"]["features"]["mic"]
+                c_a, c_b, c_c = st.columns([3, 2, 2])
+                c_a.write(f"{rec['inspected_at'][11:19]} · {rec['flange_id']}-{rec['bolt_id']} · 음향 {mic_['peak_hz']:.0f} Hz")
+                c_b.write(ui.KO[rec["final_result"]])
+                done = already_added(res_)
+                if c_c.button("✔ 추가됨" if done else "➕ 샘플로 추가", key=f"addp_{rec['record_id']}", disabled=done):
+                    ok, msg_ = add_sample(res_, inspector)
+                    st.toast(msg_, icon=None if ok else "⚠️")
+                    st.rerun()
+    with st.expander(f"{fid}-{bolt} 검사 이력"):
+        hist = bolt_hist(fid, bolt)
+        if hist:
+            h = pd.json_normalize(hist).sort_values("inspected_at", ascending=False)
+            h["판정"] = h.final_result.map(ui.KO)
+            show = {"inspected_at": "시간", "inspector": "검사자", "판정": "판정",
+                    "tapping.features.mic.peak_hz": "음향 Peak(Hz)", "tapping.features.acc.peak_hz": "진동 Peak(Hz)",
+                    "tapping.score": "이탈 수", "tapping.ref_source": "기준"}
+            t_ = h[[c for c in show if c in h.columns]].rename(columns=show)
+            t_["시간"] = pd.to_datetime(t_["시간"]).dt.strftime("%m/%d %H:%M:%S")
+            st.dataframe(t_.style.map(ui.badge_style, subset=["판정"]).format(
+                {c: "{:.1f}" for c in ("음향 Peak(Hz)", "진동 Peak(Hz)") if c in t_} | {"이탈 수": "{:.0f}"}, na_rep="-"),
+                hide_index=True, width="stretch")
+        else:
+            st.caption("아직 이 볼트의 저장된 기록이 없습니다.")
+
+ui.cta("전체 볼트<br>상태를 볼까요?", "검사 현황 보기", "/home")
+ui.footer()

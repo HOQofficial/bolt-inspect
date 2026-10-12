@@ -7,7 +7,7 @@ import { TapLink, bleSupported, hasSavedDevice, forgetDevice, isNative } from ".
 import { tappingFromFeatures, refSourceText, makeRecord, RESULT_KO } from "./judge.js";
 import { validateInspection, validateTapRef } from "./validate.js";
 import { gaugeCompactHtml } from "./gauge.js";
-import { spectrumHtml } from "./spectrum.js";
+import { spectrumHtml, wireSpectra } from "./spectrum.js";
 import {
   initStore, hasServer, loadFlanges, saveInspection, getHist, onHistChange, pendingCount,
   getSamples, setSamples, getUsedKeys, addUsedKeys, saveTapRef,
@@ -101,6 +101,9 @@ function renderChips() {
   const c = $("chipBle");
   c.className = "chip " + (st === "connected" ? "on" : "off");
   c.textContent = { idle: "끊김", connecting: "연결 중…", connected: "연결됨", reconnecting: "재연결 중…" }[st];
+  const sb = $("sbConn");
+  sb.textContent = st === "connected" ? "연결됨" : st === "idle" ? "끊김" : "연결 중";
+  sb.parentElement.classList.toggle("on", st === "connected");
   $("chipNet").textContent = navigator.onLine ? "온라인" : "오프라인";
   $("chipNet").className = "chip " + (navigator.onLine ? "on" : "off");
   const p = pendingCount();
@@ -152,36 +155,51 @@ function sensorCard(s, c, ref) {
   const res = tp && r ? tp.sensor_results[s] : null;
   let html = `<div class="sc"><div class="sc-head"><div class="sc-name">${IC[s]}${NAME[s]} <small>${PART[s]}</small></div>` +
     `<span class="badge ${res || "none"}">${res ? RESULT_KO[res] : "기준 없음"}</span></div>`;
+  let gauges = "";
   if (!r) {
-    html += `<div class="sc-none">정상 기준이 없어 판정에서 제외했어요.<br>` + KEYS.map((k) => `${LABEL[k]} ${valText(s, k, f[k])}`).join(" · ") + `</div>`;
+    gauges = `<div class="sc-none">정상 기준이 없어 판정에서 제외했어요.<br>` + KEYS.map((k) => `${LABEL[k]} ${valText(s, k, f[k])}`).join(" · ") + `</div>`;
   } else {
-    html += KEYS.map((k) => gaugeCompactHtml(LABEL[k], f[k], r[k][0], r[k][1], unitText(s, k), valText(s, k, f[k]),
-      `정상 ${rangeNum(k, r[k][0])} ~ ${rangeNum(k, r[k][1])}${unitText(s, k)}`)).join("");
+    gauges = `<div class="gcs">` + KEYS.map((k) => gaugeCompactHtml(LABEL[k], f[k], r[k][0], r[k][1], unitText(s, k), valText(s, k, f[k]),
+      `정상 ${rangeNum(k, r[k][0])} ~ ${rangeNum(k, r[k][1])}${unitText(s, k)}`)).join("") + `</div>`;
   }
   const tr = c.spectrum && c.spectrum[s];
   if (tr) {
     html += `<div class="fft"><div class="fft-t"><span>FFT 그래프</span><i>0 ~ ${tr.f_max >= 1000 ? tr.f_max / 1000 + " kHz" : tr.f_max + " Hz"}</i></div>` +
-      spectrumHtml(tr, f.peak_hz, r ? r.peak_hz : null, NAME[s]) +
-      `<div class="legend"><span>정상 Peak 범위</span><span class="pk">이번 Peak</span></div></div>`;
+      spectrumHtml(tr, f.peak_hz, r ? r.peak_hz : null, NAME[s], { mag: f.mag, magBand: r ? r.mag : null }) +
+      `<div class="legend"><span>정상 범위</span><span class="pk">이번 Peak</span></div></div>`;
   }
+  html += gauges;
   return html + `</div>`;
+}
+
+// "B04" -> "4번 볼트" (숫자가 아니면 그대로)
+function boltLabel(id) {
+  const m = /^B0*(\d+)$/i.exec(String(id));
+  return m ? `${m[1]}번 볼트` : String(id);
 }
 
 function renderResult() {
   const c = current;
   $("waitCard").hidden = !!c;
   $("resultCard").hidden = !c;
+  $("hero").hidden = !c;
   if (!c) return;
   const tp = c.tapping, ref = c.flange && c.flange.tap_ref;
   $("hero").className = "hero " + (tp ? tp.result : "");
-  $("heroIc").innerHTML = tp ? IC[tp.result] : "?";
-  $("heroSub").textContent = `${c.flange ? c.flange.flange_id : "-"}-${c.bolt} 종합 판정`;
-  $("heroRes").textContent = tp ? RESULT_KO[tp.result] : "판정 불가";
-  $("heroMeta").textContent = tp
-    ? `범위 밖 특징 ${tp.score}개 · ${tp.ref_source} · ${c.saved ? "저장됨" : "저장 안 됨"}`
-    : c.reason || "";
+  const bn = boltLabel(c.bolt);
+  $("heroSub").textContent = `${c.flange ? c.flange.flange_id : "-"} · BOLT ${String(c.bolt).replace(/^B/i, "")}`;
+  $("heroRes").innerHTML = tp
+    ? ({ OK: `${bn}는 <br><b>정상</b>이에요.`, CHECK: `${bn}는 <br><b>재측정</b>이 필요해요.`, NG: `${bn}는 <br><b>체결 이상</b>이 의심돼요.` })[tp.result]
+    : `${bn}는 <br><b>판정 불가</b>예요.`;
+  $("heroMeta").textContent = tp ? `${tp.ref_source} · ${c.saved ? "저장됨" : "저장 안 됨"}` : c.reason || "";
+  const inN = (s) => (tp && tp.checks[s] ? Object.values(tp.checks[s]).filter(Boolean).length : null);
+  $("heroChips").innerHTML = tp
+    ? `<span class="hchip main">벗어난 항목 ${tp.score}개</span>` +
+      ["mic", "acc"].filter((s) => inN(s) != null).map((s) => `<span class="hchip sub">${NAME[s]} ${inN(s)} / 3</span>`).join("")
+    : "";
   $("warnSat").hidden = !(c.features.mic && c.features.mic.mag >= 0.98);
   $("sensors").innerHTML = ["mic", "acc"].map((s) => sensorCard(s, c, ref)).join("");
+  wireSpectra($("sensors"));                         // FFT 그래프에 확대·말풍선 기능 붙이기
   $("btnSave").disabled = !tp || c.saved;
   $("btnSave").textContent = c.saved ? "✔ 저장됨" : "💾 저장";
 }
@@ -204,17 +222,73 @@ function renderRefTable() {
 }
 
 // ---------- 기록 탭 ----------
+let histFilter = "";          // "" = 전체, "OK" / "CHECK" / "NG"
+let histSel = null;           // 오른쪽 상세(태블릿)에 보여 줄 기록 id
+const RES_ORDER = ["OK", "CHECK", "NG"];
+const RES_SHORT = { OK: "정상", CHECK: "재측정 필요", NG: "체결 이상 의심" };
 function renderHist() {
-  const h = getHist().slice(0, 30);
+  const all = getHist();
+  const cnt = { OK: 0, CHECK: 0, NG: 0 };
+  all.forEach((x) => { if (cnt[x.result] != null) cnt[x.result]++; });
+  const today = new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric" });
+  $("histTitle").textContent = `${today} · 오늘`;
+  $("histTiles").innerHTML = RES_ORDER.map((k) =>
+    `<div class="tile t${k}"><span>${RES_SHORT[k]}</span><b>${cnt[k]}</b></div>`).join("");
+  $("histChips").innerHTML = [["", "전체"], ["OK", "정상"], ["CHECK", "재측정"], ["NG", "이상 의심"]].map(([k, l]) =>
+    `<button type="button" class="chip2${histFilter === k ? " on" : ""}" data-f="${k}">${l}</button>`).join("");
+  $("histChips").querySelectorAll("[data-f]").forEach((b) => { b.onclick = () => { histFilter = b.dataset.f; histSel = null; renderHist(); }; });
+
+  const h = all.filter((x) => !histFilter || x.result === histFilter).slice(0, 30);
   $("histEmpty").hidden = h.length > 0;
+  if (!histSel || !h.some((x) => x.id === histSel)) histSel = h[0] ? h[0].id : null;
   $("hist").innerHTML = h.map((x) => {
     const t = new Date(x.at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
     const st = x.test ? "시험(서버 없음)" : x.sent ? "전송 완료" : "전송 대기";
-    return `<div class="hrow"><span class="badge ${x.result}">${RESULT_KO[x.result]}</span>` +
+    return `<div class="hrow${x.id === histSel ? " sel" : ""}" data-id="${esc(x.id)}">` +
+      `<div class="hic ${x.result}">${IC[x.result] || ""}</div>` +
       `<div class="m">${esc(x.flange_id)}-${esc(x.bolt_id)}<small>${t} · ${esc(x.inspector || "-")} · ${st}</small></div>` +
-      `<div class="t">${x.mic_peak != null ? x.mic_peak.toFixed(0) : "-"} Hz</div></div>`;
+      `<div class="hr"><span class="hres ${x.result}">${RESULT_KO[x.result]}</span><span class="t">${x.mic_peak != null ? x.mic_peak.toFixed(0) : "-"} Hz</span></div></div>`;
   }).join("");
+  $("hist").querySelectorAll("[data-id]").forEach((el) => { el.onclick = () => { histSel = el.dataset.id; renderHist(); }; });
+
+  // 오른쪽 상세 (태블릿 가로 화면에서만 보임)
+  const x = h.find((r) => r.id === histSel);
+  $("histDetail").hidden = !x;
+  if (x) {
+    const t = new Date(x.at).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false });
+    const st = x.test ? "시험(서버 없음)" : x.sent ? "전송 완료" : "전송 대기";
+    let body;
+    if (x.feat && x.rng) {                           // 새로 저장한 기록: 기준 범위 위에 점으로 보여 줌
+      const out = (s) => (x.feat[s] && x.rng[s] ? KEYS.filter((k) => x.feat[s][k] < x.rng[s][k][0] || x.feat[s][k] > x.rng[s][k][1]).length : null);
+      const part = (s) => x.feat[s] && x.rng[s]
+        ? `<div class="dsec">${NAME[s]}</div><div class="gcs">` + KEYS.map((k) => gaugeCompactHtml(LABEL[k], x.feat[s][k], x.rng[s][k][0], x.rng[s][k][1],
+            unitText(s, k), valText(s, k, x.feat[s][k]), `정상 ${rangeNum(k, x.rng[s][k][0])} ~ ${rangeNum(k, x.rng[s][k][1])}${unitText(s, k)}`)).join("") + `</div>` : "";
+      body = `<div class="dpill ${x.result}">${t} · 음향 ${out("mic") ?? "-"} · 진동 ${out("acc") ?? "-"}</div>` + part("mic") + part("acc");
+    } else {                                         // 예전 기록(범위 정보 없음): 숫자만
+      body = `<div class="dline">범위 밖 특징 ${x.score ?? "-"}개 · ${esc(x.ref || "-")}</div>` +
+        `<div class="dgrid"><div><span>음향 Peak</span><b>${x.mic_peak != null ? x.mic_peak.toFixed(0) : "-"} Hz</b></div>` +
+        `<div><span>진동 Peak</span><b>${x.acc_peak != null ? x.acc_peak.toFixed(0) : "-"} Hz</b></div>` +
+        `<div><span>검사자</span><b>${esc(x.inspector || "-")}</b></div>` +
+        `<div><span>저장 상태</span><b>${st}</b></div></div>`;
+    }
+    $("histDetail").innerHTML =
+      `<div class="eyebrow">${t} · 상세</div>` +
+      `<div class="dt">${esc(x.flange_id)}-${esc(x.bolt_id)}<br><b class="${x.result}">${RESULT_KO[x.result]}</b></div>` +
+      body + `<div class="dline dfoot">검사자 ${esc(x.inspector || "-")} · ${st}</div>`;
+  }
+  renderRecent(all);
   renderChips();
+}
+
+// 측정 탭(태블릿) 오른쪽의 "최근 측정" 5건
+function renderRecent(all = getHist()) {
+  const list = all.slice(0, 5);
+  $("recentList").innerHTML = list.length ? list.map((x) => {
+    const t = new Date(x.at).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false });
+    return `<div class="rrow"><div class="hic ${x.result}">${IC[x.result] || ""}</div>` +
+      `<div class="m">${esc(x.flange_id)}-${esc(x.bolt_id)}<small>${t}</small></div>` +
+      `<span class="hres ${x.result}">${RESULT_KO[x.result]}</span></div>`;
+  }).join("") : `<div class="hint">아직 저장한 기록이 없어요.</div>`;
 }
 
 // ---------- 기준 등록 탭 ----------
@@ -386,7 +460,7 @@ function doSave() {
   const errs = validateInspection(rec);
   if (errs.length) { notice("저장할 수 없어요: " + errs.join("; ")); log("스키마 오류: " + errs.join("; ")); return; }
   notice("");
-  saveInspection(rec);
+  saveInspection(rec, { rng: c.flange.tap_ref });
   c.saved = true;
   log(`저장: ${rec.record_id} (${hasServer ? navigator.onLine ? "서버로 전송 중" : "인터넷 없음 → 기기에 보관" : "시험 모드"})`);
   renderResult(); renderHist();
@@ -426,6 +500,12 @@ function boot() {
   link.state = "idle";
 
   document.querySelectorAll(".tabbtn").forEach((b) => { b.onclick = () => setTab(b.dataset.tab); });
+  document.querySelectorAll("#sensTabs button").forEach((b) => {       // 폰: 음향 / 진동 카드를 번갈아 보기
+    b.onclick = () => {
+      $("sensors").dataset.show = b.dataset.s;
+      document.querySelectorAll("#sensTabs button").forEach((x) => x.classList.toggle("on", x === b));
+    };
+  });
   $("btnConnect").onclick = () => toggleConnect(false);
   $("btnPick").onclick = () => toggleConnect(true);
   $("btnStrike").onclick = () => request("strike");
@@ -464,12 +544,17 @@ function boot() {
   window.addEventListener("online", renderChips);
   window.addEventListener("offline", renderChips);
   onHistChange(renderHist);
+  $("recentAll").onclick = () => setTab("history");
 
   if (!bleSupported()) notice("이 브라우저는 블루투스를 지원하지 않아요. 안드로이드 앱이나 PC·안드로이드 크롬을 쓰세요 (사파리·아이폰은 안 돼요).");
   if (!Capacitor.isNativePlatform() && "serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }
   setTab("measure");
+  try {                                                  // 소개 페이지에서 ?tab=history 로 들어오면 그 탭부터 열기
+    const want = new URLSearchParams(location.search).get("tab");
+    if (want && ["measure", "register", "history", "settings"].includes(want)) setTab(want);
+  } catch { /* 무시 */ }
   renderChips(); renderHist(); renderResult();
   const reload = (why) => loadFlanges().then(({ list, source }) => {
     flanges = list; renderFlanges(source); log(`플랜지 ${list.length}개 (${source}${why ? " · " + why : ""})`);

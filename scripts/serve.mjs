@@ -9,7 +9,8 @@ const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", "
   ".webmanifest": "application/manifest+json", ".json": "application/json" };
 createServer(async (req, res) => {
   const p = new URL(req.url, "http://x").pathname;
-  const file = resolve(www, "." + (p === "/" ? "/index.html" : p));
+  if (!extname(p) && !p.endsWith("/")) { res.writeHead(302, { Location: p + "/" }).end(); return; }   // /app -> /app/
+  const file = resolve(www, "." + (p.endsWith("/") ? p + "index.html" : p));   // 주소가 / 로 끝나면 그 폴더의 index.html (예: /app/)
   if (!file.startsWith(www)) { res.writeHead(403).end(); return; }
   try { const data = await readFile(file); res.writeHead(200, { "Content-Type": types[extname(file)] || "application/octet-stream" }); res.end(data); }
   catch { res.writeHead(404).end("not found"); }
