@@ -5,6 +5,7 @@ import { LineAssembler } from "../web/app/lines.js";
 import { featuresFromBle, spectrumFromBle, calcTapRef } from "../web/schema.js";
 import { tappingFromFeatures, refSourceText, makeRecord } from "../web/app/judge.js";
 import { validateInspection, validateTapRef } from "../web/app/validate.js";
+import { isAdminEmail, ADMIN_EMAILS } from "../web/app/admin.js";
 
 let n = 0;
 const ok = (name, fn) => { fn(); n++; console.log("  ✔", name); };
@@ -106,6 +107,16 @@ ok("FFT 막대가 기록(tapping.spectrum)에 들어가도 스키마를 통과",
 });
 ok("FFT 막대가 없는 메시지는 spectrum 이 null", () => {
   assert.equal(spectrumFromBle(msgAt(fl.tap_ref)), null);
+});
+
+console.log("관리자 모드");
+ok("관리자 목록에 있는 이메일만 관리자 (대소문자·앞뒤 공백 무시)", () => {
+  assert.ok(ADMIN_EMAILS.length >= 1);
+  assert.equal(isAdminEmail(ADMIN_EMAILS[0]), true);
+  assert.equal(isAdminEmail("  " + ADMIN_EMAILS[0].toUpperCase() + " "), true);
+  assert.equal(isAdminEmail("worker@example.com"), false);
+  assert.equal(isAdminEmail(""), false);
+  assert.equal(isAdminEmail(null), false);
 });
 
 if (process.env.DUMP) writeFileSync(process.env.DUMP, JSON.stringify(dump));

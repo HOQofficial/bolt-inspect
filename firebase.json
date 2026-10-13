@@ -1,6 +1,21 @@
 {
   "hosting": {
     "public": "www",
-    "ignore": ["firebase.json", "**/.*", "**/*.example.js"]
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/*.example.js"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(html|js|css|webmanifest)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
   }
 }

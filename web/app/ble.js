@@ -10,10 +10,12 @@ export const SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 export const CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 export const RX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";   // 폰 → ESP32: 명령 ("L,OK" = LED, "S" = 타격, "M" = 손으로 칠게요)
 const LS_DEVICE = "tap_device_id_v1";
+const LS_WAS = "tap_was_connected_v1";     // 마지막으로 직접 끊은 게 아니라면 "연결돼 있었음" → 새로고침 뒤 자동으로 다시 연결
 
 export const isNative = () => Capacitor.isNativePlatform();
 export const bleSupported = () => isNative() || !!navigator.bluetooth;
 export const hasSavedDevice = () => isNative() && !!safeGet(LS_DEVICE);
+export const wasConnected = () => safeGet(LS_WAS) === "1";
 export function forgetDevice() { try { localStorage.removeItem(LS_DEVICE); } catch { /* 무시 */ } }
 
 function safeGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
@@ -69,6 +71,7 @@ export class TapLink {
     try {
       if (isNative()) await this._connectNative(pick);
       else await this._connectWeb();
+      safeSet(LS_WAS, "1");
       this.onState("connected");
     } catch (e) {
       this.userStopped = true;
@@ -137,8 +140,28 @@ export class TapLink {
     this._retrying = false;
   }
 
+  // 새로고침·앱 재시작 직후: 직접 끊은 게 아니라면 전에 쓰던 ESP32 에 알아서 다시 연결 (돌려주는 값 = 시도했는지)
+  //  - 안드로이드 앱: 저장해 둔 기기로 바로 연결
+  //  - 크롬: 전에 허용한 기기 목록(getDevices)을 지원할 때만 가능. 지원하지 않으면 버튼을 한 번 눌러야 함
+  async autoReconnect() {
+    if (!wasConnected() || this.state !== "idle") return false;
+    if (isNative()) {
+      if (!safeGet(LS_DEVICE)) return false;
+    } else {
+      if (!navigator.bluetooth || !navigator.bluetooth.getDevices) return false;
+      const d = (await navigator.bluetooth.getDevices()).find((x) => x.name && x.name.startsWith("TAP-"));
+      if (!d) return false;
+      this.webDevice = d;
+      d.addEventListener("gattserverdisconnected", () => this._onDropped());
+    }
+    this.onLog("이전에 연결했던 기기에 다시 연결하는 중…");
+    await this.connect();
+    return true;
+  }
+
   async disconnect() {
     this.userStopped = true;
+    try { localStorage.removeItem(LS_WAS); } catch { /* 무시 */ }
     try {
       if (isNative() && this.deviceId) await BleClient.disconnect(this.deviceId);
       else if (this.webDevice?.gatt?.connected) this.webDevice.gatt.disconnect();

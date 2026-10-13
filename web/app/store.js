@@ -2,6 +2,7 @@
 //  - Firebase 설정(web/firebase-config.js)이 있으면 Firestore 에 저장. 인터넷이 없으면 기기에 쌓아 두었다가 연결되면 자동 업로드.
 //  - 설정이 없으면 '시험 모드': 가짜 플랜지로 블루투스·판정만 시험하고 서버에는 아무것도 올리지 않음.
 import { initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import { initializeFirestore, persistentLocalCache, doc, setDoc, collection, getDocs, waitForPendingWrites } from "firebase/firestore";
 import { nowKstIso } from "../schema.js";
 import { firebaseConfig } from "./_config.js";
@@ -14,6 +15,7 @@ const LS_USED = "bolt_ref_used_keys_v1";      // 이미 정상 샘플로 쓴 측
 
 export const hasServer = !!(firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("여기에"));
 let db = null;
+let auth = null;
 
 // 시험 모드용 가짜 플랜지 (tools/sim.py 의 DEMO_REF 와 같은 값)
 export const DEMO_FLANGE = {
@@ -34,9 +36,24 @@ export function initStore() {
   if (!hasServer) return;
   const app = initializeApp(firebaseConfig);
   db = initializeFirestore(app, { localCache: persistentLocalCache() });
+  auth = getAuth(app);
   syncSent();
   window.addEventListener("online", syncSent);
 }
+
+// ---------- 관리자 로그인 (이메일 + 비밀번호, Firebase Authentication) ----------
+// 비밀번호는 Firebase 가 처리하고 이 앱은 저장하지 않아요. 서버 설정이 없는 시험 모드에서는 쓸 수 없어요.
+export const authAvailable = () => !!auth;
+export function onAuth(cb) {
+  if (!auth) { cb(null); return () => {}; }
+  return onAuthStateChanged(auth, (u) => cb(u ? { email: u.email } : null));
+}
+export async function adminSignIn(email, password) {
+  if (!auth) throw new Error("서버 설정이 없어서 로그인할 수 없어요 (시험 모드).");
+  const c = await signInWithEmailAndPassword(auth, email, password);
+  return c.user.email;
+}
+export const adminSignOut = () => (auth ? signOut(auth) : Promise.resolve());
 
 // ---------- 플랜지 ----------
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("시간 초과")), ms))]);

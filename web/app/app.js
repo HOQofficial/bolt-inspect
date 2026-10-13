@@ -1,15 +1,16 @@
-// 볼트 타음 검사 앱 화면 (탭 4개: 측정 / 기준 등록 / 기록 / 설정).
+// 볼트 타음 검사 앱 화면 (탭: 측정 / 기록 / 설정 + 관리자 로그인 시 '기준 등록').
 // 흐름: 버튼을 누르면 ESP32 가 솔레노이드로 한 번 치고 1회만 측정 -> 특징값·FFT 를 받아 정상 기준과 비교 -> 저장.
 // 소리가 날 때마다 자동 측정하지 않음 (Firebase 한도 절약). 'evt:miss' 는 소리를 못 들었다는 뜻.
 import { Capacitor } from "@capacitor/core";
 import { featuresFromBle, spectrumFromBle, calcTapRef } from "../schema.js";
-import { TapLink, bleSupported, hasSavedDevice, forgetDevice, isNative } from "./ble.js";
+import { TapLink, bleSupported, hasSavedDevice, wasConnected, forgetDevice, isNative } from "./ble.js";
 import { tappingFromFeatures, refSourceText, makeRecord, RESULT_KO } from "./judge.js";
 import { validateInspection, validateTapRef } from "./validate.js";
 import { gaugeCompactHtml } from "./gauge.js";
+import { isAdminEmail, authErrorText } from "./admin.js";
 import { spectrumHtml, wireSpectra } from "./spectrum.js";
 import {
-  initStore, hasServer, loadFlanges, saveInspection, getHist, onHistChange, pendingCount,
+  initStore, hasServer, authAvailable, onAuth, adminSignIn, adminSignOut, loadFlanges, saveInspection, getHist, onHistChange, pendingCount,
   getSamples, setSamples, getUsedKeys, addUsedKeys, saveTapRef,
 } from "./store.js";
 
@@ -55,8 +56,42 @@ const connected = () => !!link && link.state === "connected";
 
 function currentFlange() { return flanges.find((f) => f.flange_id === $("selFlange").value) || null; }
 
+// ---------- 관리자 모드 ----------
+let adminEmail = null;                                   // 로그인한 이메일 (관리자 목록에 있을 때만 채움)
+const isAdmin = () => isAdminEmail(adminEmail);
+// 정상 기준이 없을 때 안내 문구: 관리자는 직접 등록, 측정원은 관리자에게 요청
+const regWhere = () => (isAdmin() ? "'기준 등록' 탭에서 먼저 등록하세요." : "관리자에게 기준 등록을 요청하세요.");
+
+function renderAdmin() {
+  document.body.classList.toggle("admin", isAdmin());    // 이 값이 있을 때만 4번째 탭(기준 등록)이 보임
+  $("adminOut").hidden = isAdmin();
+  $("adminIn").hidden = !isAdmin();
+  $("admMail").textContent = adminEmail || "";
+  if (!isAdmin() && tab === "register") setTab("measure");
+  renderRefInfo();
+}
+function adminMsg(t) { $("admMsg").hidden = !t; $("admMsg").textContent = t || ""; }
+async function doAdminLogin(ev) {
+  ev.preventDefault();
+  const email = $("admEmail").value.trim(), pw = $("admPw").value;
+  if (!email || !pw) { adminMsg("이메일과 비밀번호를 모두 적어 주세요."); return; }
+  if (!authAvailable()) { adminMsg("서버 설정이 없는 시험 모드에서는 로그인할 수 없어요."); return; }
+  adminMsg(""); $("btnAdminGo").disabled = true;
+  try {
+    const mail = await adminSignIn(email, pw);
+    if (!isAdminEmail(mail)) {                           // 계정은 있지만 관리자 목록에 없음 -> 바로 로그아웃
+      await adminSignOut(); adminEmail = null;
+      adminMsg("관리자 권한이 없는 계정이에요."); renderAdmin(); return;
+    }
+    adminEmail = mail; $("admPw").value = ""; $("adminForm").hidden = true;
+    renderAdmin(); notice("");
+  } catch (e) { adminMsg(authErrorText(e)); }
+  finally { $("btnAdminGo").disabled = false; }
+}
+
 // ---------- 탭 ----------
 function setTab(name) {
+  if (name === "register" && !isAdmin()) name = "measure";      // 관리자가 아니면 기준 등록 탭은 열 수 없음
   tab = name;
   document.querySelectorAll(".tab").forEach((el) => { el.hidden = el.id !== `tab-${name}`; });
   document.querySelectorAll(".tabbtn").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
@@ -91,7 +126,7 @@ function renderBolts() {
 function renderRefInfo() {
   const f = currentFlange();
   if (!f) { $("refInfo").textContent = ""; return; }
-  if (!f.tap_ref) { $("refInfo").textContent = "⚠ 이 플랜지는 정상 기준이 아직 없어요 → '기준 등록' 탭에서 먼저 등록하세요."; return; }
+  if (!f.tap_ref) { $("refInfo").textContent = "⚠ 이 플랜지는 정상 기준이 아직 없어요 → " + regWhere(); return; }
   const acc = f.tap_ref.acc ? "음향+진동" : "음향만";
   $("refInfo").textContent = `정상 기준: ${refSourceText(f.tap_ref)} · ${acc}`;
 }
@@ -110,8 +145,9 @@ function renderChips() {
   $("chipPend").hidden = p === 0;
   $("chipPend").textContent = `전송 대기 ${p}건`;
   const btn = $("btnConnect");
-  btn.textContent = st === "connected" ? "연결됨 · 끊기" : st === "idle" ? (hasSavedDevice() ? "블루투스 다시 연결" : "블루투스 연결") : "연결 중… (누르면 취소)";
+  btn.textContent = st === "connected" ? "연결됨 · 끊기" : st === "idle" ? (hasSavedDevice() || wasConnected() ? "블루투스 다시 연결" : "블루투스 연결") : "연결 중… (누르면 취소)";
   btn.classList.toggle("primary", st !== "connected");
+  btn.closest(".conn").classList.toggle("connected", st === "connected");
   $("btnPick").hidden = !(isNative() && hasSavedDevice() && st === "idle");
   const on = st === "connected";
   $("actions").hidden = !on;
@@ -136,7 +172,7 @@ async function request(kind) {
   if (tab === "measure") {
     const f = currentFlange();
     if (!f) { notice("플랜지를 먼저 고르세요."); return; }
-    if (!f.tap_ref) { notice("이 플랜지는 정상 기준이 없어요 → '기준 등록' 탭에서 먼저 등록하세요."); return; }
+    if (!f.tap_ref) { notice("이 플랜지는 정상 기준이 없어요 → " + regWhere()); return; }
   }
   const ok = kind === "strike" ? await link.sendStrike() : await link.sendHandArm();
   if (!ok) { setStatus("명령을 못 보냈어요. 연결을 확인하세요.", "bad"); return; }
@@ -374,6 +410,7 @@ function removeSample(i) {
   renderRegister();
 }
 async function saveRef() {
+  if (!isAdmin()) { notice("관리자만 기준을 저장할 수 있어요."); return; }
   const f = currentFlange();
   if (!f) return;
   const list = getSamples(f.flange_id);
@@ -432,7 +469,7 @@ function onLine(line) {
   const bolt = $("selBolt").value;
   let tapping = null, reason = "";
   if (!flange) reason = "플랜지를 먼저 고르세요.";
-  else if (!flange.tap_ref) reason = "이 플랜지는 정상 기준이 없어요 → '기준 등록' 탭에서 등록하세요.";
+  else if (!flange.tap_ref) reason = "이 플랜지는 정상 기준이 없어요 → " + regWhere();
   else {
     tapping = tappingFromFeatures(features, flange.tap_ref, refSourceText(flange.tap_ref), spectrum);
     if (!tapping) reason = "정상 기준과 맞는 센서 값이 없어서 판정할 수 없어요.";
@@ -498,6 +535,7 @@ function boot() {
     onState: (s) => { link.state = s; renderChips(); },
   });
   link.state = "idle";
+  link.autoReconnect().catch((e) => log("자동 재연결 실패: " + (e && e.message ? e.message : e)));   // 새로고침해도 연결 유지
 
   document.querySelectorAll(".tabbtn").forEach((b) => { b.onclick = () => setTab(b.dataset.tab); });
   document.querySelectorAll("#sensTabs button").forEach((b) => {       // 폰: 음향 / 진동 카드를 번갈아 보기
@@ -531,6 +569,8 @@ function boot() {
   };
   $("selFlange").onchange = () => { store.s("last_flange", $("selFlange").value); current = null; lastReg = null; renderResult(); renderBolts(); };
   $("selBolt").onchange = () => store.s("last_bolt", $("selBolt").value);
+  $("inpInspector").oninput = () => store.s("inspector", $("inpInspector").value.trim());     // 적는 즉시 기억 (저장 버튼 안 눌러도 유지)
+  $("inpDevice").oninput = () => store.s("device", $("inpDevice").value.trim());
   $("chkAuto").onchange = () => store.s("auto_save", $("chkAuto").checked ? "1" : "0");
   $("chkRegAuto").onchange = () => store.s("reg_auto", $("chkRegAuto").checked ? "1" : "0");
   $("regTarget").onchange = () => { store.s("reg_target", $("regTarget").value); renderRegister(); };
@@ -545,6 +585,14 @@ function boot() {
   window.addEventListener("offline", renderChips);
   onHistChange(renderHist);
   $("recentAll").onclick = () => setTab("history");
+  $("btnAdmin").onclick = () => { $("adminForm").hidden = false; $("btnAdmin").hidden = true; adminMsg(""); $("admEmail").focus(); };
+  $("btnAdminCancel").onclick = () => { $("adminForm").hidden = true; $("btnAdmin").hidden = false; adminMsg(""); $("admPw").value = ""; };
+  $("adminForm").onsubmit = doAdminLogin;
+  $("btnAdminOut").onclick = async () => { await adminSignOut(); adminEmail = null; $("btnAdmin").hidden = false; renderAdmin(); };
+  onAuth((u) => {                                        // 앱을 다시 켜도 로그인이 남아 있으면 여기로 들어옴
+    if (u && !isAdminEmail(u.email)) { adminSignOut(); adminEmail = null; } else adminEmail = u ? u.email : null;
+    renderAdmin();
+  });
 
   if (!bleSupported()) notice("이 브라우저는 블루투스를 지원하지 않아요. 안드로이드 앱이나 PC·안드로이드 크롬을 쓰세요 (사파리·아이폰은 안 돼요).");
   if (!Capacitor.isNativePlatform() && "serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {

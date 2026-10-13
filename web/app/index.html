@@ -52,7 +52,7 @@
       </div>
 
       <div id="waitCard" class="card empty">
-        <div class="empty-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="empty-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h2M7 7v10M11 3v18M15 8v8M19 11v2"/></svg></div>
         <div class="empty-tx">블루투스를 연결하고<br><b>타격 + 측정</b>을 누르면<br>여기에 결과가 나와요.</div>
       </div>
 
@@ -169,6 +169,27 @@
           <button id="btnLed" class="btn" type="button">💡 LED 시험</button>
         </div>
       </div>
+      <div class="card" id="adminCard">
+        <h2>관리자 모드</h2>
+        <div id="adminOut">
+          <p class="hint">정상 기준을 등록하는 <b>기준 등록</b> 탭은 관리자 계정으로 로그인해야 열려요.</p>
+          <button id="btnAdmin" class="btn" type="button">관리자 모드</button>
+          <form id="adminForm" class="adminform" hidden autocomplete="on">
+            <label>이메일<input id="admEmail" type="email" autocomplete="username" inputmode="email" placeholder="name@company.com"></label>
+            <label>비밀번호<input id="admPw" type="password" autocomplete="current-password"></label>
+            <div id="admMsg" class="statusline bad" hidden></div>
+            <div class="btnrow">
+              <button id="btnAdminGo" class="btn primary" type="submit">로그인</button>
+              <button id="btnAdminCancel" class="btn" type="button">취소</button>
+            </div>
+          </form>
+        </div>
+        <div id="adminIn" hidden>
+          <p class="hint">관리자로 로그인됨 · <b id="admMail"></b></p>
+          <button id="btnAdminOut" class="btn" type="button">로그아웃</button>
+        </div>
+      </div>
+
       <details class="card">
         <summary>판정 규칙</summary>
         <pre id="ruleText"></pre>
@@ -187,16 +208,16 @@
   <nav class="tabbar" aria-label="메뉴">
     <div class="sb-logo" aria-hidden="true">RE<b>:</b>S</div>
     <button class="tabbtn active" data-tab="measure" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>측정</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h2M7 7v10M11 3v18M15 8v8M19 11v2"/></svg><span>측정</span>
     </button>
     <button class="tabbtn" data-tab="register" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>기준 등록</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>기준 등록</span>
     </button>
     <button class="tabbtn" data-tab="history" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>기록</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span>기록</span>
     </button>
     <button class="tabbtn" data-tab="settings" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><span>설정</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><span>설정</span>
     </button>
     <div class="sb-conn" aria-hidden="true"><i></i><span id="sbConn">끊김</span></div>
   </nav>

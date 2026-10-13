@@ -1,8 +1,9 @@
 // FFT 그래프 (새 디자인): 주황 막대 = FFT 크기, 연두 박스 = 정상 범위(Peak 주파수 × Peak 크기), 핑크 점 = 이번 Peak.
 // - 이번 Peak(점)가 연두 박스 안에 들어오면 정상. 막대 모양이 박스 밖으로 나가도 괜찮음.
 // - 점에 마우스를 올리거나(폰은 점을 톡 누르면) 핑크·흰색 말풍선으로 Peak 값이 보임.
-// - 그래프 위를 대각선으로 끌면 그 부분이 확대됨 (더블클릭 / "확대 해제" 로 되돌림).
-//   폰처럼 좁은 화면에서는 스크롤과 겹치지 않게 "확대" 버튼을 눌러 큰 창에서 확대함.
+// - 처음에는 전체(0~f_max)를 보여 주고, 연두 박스(정상 Peak 크기 범위)는 가로로 그래프 끝에서 끝까지 길게 뻗음.
+// - 폰·태블릿: 두 손가락으로 벌리면 확대, 오므리면 축소, 확대한 상태에서 한 손가락을 좌우로 끌면 이동. 더블탭 / "원래대로" 로 되돌림.
+// - PC(마우스): 그래프 위를 끌면 사각형으로 확대, 더블클릭 / "원래대로" 로 되돌림.
 // ESP32 가 보낸 막대(0~100)를 그대로 그림. 막대의 주파수 범위는 f_max(Hz) 까지. 판정 계산에는 관여하지 않음(그리기 전용).
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const hzText = (f) => (f >= 1000 ? `${Number((f / 1000).toFixed(2))} kHz` : `${Math.round(f)} Hz`);
@@ -22,22 +23,34 @@ function model(args) {
   let top = maxV;
   let box = null;
   if (band && band[1] > 0) {
-    const px = Math.max(fmax * 0.012, 0), py = scale ? 0.025 * scale : 0;      // 박스를 정상 범위보다 아주 조금 크게
+    const py = scale ? 0.025 * scale : 0;      // 박스를 정상 범위보다 아주 조금 높게
     box = {
-      x0: Math.max(band[0] - px, 0), x1: band[1] + px,
+      x0: 0, x1: fmax,                          // 가로로 그래프 끝에서 끝까지 길게 (세로 = 정상 Peak 크기 범위)
       v0: scale && magBand ? Math.max(magBand[0] * scale - py, 0) : 0,
       v1: scale && magBand ? magBand[1] * scale + py : null,
     };
     if (box.v1 != null) top = Math.max(top, box.v1);
   }
-  return { n, fmax, bin, peakV, scale, box, top: Math.min(top * 1.12, 130) };
+  return { n, fmax, peakHz, bin, peakV, scale, box, top: Math.min(top * 1.12, 130) };
 }
 
-// 확대 상태(view)에 따라 그래프 안쪽 HTML 만들기
-function inner(args, view, h) {
+// 보이는 범위(view) = { x0, x1, v0, v1 } (주파수, 막대 높이)
+const fullView = (m) => ({ x0: 0, x1: m.fmax, v0: 0, v1: m.top });
+// 처음 보여 줄 범위 = 전체 (0 ~ f_max). 연두 박스는 가로로 길게 뻗어 있음.
+const defView = (m) => fullView(m);
+function clampView(v, m) {
+  const full = fullView(m);
+  let xs = clamp(v.x1 - v.x0, m.fmax * 0.02, full.x1), vs = clamp(v.v1 - v.v0, full.v1 * 0.04, full.v1);
+  const x0 = clamp(v.x0, 0, full.x1 - xs), v0 = clamp(v.v0, 0, full.v1 - vs);
+  return { x0, x1: x0 + xs, v0, v1: v0 + vs };
+}
+const sameView = (a, b) => ["x0", "x1", "v0", "v1"].every((k) => Math.abs(a[k] - b[k]) < 1e-6);
+
+// 그래프 안쪽(막대·박스·Peak 점)만 HTML 로 만들기 — 움직이는 중에도 이 부분만 다시 그림
+function layer(args, view) {
   const m = model(args);
   const { trace, peakHz, magBand, mag } = args;
-  const v = view || { x0: 0, x1: m.fmax, v0: 0, v1: m.top };
+  const v = view;
   const xs = v.x1 - v.x0, vs = v.v1 - v.v0;
   const X = (f) => ((f - v.x0) / xs) * 100;
   const Y = (val) => 100 - ((val - v.v0) / vs) * 100;
@@ -68,93 +81,104 @@ function inner(args, view, h) {
   const peak = `<div class="pkw" tabindex="0" style="left:${px.toFixed(2)}%;top:${py.toFixed(2)}%;opacity:${vis ? 1 : 0};pointer-events:${vis ? "auto" : "none"}">` +
     `<i class="pkh"></i><i class="pkd"></i>` +
     `<div class="pkt" style="${right ? "right:16px" : "left:16px"}"><b>PEAK 크기</b><strong>${Number(mag).toFixed(2)}</strong><em>${esc(hzText(peakHz))}</em></div></div>`;
-  const zoomed = !!view;
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((r) => `<span>${tickText(v.x0 + xs * r, xs)}</span>`).join("");
-  return `<div class="spx"><div class="spp" style="height:${h}px">${box}${bars}<i class="spax"></i>${edge}${peak}` +
-    `<div class="spsel" hidden></div><button type="button" class="spreset" ${zoomed ? "" : "hidden"}>확대 해제</button></div>` +
-    `<div class="spticks">${ticks}</div></div>`;
+  return { html: `${box}${bars}<i class="spax"></i>${edge}${peak}`, ticks };
 }
 
 // 카드 안에 들어갈 그래프 HTML. 인자는 기존과 같고, 마지막 extra 만 새로 추가됨.
 // extra = { mag: 이번 Peak 크기, magBand: [하한, 상한] (정상 Peak 크기 범위) }
 export function spectrumHtml(trace, peakHz, band, label, extra = {}) {
   const args = { trace, peakHz, band: band || null, mag: Number(extra.mag) || 0, magBand: extra.magBand || null, label };
-  const data = esc(JSON.stringify(args));
-  return `<div class="spw" data-sp="${data}" role="img" aria-label="${esc(label)} FFT 그래프, Peak ${esc(hzText(peakHz))}">${inner(args, null, 150)}` +
-    `<button type="button" class="spbig" aria-label="${esc(label)} 그래프 크게 보기">확대</button></div>`;
+  const m = model(args);
+  const L = layer(args, defView(m));
+  return `<div class="spw" data-sp="${esc(JSON.stringify(args))}" role="img" aria-label="${esc(label)} FFT 그래프, Peak ${esc(hzText(peakHz))}">` +
+    `<div class="spx"><div class="spp" style="height:150px"><div class="spl">${L.html}</div>` +
+    `<div class="spsel" hidden></div><button type="button" class="spreset" hidden>원래대로</button></div>` +
+    `<div class="spticks">${L.ticks}</div></div></div>`;
 }
 
-const narrow = () => !window.matchMedia("(min-width: 680px)").matches;
-
-// 화면에 그려진 그래프에 끌어서 확대 / 말풍선 / 크게 보기 기능을 붙임. 화면을 다시 그린 뒤마다 한 번 불러 주세요.
+// 화면에 그려진 그래프에 확대·이동·말풍선 기능을 붙임. 화면을 다시 그린 뒤마다 한 번 불러 주세요.
 export function wireSpectra(root = document) {
   root.querySelectorAll(".spw").forEach((w) => {
     if (w._wired) return;
     w._wired = true;
     const args = JSON.parse(w.dataset.sp);
-    const h = w.classList.contains("big") ? 320 : 150;
-    let view = null;
+    const m = model(args), full = fullView(m), def = defView(m);
+    const p = w.querySelector(".spp"), sel = w.querySelector(".spsel"), lay = w.querySelector(".spl"), tk = w.querySelector(".spticks"), rs = w.querySelector(".spreset");
+    let view = def;
     const draw = () => {
-      const old = w.querySelector(".spx");
-      const tmp = document.createElement("div");
-      tmp.innerHTML = inner(args, view, h);
-      old.replaceWith(tmp.firstChild);
-      bind();
+      const L = layer(args, view);
+      lay.innerHTML = L.html; tk.innerHTML = L.ticks;
+      rs.hidden = sameView(view, def);
     };
-    const bind = () => {
-      const p = w.querySelector(".spp"), sel = w.querySelector(".spsel"), m = model(args);
-      const cur = view || { x0: 0, x1: m.fmax, v0: 0, v1: m.top };
-      let st = null;
-      const frac = (e) => {
-        const r = p.getBoundingClientRect();
-        return { fx: clamp((e.clientX - r.left) / r.width, 0, 1), fy: clamp((e.clientY - r.top) / r.height, 0, 1) };
-      };
-      p.onpointerdown = (e) => {
-        if (e.target.closest(".spreset") || e.target.closest(".pkw")) return;
-        if (!w.classList.contains("big") && narrow()) return;          // 좁은 화면은 스크롤 우선 (확대는 큰 창에서)
+    const ptrs = new Map();            // 화면에 닿아 있는 손가락(또는 마우스)
+    let g = null;                      // 지금 하는 동작: 사각형 확대(마우스) / 이동(손가락 1개) / 두 손가락 확대·축소
+    const rect = () => p.getBoundingClientRect();
+    const frac = (e) => { const r = rect(); return { fx: clamp((e.clientX - r.left) / r.width, 0, 1), fy: clamp((e.clientY - r.top) / r.height, 0, 1) }; };
+    const startTouchGesture = () => {
+      const pts = [...ptrs.values()], r = rect();
+      if (pts.length >= 2) {
+        const [a, b] = pts, d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+        const mx = ((a.x + b.x) / 2 - r.left) / r.width, my = ((a.y + b.y) / 2 - r.top) / r.height;
+        g = { kind: "pinch", d0: d, v0: { ...view }, mx0: mx, my0: my };
+        g.fx = view.x0 + mx * (view.x1 - view.x0); g.fy = view.v1 - my * (view.v1 - view.v0);   // 두 손가락 가운데 아래의 실제 값(주파수·높이)
+      } else if (pts.length === 1) {
+        g = { kind: "pan", x: pts[0].x, v0: { ...view } };
+      } else g = null;
+    };
+    p.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".spreset") || e.target.closest(".pkw")) return;
+      if (e.pointerType === "mouse") {
+        if (e.button !== 0) return;
         const f = frac(e);
-        st = { sx: f.fx, sy: f.fy, cx: f.fx, cy: f.fy };
-        try { p.setPointerCapture(e.pointerId); } catch { /* 무시 */ }
-      };
-      p.onpointermove = (e) => {
-        if (!st) return;
+        g = { kind: "rect", sx: f.fx, sy: f.fy, cx: f.fx, cy: f.fy };
+      } else {
+        ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        startTouchGesture();
+      }
+      try { p.setPointerCapture(e.pointerId); } catch { /* 무시 */ }
+    });
+    p.addEventListener("pointermove", (e) => {
+      if (!g) return;
+      if (g.kind === "rect") {
         const f = frac(e);
-        st.cx = f.fx; st.cy = f.fy;
-        sel.hidden = false;
-        sel.style.left = Math.min(st.sx, st.cx) * 100 + "%"; sel.style.top = Math.min(st.sy, st.cy) * 100 + "%";
-        sel.style.width = Math.abs(st.cx - st.sx) * 100 + "%"; sel.style.height = Math.abs(st.cy - st.sy) * 100 + "%";
-      };
-      const end = () => {
-        if (!st) return;
-        const a = st; st = null; sel.hidden = true;
+        g.cx = f.fx; g.cy = f.fy; sel.hidden = false;
+        sel.style.left = Math.min(g.sx, g.cx) * 100 + "%"; sel.style.top = Math.min(g.sy, g.cy) * 100 + "%";
+        sel.style.width = Math.abs(g.cx - g.sx) * 100 + "%"; sel.style.height = Math.abs(g.cy - g.sy) * 100 + "%";
+        return;
+      }
+      if (!ptrs.has(e.pointerId)) return;
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const r = rect(), pts = [...ptrs.values()];
+      if (g.kind === "pinch" && pts.length >= 2) {
+        const [a, b] = pts, d = Math.hypot(a.x - b.x, a.y - b.y) || 1, s = g.d0 / d;        // 벌리면 s<1 → 더 좁은 범위(확대)
+        const xs = (g.v0.x1 - g.v0.x0) * s, vs = (g.v0.v1 - g.v0.v0) * s;
+        const mx = ((a.x + b.x) / 2 - r.left) / r.width, my = ((a.y + b.y) / 2 - r.top) / r.height;
+        view = clampView({ x0: g.fx - mx * xs, x1: g.fx - mx * xs + xs, v1: g.fy + my * vs, v0: g.fy + my * vs - vs }, m);
+        draw();
+      } else if (g.kind === "pan" && pts.length === 1) {
+        const dx = (pts[0].x - g.x) / r.width * (g.v0.x1 - g.v0.x0);                             // 손가락을 따라 좌우로 이동
+        view = clampView({ ...g.v0, x0: g.v0.x0 - dx, x1: g.v0.x1 - dx }, m);
+        draw();
+      }
+    });
+    const end = (e) => {
+      if (g && g.kind === "rect") {
+        const a = g; g = null; sel.hidden = true;
         const x0 = Math.min(a.sx, a.cx), x1 = Math.max(a.sx, a.cx), y0 = Math.min(a.sy, a.cy), y1 = Math.max(a.sy, a.cy);
         if (x1 - x0 < 0.03 || y1 - y0 < 0.05) return;                  // 너무 작게 끌면 무시
-        const xs = cur.x1 - cur.x0, vs = cur.v1 - cur.v0;
-        const nv0 = cur.v0 + (1 - y1) * vs, nv1 = cur.v0 + (1 - y0) * vs;
-        if (nv1 - nv0 < 0.5) return;
-        view = { x0: cur.x0 + x0 * xs, x1: cur.x0 + x1 * xs, v0: Math.max(0, nv0), v1: nv1 };
+        const xs = view.x1 - view.x0, vs = view.v1 - view.v0;
+        view = clampView({ x0: view.x0 + x0 * xs, x1: view.x0 + x1 * xs, v0: view.v0 + (1 - y1) * vs, v1: view.v0 + (1 - y0) * vs }, m);
         draw();
-      };
-      p.onpointerup = end; p.onpointercancel = end;
-      p.ondblclick = () => { if (view) { view = null; draw(); } };
-      const rs = w.querySelector(".spreset");
-      if (rs) rs.onclick = () => { view = null; draw(); };
+        return;
+      }
+      ptrs.delete(e.pointerId);
+      startTouchGesture();             // 남은 손가락으로 동작을 이어 감 (두 손가락 → 한 손가락)
     };
-    bind();
-    const big = w.querySelector(".spbig");
-    if (big) big.onclick = () => openSheet(args);
+    p.addEventListener("pointerup", end);
+    p.addEventListener("pointercancel", end);
+    const reset = () => { view = def; draw(); };
+    p.addEventListener("dblclick", reset);
+    rs.onclick = reset;
   });
-}
-
-// 폰: 큰 창을 띄워 그 안에서 끌어서 확대
-function openSheet(args) {
-  const sheet = document.createElement("div");
-  sheet.className = "spsheet";
-  sheet.innerHTML = `<div class="spsheet-in"><div class="spsheet-h"><div><strong>${esc(args.label)}</strong><small>끌어서 사각형으로 감싼 부분이 확대돼요</small></div>` +
-    `<button type="button" class="spclose" aria-label="닫기">✕</button></div>` +
-    `<div class="spw big" data-sp="${esc(JSON.stringify(args))}">${inner(args, null, 320)}</div></div>`;
-  sheet.addEventListener("click", (e) => { if (e.target === sheet) sheet.remove(); });
-  sheet.querySelector(".spclose").onclick = () => sheet.remove();
-  document.body.appendChild(sheet);
-  wireSpectra(sheet);
 }

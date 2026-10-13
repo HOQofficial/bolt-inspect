@@ -1,6 +1,6 @@
 {
   "appId": "kr.boltinspect.app",
-  "appName": "볼트 타음 검사",
+  "appName": "RE:SOUND",
   "webDir": "www",
   "server": { "androidScheme": "https" }
 }

@@ -333,6 +333,33 @@ div[data-testid="stSegmentedControl"] button, div[role="radiogroup"] label { bor
 .rs-tr .mn { font-family:ui-monospace,monospace; }
 .rs-th span:last-child, .rs-tr .rt { text-align:right; }
 .rs-tr .rs-pill { padding:6px 14px; }
+.rs-fl circle[data-d] { cursor:pointer; transition:r .12s; }
+.rs-fl circle[data-d]:hover { r:7.5; }
+.rs-fl circle.sel { stroke:#0b0f1e; stroke-width:2.5; }
+.rs-dp { margin:10px 0 6px; }
+.rs-tr[data-d] { cursor:pointer; border-radius:18px; transition:background .15s; }
+.rs-tr[data-d]:hover { background:#f5f6fe; }
+.rs-tr.open { background:#f5f6fe; }
+.rs-tr.open .nm::after { content:" ▴"; color:#ff5900; font-size:11px; }
+.rs-tr[data-d]:not(.open) .nm::after { content:" ▾"; color:#9aa1b8; font-size:11px; }
+.rs-hd { background:#f5f6fe; border-radius:26px; padding:20px 22px 16px; margin:4px 0 14px; min-width:680px; }
+.rs-hd .hxh { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.rs-hd .hxh b { font-size:18px; font-weight:800; }
+.rs-hd .hxh span { font-size:13px; color:#5a6076; font-family:ui-monospace,monospace; }
+.rs-hd .hxh em { font-style:normal; font-size:12px; font-weight:700; padding:5px 12px; border-radius:99px; }
+.rs-hd .hxh small { font-size:12px; color:#5a6076; margin-left:auto; }
+.rs-hd .hxg { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.rs-hd .hxcard { background:#fff; border-radius:26px; padding:20px 24px 22px; box-shadow:0 6px 22px rgba(40,50,120,.06); min-width:0; }
+.rs-hd .rs-evh b { font-size:24px; }
+.rs-hd .hxc { position:relative; height:190px; margin:8px 0 0 0; background:#f5f6fe; border-radius:18px; }
+.rs-hd .hxb { position:absolute; bottom:0; border-radius:3px 3px 0 0; }
+.rs-hd .hxbox { position:absolute; border-radius:12px; background:#cfe8d9; opacity:.95; }
+.rs-hd .hxd { position:absolute; width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border-radius:50%; background:#ff3d81; border:2.5px solid #fff; box-sizing:content-box; box-shadow:0 2px 8px rgba(255,61,129,.5); }
+.rs-hd .hxt { position:relative; height:20px; margin-top:4px; font-size:10px; color:#5a6076; }
+.rs-hd .hxt span { position:absolute; top:0; }
+.rs-hd .hxn { font-size:12.5px; color:#5a6076; margin:10px 0 0; }
+.rs-hd .hxf { font-size:12px; color:#5a6076; margin:14px 2px 0; }
+@media (max-width:900px) { .rs-hd .hxg { grid-template-columns:1fr; } }
 
 
 .rs-evh { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
@@ -419,19 +446,32 @@ def stat3(counts, total):
     st.markdown(f'<div class="rs-stat3">{out}</div>', unsafe_allow_html=True)
 
 
-def ring_card(fid, stamp, dots, n_ok, n_chk, n_ng):
-    """플랜지 카드: 볼트 개수만큼 원 모양으로 점을 놓고 판정 색으로 칠함. dots = [판정 or None, ...]"""
+def ring_card(fid, stamp, dots, n_ok, n_chk, n_ng, bolts=None, details=None, row=0):
+    """플랜지 카드: 볼트 개수만큼 원 모양으로 점을 놓고 판정 색으로 칠함. dots = [판정 or None, ...]
+    bolts = 점마다 볼트 번호, details = 점마다 FFT 펼침 정보(없으면 None) → 있으면 점을 눌러 FFT 를 볼 수 있음"""
+    import html as _h
+    import json as _j
     n = max(len(dots), 1)
     cs = ""
     for i, d in enumerate(dots):
         a = -_math.pi / 2 + 2 * _math.pi * i / n
         col = {"OK": "#2fa36b", "CHECK": "#e8a317", "NG": "#e0443a"}.get(d, "#e3e5f1")
-        cs += f'<circle cx="{50 + 33 * _math.cos(a):.1f}" cy="{50 + 33 * _math.sin(a):.1f}" r="6" fill="{col}"/>'
+        det = details[i] if details and i < len(details) else None
+        attr = ""
+        if det:
+            attr = (f' data-k="{_h.escape(fid)}-{_h.escape(str(bolts[i]))}" '
+                    f'data-r="{row}" data-d="{_h.escape(_j.dumps(det, ensure_ascii=False, separators=(",", ":")), quote=True)}"')
+        cs += f'<circle cx="{50 + 33 * _math.cos(a):.1f}" cy="{50 + 33 * _math.sin(a):.1f}" r="6" fill="{col}"{attr}/>'
     st.markdown(
         f'<div class="rs-fl"><div class="t"><b>{fid}</b><span>{stamp}</span></div>'
         f'<svg width="100" height="100" viewBox="0 0 100 100">{cs}</svg><div class="rs-pills">'
         f'<i style="background:#d9f2e4;color:#14633f">정상 {n_ok}</i><i style="background:#ffebc2;color:#7a5200">재측정 {n_chk}</i>'
         f'<i style="background:#ffd9d6;color:#8e2019">의심 {n_ng}</i></div></div>', unsafe_allow_html=True)
+
+
+def dot_panel(row=0):
+    """플랜지 카드 한 줄 바로 아래, 그 줄의 점을 눌렀을 때 FFT 카드가 열릴 자리 (줄마다 하나씩 놓음)"""
+    st.html(f'<div id="rs-dotpanel-{row}"></div><script>{_js("fft_panel.js", "dot_panel.js")}</script>', unsafe_allow_javascript=True)
 
 
 def pill(res):
@@ -447,6 +487,46 @@ def table_card(head, rows, max_h=None):
                  f'<span class="mn">{r[3]}</span><span class="mn">{r[4]}</span><span class="mn rt">{r[5]}</span></div>')
     sty = f' style="max-height:{max_h}px;overflow-y:auto"' if max_h else ""
     st.markdown(f'<div class="rs-tbl2"{sty}><div class="rs-th">{th}</div>{body}</div>', unsafe_allow_html=True)
+
+
+_JS_CACHE = {}
+
+
+def _js(*names, **repl):
+    """dashboard/ 안의 .js 파일들을 이어 붙여 base64 로 감싼 한 줄 스크립트로 만듦.
+    st.html 은 스크립트 안에 "<" 글자가 있으면 스크립트를 실행하지 못해서, 코드를 base64 글자로 감싸 넣고 화면에서 풀어 실행함."""
+    import base64 as _b64
+    from pathlib import Path as _P
+    src = ""
+    for n in names:
+        if n not in _JS_CACHE:
+            _JS_CACHE[n] = (_P(__file__).with_name(n)).read_text(encoding="utf-8")
+        src += _JS_CACHE[n] + "\n"
+    for k, v in repl.items():
+        src = src.replace(k, v)
+    return ('(function(){var b=atob("' + _b64.b64encode(src.encode("utf-8")).decode() + '"),u=new Uint8Array(b.length);'
+            'for(var i=0;i!=b.length;i++)u[i]=b.charCodeAt(i);(0,eval)(new TextDecoder().decode(u))})()')
+
+
+def hist_table(head, rows, ids, details, max_h=None, key="hist"):
+    """전체 검사 기록 표 (table_card 와 같은 모양). 행을 누르면 바로 아래에 그때 측정한 FFT 가 열리고, 다시 누르면 닫힘.
+    ids = 행마다 고유 번호(record_id), details = 행마다 {n,t,r,f,sp,ref,src} 또는 None(타음 측정이 아닌 기록: 눌러도 안 열림)"""
+    import html as _h
+    import json as _j
+    tid = f"rs-{key}"
+    js = _js("fft_panel.js", "hist_table.js", __ID__=tid)
+    th = "".join(f"<span>{h}</span>" for h in head)
+    body = ""
+    for r, rid, d in zip(rows, ids, details):
+        attr = ""
+        if d:
+            attr = (f' data-id="{_h.escape(str(rid), quote=True)}" data-d="{_h.escape(_j.dumps(d, ensure_ascii=False, separators=(",", ":")), quote=True)}"'
+                    ' role="button" tabindex="0" aria-expanded="false"')
+        body += (f'<div class="rs-tr"{attr}><span class="tm">{r[0]}</span><span class="nm">{r[1]}</span><span>{r[2]}</span>'
+                 f'<span class="mn">{r[3]}</span><span class="mn">{r[4]}</span><span class="mn rt">{r[5]}</span></div>')
+    sty = f' style="max-height:{max_h}px;overflow-y:auto"' if max_h else ""
+    st.html(f'<div class="rs-tbl2" id="{tid}"{sty}><div class="rs-th">{th}</div>{body}</div><script>{js}</script>',
+            unsafe_allow_javascript=True)
 
 
 def cta(text_html, label, href):

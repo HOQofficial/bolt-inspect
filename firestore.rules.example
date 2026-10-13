@@ -1,0 +1,19 @@
+// [참고용 예시] Firebase 콘솔 > Firestore Database > 규칙 에서 직접 붙여 넣는 글이에요. (이 파일을 올려도 자동으로 적용되지 않아요)
+// 지금 쓰고 있는 규칙이 있으면 통째로 바꾸지 말고, 아래 'flanges' 부분의 write 줄만 같은 뜻으로 고치세요.
+//
+// 중요: 앱 화면에서 '기준 등록' 탭을 숨기는 것은 편의 기능이에요. 이 규칙을 적용해야 관리자가 아닌 사람이
+//       어떤 방법으로도 정상 기준(flanges)을 바꿀 수 없게 막혀요.
+// 관리자 이메일은 web/app/admin.js 의 ADMIN_EMAILS 와 똑같이 맞춰 주세요.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email in ['sysadmin@hanwha.com'];
+    }
+    match /flanges/{id} {
+      allow read: if true;          // 측정원 앱이 정상 기준을 읽어야 해서 열어 둠
+      allow write: if isAdmin();    // 정상 기준 등록·수정은 관리자만
+    }
+    // inspections(검사 기록) 등 나머지는 지금 쓰던 규칙을 그대로 두세요.
+  }
+}
